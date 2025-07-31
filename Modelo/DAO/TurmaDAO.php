@@ -158,6 +158,15 @@ class TurmaDAO
             error_log("Erro ao verificar tabela curso: " . $e->getMessage());
         }
     }
+    public function existeTurma($nomeTurma, $idCurso)
+    {
+        $sql = "SELECT COUNT(*) FROM turma WHERE nomeTurma = :nomeTurma AND idCurso = :idCurso";
+        $stmt = $this->conexao->prepare($sql);
+        $stmt->bindParam(":nomeTurma", $nomeTurma);
+        $stmt->bindParam(":idCurso", $idCurso);
+        $stmt->execute();
+        return $stmt->fetchColumn() > 0;
+    }
 
     private function mapearParaDTO($linha)
     {

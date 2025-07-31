@@ -271,7 +271,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h4 class="card-title">Lista de Matriculas</h4>
-                            <a href="#" class="btn btn-success btn-rounded" data-bs-toggle="modal" data-bs-target="#modalMatriculaCadastrar">+ Adicionar matricula</a>
+                            <a href="#" class="btn btn-success btn-rounded d-none" data-bs-toggle="modal" data-bs-target="#modalMatriculaCadastrar">+ Adicionar matricula</a>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">

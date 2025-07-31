@@ -369,14 +369,14 @@ $usuarioId = $_SESSION['idUtilizador'];
                     </div>
                     <div class="modal-body">
                         <form action="../Controle/crudAluno.php" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" class="form-control input-rounded" name="dataMatricula" required>
+
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Nome do Aluno <b style="font-size: 14px;color: red;">*</b></strong></label>
+                                <input type="text" class="form-control input-rounded" name="nomeAluno" required>
+                            </div>
 
                             <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="mb-1"><strong>Nome do Aluno <b style="font-size: 14px;color: red;">*</b></strong></label>
-                                        <input type="text" class="form-control input-rounded" name="nomeAluno" required>
-                                    </div>
-                                </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="mb-1">
@@ -390,16 +390,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                                             required>
                                     </div>
                                 </div>
-                            </div>
 
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="mb-1"><strong>Foto do Aluno <b style="font-size: 14px;color: red;">*</b></strong></label>
-                                        <input type="file" class="form-control input-rounded" name="fotoAluno" accept="image/*" required>
-                                    </div>
-                                </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="mb-1"><strong>Gênero <b style="font-size: 14px;color: red;">*</b></strong></label>
@@ -411,6 +402,8 @@ $usuarioId = $_SESSION['idUtilizador'];
                                     </div>
                                 </div>
                             </div>
+
+
 
                             <div class="row">
                                 <div class="col-md-6">
@@ -458,7 +451,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                                 $dao = new TurmaDAO();
                                 $turmas = $dao->listarTodos();
                                 ?>
-                                <div class="col-md-6">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label class="mb-1"><strong>Turma <b style="font-size: 14px;color: red;">*</b></strong></label>
                                         <select class="form-control input-rounded" name="tipoTurma" required>
@@ -473,8 +466,40 @@ $usuarioId = $_SESSION['idUtilizador'];
                                     </div>
 
                                 </div>
+
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>Classe<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <select class="form-control input-rounded" name="classeMatricula" required>
+                                            <option value="">Selecione a classe</option>
+                                            <option value="10">10ª</option>
+                                            <option value="11">11ª</option>
+                                            <option value="12">12ª</option>
+                                            <option value="13">13ª</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
 
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>Período<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <select class="form-control input-rounded" name="periodoMatricula" required>
+                                            <option value="">Selecione o período</option>
+                                            <option value="Manhã">Manhã</option>
+                                            <option value="Tarde">Tarde</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>Foto do Aluno <b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <input type="file" class="form-control input-rounded" name="fotoAluno" accept="image/*" required>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -792,6 +817,13 @@ $usuarioId = $_SESSION['idUtilizador'];
                 }, 100);
             });
         }
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const hoje = new Date().toISOString().split('T')[0];
+            document.querySelector('input[name="dataMatricula"]').value = hoje;
+        });
     </script>
 </body>
 

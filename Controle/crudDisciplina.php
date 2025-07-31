@@ -9,99 +9,93 @@ require_once("../Modelo/DTO/NotificacoesDTO.php");
 $notificacaoDTO = new NotificacoesDTO();
 $notificacaoDAO = new NotificacoesDAO();
 
-$DisciplinaDAO = new DisciplinaDAO();
-$DisciplinaDTO = new DisciplinaDTO();
+$disciplinaDAO = new DisciplinaDAO();
+$disciplinaDTO = new DisciplinaDTO();
+
+// Função auxiliar para criar notificação
+function criarNotificacao($tipo, $mensagem, $notificacaoDTO, $notificacaoDAO)
+{
+    $notificacaoDTO->setTipoNotificacoes($tipo);
+    $notificacaoDTO->setMensagemNotificacoes($mensagem);
+    $notificacaoDTO->setlidaNotificacoes(0);
+    $notificacaoDTO->setIdUtilizador($_SESSION['idUtilizador']);
+    $notificacaoDAO->criarNotificacao($notificacaoDTO);
+}
+
+// Função auxiliar para redirecionamento
+function redirecionar($mensagem, $tipo, $local)
+{
+    $_SESSION[$tipo === 'success' ? 'success' : 'error'] = $mensagem;
+    $_SESSION['icon'] = $tipo;
+    header("Location: $local");
+    exit();
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    // CADASTRAR DISCIPLINA
+    // === CADASTRAR DISCIPLINA ===
     if (isset($_POST["cadastrarDisciplina"])) {
-        $nomeDisciplina = trim($_POST['nomeDisciplina']);
-        $classeDisciplina = trim($_POST['classeDisciplina']);
-        $cursoDisciplina = trim($_POST['cursoDisciplina']);
-        $professorDisciplina = trim($_POST['professorDisciplina']);
+        $nome = trim(filter_input(INPUT_POST, 'nomeDisciplina', FILTER_SANITIZE_STRING));
+        $classe = trim(filter_input(INPUT_POST, 'classeDisciplina', FILTER_SANITIZE_STRING));
+        $curso = trim(filter_input(INPUT_POST, 'cursoDisciplina', FILTER_SANITIZE_NUMBER_INT));
+        $professor = trim(filter_input(INPUT_POST, 'professorDisciplina', FILTER_SANITIZE_NUMBER_INT));
 
-        $DisciplinaDTO->setNomeDisciplina($nomeDisciplina);
-        $DisciplinaDTO->setClasseDisciplina($classeDisciplina);
-        $DisciplinaDTO->setIdCurso($cursoDisciplina);
-        $DisciplinaDTO->setidProfessor($professorDisciplina);
+        if ($nome && $classe && $curso && $professor) {
+            $disciplinaDTO->setNomeDisciplina($nome);
+            $disciplinaDTO->setClasseDisciplina($classe);
+            $disciplinaDTO->setIdCurso($curso);
+            $disciplinaDTO->setIdProfessor($professor);
 
-        if ($DisciplinaDAO->cadastrar($DisciplinaDTO)) {
-            $notificacaoDTO->setTipoNotificacoes("Cadastro de disciplina");
-            $notificacaoDTO->setMensagemNotificacoes("Foi cadastrado uma nova disciplina: " . $nomeDisciplina);
-            $notificacaoDTO->setlidaNotificacoes(0);
-            $notificacaoDTO->setIdUtilizador($_SESSION['idUtilizador']);
-            $notificacaoDAO->criarNotificacao($notificacaoDTO);
-
-            $_SESSION['success'] = 'Disciplina cadastrada com sucesso!';
-            $_SESSION['icon'] = 'success';
-            header('Location: ../Visao/disciplinaBase.php');
-            exit();
+            if ($disciplinaDAO->cadastrar($disciplinaDTO)) {
+                criarNotificacao("Cadastro de disciplina", "Foi cadastrada uma nova disciplina: $nome", $notificacaoDTO, $notificacaoDAO);
+                redirecionar("Disciplina cadastrada com sucesso!", "success", "../Visao/disciplinaBase.php");
+            } else {
+                redirecionar("Erro ao cadastrar disciplina.", "error", "../Visao/criarDisciplina.php");
+            }
         } else {
-            $_SESSION['error'] = 'Erro ao cadastrar disciplina.';
-            $_SESSION['icon'] = 'error';
-            header('Location: ../Visao/criarDisciplina.php');
-            exit();
+            redirecionar("Todos os campos são obrigatórios.", "warning", "../Visao/criarDisciplina.php");
         }
     }
 
-    //ACTUALIZAR DISCIPLINA
-} elseif (isset($_POST['actualizarDisciplina'])) {
-    $id = $_POST['idDisciplina'];
-    $nomeDisciplina = trim($_POST['nomeDisciplina']);
-    $classeDisciplina = trim($_POST['classeDisciplina']);
-    $cursoDisciplina = trim($_POST['cursoDisciplina']);
-    $professorDisciplina = trim($_POST['professorDisciplina']);
+    // === ACTUALIZAR DISCIPLINA ===
+    elseif (isset($_POST['actualizarDisciplina'])) {
+        $id = filter_input(INPUT_POST, 'idDisciplina', FILTER_VALIDATE_INT);
+        $nome = trim(filter_input(INPUT_POST, 'nomeDisciplina', FILTER_SANITIZE_STRING));
+        $classe = trim(filter_input(INPUT_POST, 'classeDisciplina', FILTER_SANITIZE_STRING));
+        $curso = trim(filter_input(INPUT_POST, 'cursoDisciplina', FILTER_SANITIZE_NUMBER_INT));
+        $professor = trim(filter_input(INPUT_POST, 'professorDisciplina', FILTER_SANITIZE_NUMBER_INT));
 
-    $DisciplinaDTO->setIdDisciplina($id);
-    $DisciplinaDTO->setNomeDisciplina($nomeDisciplina);
-    $DisciplinaDTO->setClasseDisciplina($classeDisciplina);
-    $DisciplinaDTO->setIdCurso($cursoDisciplina);
-    $DisciplinaDTO->setIdProfessor($professorDisciplina);
+        if ($id && $nome && $classe && $curso && $professor) {
+            $disciplinaDTO->setIdDisciplina($id);
+            $disciplinaDTO->setNomeDisciplina($nome);
+            $disciplinaDTO->setClasseDisciplina($classe);
+            $disciplinaDTO->setIdCurso($curso);
+            $disciplinaDTO->setIdProfessor($professor);
 
-    if ($DisciplinaDAO->actualizar($DisciplinaDTO)) {
-        $notificacaoDTO->setTipoNotificacoes("Actualizacao de disciplina");
-        $notificacaoDTO->setMensagemNotificacoes("Disciplina actualizada: " . $nomeDisciplina);
-        $notificacaoDTO->setlidaNotificacoes(0);
-        $notificacaoDTO->setIdUtilizador($_SESSION['idUtilizador']);
-        $notificacaoDAO->criarNotificacao($notificacaoDTO);
-        $_SESSION['success'] = 'Disciplina atualizada com sucesso!';
-        $_SESSION['icon'] = 'success';
-        header('Location: ../Visao/disciplinaBase.php');
-        exit();
-    } else {
-        $_SESSION['sucess'] = 'Erro ao atualizar a disciplina.';
-        $_SESSION['icon'] = 'error';
-        header('Location: ../Visao/disciplinaBase.php');
-        exit();
-    }
-}
-
-// APAGAR DISCIPLINA
-elseif (isset($_POST['apagarDisciplina'])) {
-
-    $id = $_POST['idDisciplina'];
-    if ($id != null) {
-        if ($DisciplinaDAO->apagar($id)) {
-            $notificacaoDTO->setTipoNotificacoes("Delete de disciplina");
-            $notificacaoDTO->setMensagemNotificacoes("Os dados de uma disciplina foram Eliminados!");
-            $notificacaoDTO->setlidaNotificacoes(0);
-            $notificacaoDTO->setIdUtilizador($_SESSION['idUtilizador']);
-            $notificacaoDAO->criarNotificacao($notificacaoDTO);
-            $_SESSION['success'] = 'Disciplina eliminada com sucesso!';
-            $_SESSION['icon'] = 'success';
-            header('Location: ../Visao/disciplinaBase.php');
-            exit();
+            if ($disciplinaDAO->actualizar($disciplinaDTO)) {
+                criarNotificacao("Actualização de disciplina", "Disciplina actualizada: $nome", $notificacaoDTO, $notificacaoDAO);
+                redirecionar("Disciplina atualizada com sucesso!", "success", "../Visao/disciplinaBase.php");
+            } else {
+                redirecionar("Erro ao atualizar a disciplina.", "error", "../Visao/disciplinaBase.php");
+            }
         } else {
-            $_SESSION['error'] = 'Erro ao eliminar a disciplina.';
-            $_SESSION['icon'] = 'error';
-            header('Location: ../Visao/disciplinaBase.php');
-            exit();
+            redirecionar("Todos os campos são obrigatórios.", "warning", "../Visao/disciplinaBase.php");
         }
-    } else {
-        $_SESSION['error'] = 'Por favor, selecione uma disciplina para eliminar.';
-        $_SESSION['icon'] = 'warning';
-        header('Location: ../Visao/disciplinaBase.php');
-        exit();
+    }
+
+    // === APAGAR DISCIPLINA ===
+    elseif (isset($_POST['apagarDisciplina'])) {
+        $id = filter_input(INPUT_POST, 'idDisciplina', FILTER_VALIDATE_INT);
+
+        if ($id) {
+            if ($disciplinaDAO->apagar($id)) {
+                criarNotificacao("Eliminação de disciplina", "Dados de uma disciplina foram eliminados.", $notificacaoDTO, $notificacaoDAO);
+                redirecionar("Disciplina eliminada com sucesso!", "success", "../Visao/disciplinaBase.php");
+            } else {
+                redirecionar("Erro ao eliminar a disciplina.", "error", "../Visao/disciplinaBase.php");
+            }
+        } else {
+            redirecionar("Selecione uma disciplina válida para eliminar.", "warning", "../Visao/disciplinaBase.php");
+        }
     }
 }

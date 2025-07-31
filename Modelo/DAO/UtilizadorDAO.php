@@ -19,13 +19,12 @@ class UtilizadorDAO
     public function cadastrar(UtilizadorDTO $utilizador)
     {
         try {
-            // 🔧 Atualizado com todos os campos do DTO
             $stmt = $this->conexao->prepare("
-                INSERT INTO utilizador (
-                    nomeUtilizador,  nIdentificacao, emailUtilizador,generoUtilizador, telefoneUtilizador, 
-                    moradaUtilizador, perfilUtilizador, senhaUtilizador, idAcesso
-                ) VALUES ( ?, ?, ?, ?, ?, ?,?,?,?)
-            ");
+            INSERT INTO utilizador (
+                nomeUtilizador, nIdentificacao, emailUtilizador, generoUtilizador, telefoneUtilizador, 
+                moradaUtilizador, perfilUtilizador, senhaUtilizador, idAcesso
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
             $stmt->execute([
                 $utilizador->getNomeUtilizador(),
                 $utilizador->getNumIdentificacao(),
@@ -36,17 +35,17 @@ class UtilizadorDAO
                 $utilizador->getPerfilUtilizador(),
                 $utilizador->getSenhaUtilizador(),
                 $utilizador->getIdAcesso()
-
             ]);
-            // Recuperar o último ID inserido
+
             $lastId = $this->conexao->lastInsertId();
             $utilizador->setIdUtilizador($lastId);
 
-            return $lastId; // opcionalmente retorna
+            return $lastId;
         } catch (PDOException $e) {
-            die("Erro ao cadastrar utilizador: " . $e->getMessage());
+            throw $e; // <-- lança para ser tratado externamente
         }
     }
+
 
     public function actualizar(UtilizadorDTO $utilizador)
     {

@@ -38,7 +38,11 @@ class AlunoDAO
 
 
             ]);
-            return true;
+            // Recuperar o último ID inserido
+            $lastId = $this->conexao->lastInsertId();
+            $aluno->setIdAluno($lastId);
+
+            return $lastId; // opcionalmente retorna
         } catch (PDOException $e) {
             die("Erro ao cadastrar aluno: " . $e->getMessage());
             return false;
