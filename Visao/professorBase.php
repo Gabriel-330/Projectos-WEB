@@ -1,0 +1,695 @@
+<?php
+session_start();
+require_once("../Modelo/DAO/NotificacoesDAO.php");
+require_once("../Modelo/DTO/NotificacoesDTO.php");
+// Verifica se o utilizador está autenticado
+if (!isset($_SESSION['idUtilizador']) || !isset($_SESSION['acesso'])) {
+    header("Location: index.php"); // Redireciona para login se não estiver autenticado
+    exit();
+}
+
+$acesso = strtoupper($_SESSION['acesso']);
+
+// Verifica se o acesso é email de admin válido (ex: termina com @admin.estrela.com)
+if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {    // Se não for admin, redireciona para página de acesso negado ou login
+    $_SESSION['success'] = "Acesso negado! Apenas administradores podem aceder.";
+    $_SESSION['icon'] = "error";
+    header("Location: index.php");
+    exit();
+}
+
+// Se chegou aqui, é admin autenticado e pode continuar
+$usuarioId = $_SESSION['idUtilizador'];
+?>
+
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+
+    <!-- Icones do site-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Estilo da página-->
+    <link rel="stylesheet" href="css/style-home.css">
+
+    <!--Icone da página-->
+    <link rel="icon" href="imagens/graduate-cap-icone-head.png" type="image/png">
+    <script src="js/alertsMessage.js"></script>
+    <script src="js/sweetalert.js"></script>
+
+    <link href="assets/vendor/chartist/css/chartist.min.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/css/intlTelInput.css" />
+    <link href="assets/vendor/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" />
+    <link href="assets/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet" type="text/css" />
+    <link href="assets/css/style.css" rel="stylesheet" type="text/css" />
+
+    <style>
+        .iti {
+            width: 100%;
+        }
+    </style>
+
+</head>
+
+<body onload="initProgressBars()">
+    <?php
+    // Verifica se a variável de sessão com a mensagem está definida
+    if (isset($_SESSION['success']) && $_SESSION['success'] != '') {
+
+    ?>
+        <script>
+            swal({
+                title: '<?php echo $_SESSION['success']; ?>',
+                icon: '<?php echo $_SESSION['icon']; ?>',
+                button: "Ok",
+            });
+        </script>
+    <?php
+
+        unset($_SESSION['success']);
+    }
+    ?>
+    <div class="header">
+        <div class="header-content">
+            <nav class="navbar navbar-expand">
+                <div class="collapse navbar-collapse justify-content-between">
+                    <div class="header-left">
+                    </div>
+                    <?php
+                    function traduzMes($mesNumero)
+                    {
+                        $meses = [
+                            '01' => 'Janeiro',
+                            '02' => 'Fevereiro',
+                            '03' => 'Março',
+                            '04' => 'Abril',
+                            '05' => 'Maio',
+                            '06' => 'Junho',
+                            '07' => 'Julho',
+                            '08' => 'Agosto',
+                            '09' => 'Setembro',
+                            '10' => 'Outubro',
+                            '11' => 'Novembro',
+                            '12' => 'Dezembro',
+                        ];
+
+                        return $meses[$mesNumero] ?? $mesNumero;
+                    }
+                    $dao = new NotificacoesDAO();
+                    $n_Notificacoes = $dao->contarNotificacaoes();
+                    $mensagens = $dao->mostrarTodasNotificacoes();
+
+                    ?>
+                    <ul class="navbar-nav header-right">
+                        <li class="nav-item dropdown notification_dropdown">
+                            <a class="nav-link ai-icon" href="javascript:void(0)" role="button" data-bs-toggle="dropdown">
+                                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M22.75 15.8385V13.0463C22.7471 10.8855 21.9385 8.80353 20.4821 7.20735C19.0258 5.61116 17.0264 4.61555 14.875 4.41516V2.625C14.875 2.39294 14.7828 2.17038 14.6187 2.00628C14.4546 1.84219 14.2321 1.75 14 1.75C13.7679 1.75 13.5454 1.84219 13.3813 2.00628C13.2172 2.17038 13.125 2.39294 13.125 2.625V4.41534C10.9736 4.61572 8.97429 5.61131 7.51794 7.20746C6.06159 8.80361 5.25291 10.8855 5.25 13.0463V15.8383C4.26257 16.0412 3.37529 16.5784 2.73774 17.3593C2.10019 18.1401 1.75134 19.1169 1.75 20.125C1.75076 20.821 2.02757 21.4882 2.51969 21.9803C3.01181 22.4724 3.67904 22.7492 4.375 22.75H9.71346C9.91521 23.738 10.452 24.6259 11.2331 25.2636C12.0142 25.9013 12.9916 26.2497 14 26.2497C15.0084 26.2497 15.9858 25.9013 16.7669 25.2636C17.548 24.6259 18.0848 23.738 18.2865 22.75H23.625C24.321 22.7492 24.9882 22.4724 25.4803 21.9803C25.9724 21.4882 26.2492 20.821 26.25 20.125C26.2486 19.117 25.8998 18.1402 25.2622 17.3594C24.6247 16.5786 23.7374 16.0414 22.75 15.8385Z" fill="#007bff" />
+                                </svg>
+                                <span class="badge light text-white bg-primary"> <?= $n_Notificacoes ?></span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end p-0">
+                                <div id="DZ_W_Notification1" class="widget-media dz-scroll p-3" style="max-height: 380px; overflow-y: auto;">
+                                    <ul class="timeline m-0 p-0">
+                                        <?php foreach ($mensagens as $mensagem): ?>
+                                            <?php
+                                            $texto = strtolower($mensagem->getMensagemNotificacoes());
+                                            $icone = 'fa-info-circle'; // padrão
+                                            $cor = 'media-secondary'; // cor padrão
+
+                                            switch (true) {
+                                                case str_contains($texto, 'curso'):
+                                                    $icone = 'fa-book';
+                                                    $cor = 'media-primary';
+                                                    break;
+                                                case str_contains($texto, 'evento'):
+                                                    $icone = 'fa-calendar';
+                                                    $cor = 'media-info';
+                                                    break;
+                                                case str_contains($texto, 'nota'):
+                                                    $icone = 'fa-clipboard-check';
+                                                    $cor = 'media-warning';
+                                                    break;
+                                                case str_contains($texto, 'aluno'):
+                                                    $icone = 'fa-user-graduate';
+                                                    $cor = 'media-success';
+                                                    break;
+                                                case str_contains($texto, 'horario'):
+                                                    $icone = 'fa-clock';
+                                                    $cor = 'media-danger';
+                                                    break;
+                                                case str_contains($texto, 'disciplina'):
+                                                    $icone = 'fa-book-open';
+                                                    $cor = 'media-primary';
+                                                    break;
+                                                case str_contains($texto, 'matricula'):
+                                                    $icone = 'fa-id-badge';
+                                                    $cor = 'media-warning';
+                                                    break;
+                                                case str_contains($texto, 'professor'):
+                                                    $icone = 'fa-chalkboard-teacher';
+                                                    $cor = 'media-dark';
+                                                    break;
+                                            }
+                                            ?>
+
+                                            <li>
+                                                <div class="timeline-panel d-flex align-items-start">
+                                                    <div class="media me-2 <?= $cor ?>">
+                                                        <i class="fa <?= $icone ?>"></i>
+                                                    </div>
+                                                    <div class="media-body">
+                                                        <h6 class="mb-1"><?= $mensagem->getMensagemNotificacoes() ?></h6>
+                                                        <small class="d-block">
+                                                            <?php
+                                                            $data = new DateTime($mensagem->getdataNotificacoes());
+                                                            echo $data->format('d') . ' ' . traduzMes($data->format('m')) . ' ' . $data->format('Y');
+                                                            ?>
+                                                        </small>
+
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+
+                                </div>
+                                <a class="all-notification d-block text-center p-2 border-top" href="notificacoes.php">
+                                    Ver todas as notificações <i class="ti-arrow-right"></i>
+                                </a>
+                            </div>
+                        </li>
+
+
+
+                        <li class="nav-item dropdown header-profile">
+                            <a class="nav-link" href="javascript:void(0)" role="button" data-bs-toggle="dropdown">
+                                <img src="imagens/perfil.png" width="20" alt="">
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <a href="editarPerfil.html" class="dropdown-item ai-icon">
+                                    <svg id="icon-user1" xmlns="http://www.w3.org/2000/svg" class="text-primary" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                    <span class="ms-2">Perfil </span>
+                                </a>
+                                <a href="../Controle/terminarSessao.php" class="dropdown-item ai-icon">
+                                    <svg id="icon-logout" xmlns="http://www.w3.org/2000/svg" class="text-danger" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                        <polyline points="16 17 21 12 16 7"></polyline>
+                                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                                    </svg>
+                                    <span class="ms-2">Logout </span>
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+        <nav class="menu-user">
+            <div class="menu-content">
+                <i class="fa-solid fa-user-graduate user-photo"></i>
+                <ul>
+                    <li><a href="indexAdmin.php" title="Home"><i class="fa-solid fa-chalkboard"></i></a></li>
+                    <li><a href="alunoBase.php" title="Cadastrar Aluno"><i class="fa-regular fa fa-user"></i></a></li>
+                    <li><a href="#" title="Cadastrar Professor"><i class="fa-solid fa-chalkboard-user"></i></a></li>
+                    <li><a href="eventoBase.php" title="Calendário Académico"><i class="fa-regular fa-calendar"></i></a></li>
+                    <li><a href="cursoBase.php" title="Cadastro de Cursos"><i class="fa-solid fa-book"></i></a></li>
+                    <li><a href="horarioBase.php" title="Cadastro de Horários"><i class="fa-solid fa-clock"></i></a></li>
+                    <li><a href="turmaBase.php" title="Cadastro de Turmas"><i class="fa-solid fa-users"></i></a></li>
+                    <li><a href="disciplinaBase.php" title="Cadastro de Disciplinas"><i class="fa-solid fa-book-open"></i></a></li>
+                    <li><a href="matriculaBase.php" title="Matrícula"><i class="fa-solid fa-file-signature"></i></a></li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+    <div class="content-body" style="margin-top: -30px;">
+        <!-- row -->
+        <div class="container-fluid">
+            <div class="page-titles">
+                <h4>Gestão de professor</h4>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Alunos</a></li>
+                    <li class="breadcrumb-item active"><a href="javascript:void(0)">Gestão de professor</a></li>
+                </ol>
+            </div>
+            <!-- row -->
+
+            <?php
+            require_once("../Modelo/DAO/ProfessorDAO.php");
+
+            $dao = new ProfessorDAO();
+            $palavra = $_GET['palavra'] ?? '';
+
+            // Verificar se algum filtro foi aplicado
+            if ($palavra) {
+                // Se filtros estiverem preenchidos, realizar pesquisa
+                $professores = $dao->pesquisar($palavra);
+            } else {
+                // Caso contrário, exibir todos os professores
+                $professores = $dao->listarTodos();
+            }
+            ?>
+
+            <!-- Formulário de pesquisa -->
+            <form action="professorBase.php" method="GET">
+                <div class="col-md-5">
+                    <div class="form-group d-flex">
+                        <input type="text" class="form-control input-rounded flex-grow-1 me-2" style="width: 200px;" placeholder="Pesquisar professores..." name="palavra" value="<?= htmlspecialchars($palavra) ?>">
+
+                        <button type="submit" class="btn btn-primary btn-rounded" style="flex-shrink: 0;">
+                            <i class="fa fa-search mr-2"></i> Buscar
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4 class="card-title">Lista de professores</h4>
+                            <a href="#" class="btn btn-success btn-rounded" data-bs-toggle="modal" data-bs-target="#modalProfessorCadastrar">+ Adicionar professor</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-responsive-md">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:50px;"><strong>#</strong></th>
+                                            <th><strong>NOME DO PROFESSOR</strong></th>
+                                            <th><strong>EMAIL DO PROFESSOR</strong></th>
+                                            <th><strong>GÊNERO</strong></th>
+                                            <th><strong>MORADA</strong></th>
+                                            <th><strong>DATA NASCIMENTO</strong></th>
+                                            <th><strong>DATA CONTRATACÃO</strong></th>
+                                            <th><strong>CONTRACTO</strong></th>
+                                            <th><strong>Nº DO BI</strong></th>
+
+                                            <th>AÇÕES</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php $cont = 1;
+                                        foreach ($professores as $professor): ?>
+                                            <tr>
+                                                <td><strong><?= $cont++; ?></strong></td>
+                                                <td><?= htmlspecialchars($professor->getNomeProfessor()); ?></td>
+                                                <td><?= htmlspecialchars($professor->getEmailProfessor()); ?></td>
+                                                <td><?= htmlspecialchars($professor->getGeneroProfessor()); ?></td>
+                                                <td><?= htmlspecialchars($professor->getMoradaProfessor()); ?></td>
+                                                <td><?= htmlspecialchars($professor->getDataDeNascimentoProfessor()); ?></td>
+                                                <td><?= htmlspecialchars($professor->getDataContProfessor()); ?></td>
+                                                <td><?= htmlspecialchars($professor->getTipoContratoProfessor()); ?></td>
+                                                <td><?= htmlspecialchars($professor->getnIdentificacao()); ?></td>
+
+
+                                                <td>
+                                                    <div class="dropdown">
+                                                        <button type="button" class="btn btn-primary light sharp" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1">
+                                                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                                    <rect x="0" y="0" width="24" height="24"></rect>
+                                                                    <circle fill="#000000" cx="5" cy="12" r="2"></circle>
+                                                                    <circle fill="#000000" cx="12" cy="12" r="2"></circle>
+                                                                    <circle fill="#000000" cx="19" cy="12" r="2"></circle>
+                                                                </g>
+                                                            </svg>
+                                                        </button>
+                                                        <div class="dropdown-menu">
+                                                            <a class="dropdown-item btn-apagar-professor" data-bs-toggle="modal" data-bs-target="#modalProfessorApagar" data-id="<?= $professor->getIdProfessor() ?>">Apagar</a>
+                                                            <a class="dropdown-item btn-editar-professor" data-bs-toggle="modal" data-bs-target="#modalProfessorEditar" data-id="<?= $professor->getIdProfessor() ?>">Editar</a>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalProfessorCadastrar">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Cadastrar Professor</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="../Controle/crudProfessor.php" method="POST">
+
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="mb-1"><strong>Nome do Professor<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                    <input type="text" class="form-control input-rounded" name="nomeProfessor" required>
+                                </div>
+
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>Nº de Identificação (BI)<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <input type="text" class="form-control input-rounded" pattern="([0-9]{9}[A-Z]{2}[0-9]{3})"
+                                            title="Nº do Bilhente Inválido! O BI tem esse formato (ex: 123456789LA400)" name="nIdentificacaoProfessor" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>E-mail<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <input type="text" class="form-control input-rounded" name="emailProfessor" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="mb-1"><strong>Contacto <b style="font-size: 14px;color: red;">*</b></strong></label>
+                                    <div class="form-group">
+                                        <input type="tel"
+                                            class="form-control input-rounded telefone"
+                                            name="contactoProfessor"
+                                            id="contactoProfessor"
+                                            inputmode="numeric"
+                                            pattern="\+244\d{9}"
+                                            title="O número deve começar com +244 e ter 9 dígitos (ex: +244923456789)"
+                                            required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>Gênero<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <select class="form-control input-rounded" name="generoProfessor" required>
+                                            <option value="">Selecione o gênero</option>
+                                            <option value="Masculino">Masculino</option>
+                                            <option value="Femenino">Femenino</option>
+
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>Data de Nascimento<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <input type="date" class="form-control input-rounded" name="dataNascProfessor" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>Data de Contratação<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <input type="date" class="form-control input-rounded" name="dataContProfessor" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>Tipo de Contrato<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <select class="form-control input-rounded" name="tipoContProfessor" required>
+                                            <option value="">Selecione o tipo de contrato</option>
+                                            <option value="Efectivo">Efectivo</option>
+                                            <option value="Temporário">Temporário</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>Morada<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <input type="text" class="form-control input-rounded" name="moradaProfessor" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-primary btn-rounded" name="cadastrarProfessor">Cadastrar</button>
+                                <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id="modalProfessorEditar">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Professor</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="../Controle/crudProfessor.php" method="POST">
+                            <input type="hidden" name="idProfessor" id="idProfessorEditar" required>
+
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Nome do Professor<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                <input type="text" class="form-control input-rounded" id="nomeProfessorEditar" name="nomeProfessor" required>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>Nº de Identificação (BI)<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <input type="text" class="form-control input-rounded" pattern="([0-9]{9}[A-Z]{2}[0-9]{3})"
+                                            title="Nº do Bilhente Inválido! O BI tem esse formato (ex: 123456789LA400)" id="nIdentificacaoEditar" name="nIdentificacao" required>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>E-mail<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <input type="email" class="form-control input-rounded" id="emailProfessorEditar" name="emailProfessor" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="mb-1"><strong>Contacto <b style="font-size: 14px;color: red;">*</b></strong></label>
+                                    <div class="form-group">
+                                        <input type="tel"
+                                            class="form-control input-rounded"
+                                            name="contactoProfessor"
+                                            id="contactoProfessorEditar"
+                                            inputmode="numeric"
+                                            pattern="\+244\d{9}"
+                                            title="O número deve começar com +244 e ter 9 dígitos (ex: +244923456789)"
+                                            required>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>Gênero<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <select class="form-control input-rounded" id="generoProfessorEditar" name="generoProfessor" required>
+                                            <option value="">Selecione o gênero</option>
+                                            <option value="Masculino">Masculino</option>
+                                            <option value="Femenino">Femenino</option>
+
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>Data de Nascimento<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <input type="date" class="form-control input-rounded" id="dataNascProfessorEditar" name="dataNascProfessor" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>Data de Contratação<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <input type="date" class="form-control input-rounded" id="dataContProfessorEditar" name="dataContProfessor" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>Tipo de Contrato<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <select class="form-control input-rounded" id="tipoContProfessorEditar" name="tipoContProfessor" required>
+                                            <option value="">Selecione o tipo de contrato</option>
+                                            <option value="Efectivo">Efectivo</option>
+                                            <option value="Temporário">Temporário</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>Morada<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <input type="text" class="form-control input-rounded" id="moradaProfessorEditar" name="moradaProfessor" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-primary btn-rounded" name="actualizarProfessor">Salvar Alterações</button>
+                                <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id="modalProfessorApagar">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirmar Exclusão</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Tem certeza que deseja excluir os dados deste Professor? Esta ação não pode ser desfeita.</p>
+                        <form id="formProfessorExcluir" method="POST" action="../Controle/crudProfessor.php">
+                            <input type="hidden" name="idProfessor" id="idProfessorApagar" required>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" form="formProfessorExcluir" class="btn btn-danger" name="apagarProfessor">Confirmar Exclusão</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script src="assets/js/jquery-3.6.0.min.js">
+
+    </script>
+
+    <script>
+        $(document).on('click', '.btn-editar-professor', function() {
+            const id = $(this).data('id');
+
+            $.get('../Controle/retornarProfessor.php', {
+                id: id
+            }, function(data) {
+                try {
+                    const Professor = data;
+                    $('#idProfessorEditar').val(Professor.idProfessor);
+                    $('#nomeProfessorEditar').val(Professor.nomeProfessor);
+                    $('#generoProfessorEditar').val(Professor.generoProduto);
+                    $('#emailProfessorEditar').val(Professor.emailProfessor);
+                    $('#dataNascProfessorEditar').val(Professor.dataNascProfessor);
+                    $('#dataContProfessorEditar').val(Professor.dataContProfessor);
+                    $('#tipoContProfessorEditar').val(Professor.tipoContProfessor);
+                    $('#moradaProfessorEditar').val(Professor.moradaProfessor);
+                    $('#nIdentificacaoEditar').val(Professor.nIdentificacao);
+
+
+                } catch (e) {
+                    console.log('Erro ao interpretar o JSON retornado:', data);
+                }
+            }).fail(function(xhr) {
+                console.log('Erro na requisição AJAX:', xhr.responseText);
+            });
+        });
+    </script>
+
+    <script>
+        $(document).on('click', '.btn-apagar-professor', function() {
+            const id = $(this).data('id');
+
+            $.get('../Controle/retornarProfessor.php', {
+                id: id
+            }, function(data) {
+                try {
+                    const Professor = data;
+                    $('#idProfessorApagar').val(Professor.idProfessor);
+
+                } catch (e) {
+                    console.log('Erro ao interpretar o JSON retornado:', data);
+                }
+            }).fail(function(xhr) {
+                console.log('Erro na requisição AJAX:', xhr.responseText);
+            });
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/js/intlTelInput.min.js"></script>
+    <script>
+        const input = document.querySelector("#contactoProfessor");
+
+        const iti = window.intlTelInput(input, {
+            // Mostra apenas Angola
+            onlyCountries: ["ao"],
+
+            // Usa o código internacional (+244)
+            nationalMode: false,
+
+            // Remove a possibilidade de abrir o seletor de país
+            allowDropdown: false,
+
+            // Carrega utilitários da biblioteca
+            utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/js/utils.js"
+        });
+
+        // Define o valor com +244 quando focar, se estiver vazio
+        input.addEventListener("focus", function() {
+            if (input.value.trim() === "") {
+                const dialCode = iti.getSelectedCountryData().dialCode;
+                input.value = `+${dialCode} `;
+            }
+        });
+
+        // Garante que o campo só aceite dígitos e o símbolo +
+        input.addEventListener("input", function() {
+            this.value = this.value.replace(/[^\d+]/g, '');
+        });
+    </script>
+
+    <div class="footer">
+        <div class="copyright">
+            <p>Copyright © Sistema de Gestão Web de Gestão de Alunos by <a href="#" target="_blank">SGWA</a> 2025</p>
+        </div>
+    </div>
+
+
+
+    <script src="assets/vendor/global/global.min.js" type="text/javascript"></script>
+    <script src="assets/vendor/bootstrap-select/dist/js/bootstrap-select.min.js" type="text/javascript"></script>
+    <script src="assets/vendor/chart-js/chart.bundle.min.js" type="text/javascript"></script>
+    <script src="assets/vendor/peity/jquery.peity.min.js" type="text/javascript"></script>
+    <script src="assets/vendor/apexchart/apexchart.js" type="text/javascript"></script>
+    <script src="assets/js/dashboard/dashboard-1.js" type="text/javascript"></script>
+    <script src="assets/vendor/bootstrap-datetimepicker/js/moment.js" type="text/javascript"></script>
+    <script src="assets/vendor/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
+    <script src="assets/js/custom.min.js" type="text/javascript"></script>
+    <script src="assets/js/deznav-init.js" type="text/javascript"></script>
+
+    <script>
+        function initProgressBars() {
+            document.querySelectorAll('.progress-fill').forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 100);
+            });
+        }
+    </script>
+</body>
+
+</html>
