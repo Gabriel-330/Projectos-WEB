@@ -23,7 +23,7 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
 }
 
 $alunoDAO = new AlunoDAO();
-$idAluno = $alunoDAO->retornarIdPorUtilizador($id); 
+$idAluno = $alunoDAO->retornarDadosPorUtilizador($id); 
 
 // Se chegou aqui, é um aluno autenticado e pode continuar
 ?>
@@ -240,7 +240,7 @@ $idAluno = $alunoDAO->retornarIdPorUtilizador($id);
                 $notas = $dao->pesquisar($palavra);
             } else {
                 // Caso contrário, exibir todos os notas
-                $notas = $dao->listarPorAluno($idAluno);
+                $notas = $dao->listarPorAluno($idAluno->getIdAluno());
             }
             ?>
 

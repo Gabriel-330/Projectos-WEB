@@ -73,49 +73,15 @@ class NotaDAO
         }
     }
 
-    public function boletim($idAluno)
-    {
-        try {
-            $sql = "SELECT 
-                nota.*,
-                aluno.nomeAluno,
-                aluno.dataNascimentoAluno,
-                aluno.responsavelAluno,
-                disciplina.nomeDisciplina,
-                curso.nomeCurso
-
-            FROM nota
-            INNER JOIN aluno ON nota.idAluno = aluno.idAluno
-            INNER JOIN disciplina ON nota.idDisciplina = disciplina.idDisciplina
-            INNER JOIN curso ON nota.idCurso = curso.idCurso WHERE nota.idAluno = :idAluno";
-
-            $stmt = $this->conexao->prepare($sql);
-            $stmt->bindParam(':idAluno', $idAluno, PDO::PARAM_INT);
-            $stmt->execute();
-
-            $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            $resultado = [];
-
-            foreach ($registros as $linha) {
-                $resultado[] = $this->mapearNota($linha);
-            }
-
-            return $resultado;
-        } catch (Exception $ex) {
-            echo "Erro ao listar notas do aluno: " . $ex->getMessage();
-            return false;
-        }
-    }
-
 
     public function listarPorAluno($idAluno)
     {
         try {
             $sql = "SELECT nota.*, disciplina.nomeDisciplina, curso.nomeCurso, aluno.nomeAluno, aluno.dataNascimentoAluno, aluno.responsavelAluno
-                    FROM nota 
-                    INNER JOIN disciplina ON nota.idDisciplina = disciplina.idDisciplina
-                    INNER JOIN aluno ON nota.idAluno = aluno.idAluno
-                    INNER JOIN curso ON nota.idCurso = curso.idCurso
+                FROM nota 
+                INNER JOIN disciplina ON nota.idDisciplina = disciplina.idDisciplina
+                INNER JOIN aluno ON nota.idAluno = aluno.idAluno
+                INNER JOIN curso ON nota.idCurso = curso.idCurso
                 WHERE nota.idAluno = :idAluno";
 
             $stmt = $this->conexao->prepare($sql);
@@ -136,6 +102,35 @@ class NotaDAO
         }
     }
 
+
+    public function listarPorDC($disciplina, $curso)
+    {
+        try {
+            $sql = "SELECT nota.*, disciplina.nomeDisciplina, curso.nomeCurso, aluno.nomeAluno, aluno.dataNascimentoAluno, aluno.responsavelAluno
+                FROM nota 
+                INNER JOIN disciplina ON nota.idDisciplina = disciplina.idDisciplina
+                INNER JOIN aluno ON nota.idAluno = aluno.idAluno
+                INNER JOIN curso ON nota.idCurso = curso.idCurso
+                WHERE disciplina.nomeDisciplina = :nomeDisciplina AND curso.nomeCurso = :nomeCurso";
+
+            $stmt = $this->conexao->prepare($sql);
+            $stmt->bindParam(':nomeDisciplina', $disciplina, PDO::PARAM_INT);
+            $stmt->bindParam(':nomeCurso', $curso, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $resultado = [];
+
+            foreach ($registros as $linha) {
+                $resultado[] = $this->mapearNota($linha);
+            }
+
+            return $resultado;
+        } catch (Exception $ex) {
+            echo "Erro ao listar notas do aluno: " . $ex->getMessage();
+            return false;
+        }
+    }
 
     public function listarTodos()
     {

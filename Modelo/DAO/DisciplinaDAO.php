@@ -19,7 +19,7 @@ class DisciplinaDAO
     public function cadastrar(DisciplinaDTO $disciplina)
     {
         try {
-            $stmt = $this->conexao->prepare("INSERT INTO disciplina (nomeDisciplina,classeDisciplina, idCurso,idProfessor) VALUES (?, ?,?)");
+            $stmt = $this->conexao->prepare("INSERT INTO disciplina (nomeDisciplina,classeDisciplina, idCurso,idProfessor) VALUES (?, ?,?, ?)");
             $stmt->execute([
                 $disciplina->getNomeDisciplina(),
                 $disciplina->getClasseDisciplina(),
@@ -86,6 +86,30 @@ class DisciplinaDAO
             return false;
         }
     }
+    public function listarNomeDisciplinaPorCurso($curso)
+    {
+        try {
+            $sql = "SELECT nomeDisciplina FROM disciplina WHERE idCurso = :idCurso LIMIT 1";
+            $stmt = $this->conexao->prepare($sql);
+            $stmt->bindParam(":idCurso", $curso, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $nome = $stmt->fetchColumn(); // Retorna só o nome da primeira disciplina
+
+            if ($nome !== false) {
+                $dto = new DisciplinaDTO();
+                $dto->setNomeDisciplina($nome);
+                return $dto;
+            }
+
+            return null; // Nenhuma disciplina encontrada
+        } catch (PDOException $e) {
+            echo "Erro ao listar disciplina: " . $e->getMessage();
+            return null;
+        }
+    }
+
+
     public function listarTodosCursoClasse($curso, $classe)
     {
         try {

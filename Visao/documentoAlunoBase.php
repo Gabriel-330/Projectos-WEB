@@ -367,7 +367,7 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                                                         Ações
                                                     </button>
                                                     <ul class="dropdown-menu">
-                                                        <li><a class="dropdown-item" href="#"><i class="fa fa-eye me-2"></i>Visualizar</a></li>
+                                                        <li><a class="dropdown-item" href="miniPauta.php"><i class="fa fa-eye me-2"></i>Visualizar</a></li>
                                                         <li><a class="dropdown-item" href="#"><i class="fa fa-download me-2"></i>Baixar</a></li>
                                                         <li><a class="dropdown-item" href="#"><i class="fa fa-edit me-2"></i>Editar</a></li>
                                                         <li><a class="dropdown-item text-danger" href="#"><i class="fa fa-trash me-2"></i>Excluir</a></li>

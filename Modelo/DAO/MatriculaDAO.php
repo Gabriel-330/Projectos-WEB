@@ -118,6 +118,67 @@ class MatriculaDAO
         }
     }
 
+    public function listarPorAlunoClasse($idAluno, $classe)
+    {
+        try {
+            $sql = "SELECT m.*, a.nomeAluno, c.nomeCurso, t.nomeTurma
+                FROM matricula m
+                INNER JOIN aluno a ON m.idAluno = a.idAluno
+                INNER JOIN turma t ON m.idTurma = t.idTurma
+                INNER JOIN curso c ON t.idCurso = c.idCurso
+                WHERE m.idAluno = :aluno AND m.classeMatricula = :classe";
+
+            $stmt = $this->conexao->prepare($sql);
+            $stmt->bindParam(":aluno", $idAluno, PDO::PARAM_INT);
+            $stmt->bindParam(":classe", $classe, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $resultado = [];
+            foreach ($registros as $linha) {
+                $resultado[] = $this->mapearMatricula($linha);
+            }
+
+            return $resultado;
+        } catch (Exception $e) {
+            error_log("Erro ao listar matrículas: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function listarMatriculaPorCPCT($classe, $periodo, $curso, $turma)
+    {
+        try {
+            $sql = "SELECT m.*, a.nomeAluno, c.nomeCurso, t.nomeTurma
+                FROM matricula m
+                INNER JOIN aluno a ON m.idAluno = a.idAluno
+                INNER JOIN turma t ON m.idTurma = t.idTurma
+                INNER JOIN curso c ON t.idCurso = c.idCurso
+                WHERE m.classeMatricula = :classe AND m.periodoMatricula = :periodo AND c.nomeCurso = :curso AND t.nomeTurma = :turma";
+
+            $stmt = $this->conexao->prepare($sql);
+            $stmt->bindParam(":classe", $classe, PDO::PARAM_INT);
+            $stmt->bindParam(":periodo", $periodo, PDO::PARAM_INT);
+            $stmt->bindParam(":curso", $curso, PDO::PARAM_STR);
+            $stmt->bindParam(":turma", $turma, PDO::PARAM_STR); 
+
+            $stmt->execute();
+
+            $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $resultado = [];
+            foreach ($registros as $linha) {
+                $resultado[] = $this->mapearMatricula($linha);
+            }
+
+            return $resultado;
+        } catch (Exception $e) {
+            error_log("Erro ao listar matrículas: " . $e->getMessage());
+            return [];
+        }
+    }
+
 
     public function buscarMatriculaPorId($id)
     {

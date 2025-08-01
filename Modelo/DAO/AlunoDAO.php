@@ -165,13 +165,24 @@ class AlunoDAO
             return false;
         }
     }
-    public function retornarIdPorUtilizador($id)
+
+ 
+    public function retornarDadosPorUtilizador($id)
     {
         try {
-            $sql = "SELECT a.idAluno
-                FROM aluno a
-                WHERE a.idUtilizador = :id
-                LIMIT 1";
+            $sql = "
+            SELECT 
+                a.idAluno,
+                a.nomeAluno,
+                a.responsavelAluno,
+                a.dataNascimentoAluno,
+                c.nomeCurso
+            FROM aluno a
+            INNER JOIN curso c ON a.idCurso = c.idCurso
+            WHERE a.idUtilizador = :id
+            LIMIT 1
+        ";
+
             $stmt = $this->conexao->prepare($sql);
             $stmt->bindValue(":id", $id, PDO::PARAM_INT);
             $stmt->execute();
@@ -179,15 +190,20 @@ class AlunoDAO
             $linha = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($linha) {
-                return $linha['idAluno']; // apenas o ID
+                $dto = new AlunoDTO();
+                $dto->setIdAluno($linha['idAluno']);
+                $dto->setNomeAluno($linha['nomeAluno']);
+                $dto->setResponsavelAluno($linha['responsavelAluno']);
+                $dto->setDataNascimentoAluno($linha['dataNascimentoAluno']);
+                $dto->setNomeCurso($linha['nomeCurso']);
+                return $dto;
             }
 
             return null;
         } catch (PDOException $e) {
-            die("Erro ao buscar aluno: " . $e->getMessage());
+            die("Erro ao buscar dados do aluno: " . $e->getMessage());
         }
     }
-
 
     public function actualizar(AlunoDTO $aluno)
     {

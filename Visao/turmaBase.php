@@ -287,7 +287,8 @@ $usuarioId = $_SESSION['idUtilizador'];
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php $cont = 1; foreach ($turmas as $turma): ?>
+                                        <?php $cont = 1;
+                                        foreach ($turmas as $turma): ?>
                                             <tr>
                                                 <td><?= $cont++; ?></strong></td>
                                                 <td><?= htmlspecialchars($turma->getNomeTurma()); ?></td>
@@ -371,9 +372,13 @@ $usuarioId = $_SESSION['idUtilizador'];
                         </div>
 
 
+                        <div class="form-group">
+                            <label class="mb-1"><strong>Nº da Sala <b style="font-size: 14px;color: red;">*</b></strong></label>
+                            <input type="text" class="form-control input-rounded" name="nSalaTurma" required>
+                        </div>
 
                         <div class="form-group">
-                            <label class="mb-1"><strong>Director de Turma <b style="font-size: 14px;color: red;">*</b></strong></label>
+                            <label class="mb-1"><strong>Director de Turma</label>
                             <select class="form-control input-rounded" name="directorTurma" required>
                                 <option value="">Selecione o director de turma</option>
                                 <?php foreach ($professores as $professor): ?>
@@ -385,11 +390,6 @@ $usuarioId = $_SESSION['idUtilizador'];
                             </select>
                         </div>
 
-
-                        <div class="form-group">
-                            <label class="mb-1"><strong>Nº da Sala <b style="font-size: 14px;color: red;">*</b></strong></label>
-                            <input type="text" class="form-control input-rounded" name="nSalaTurma" required>
-                        </div>
 
                         <div class="text-center mt-4">
                             <button type="submit" class="btn btn-primary btn-rounded" name="cadastrarTurma">Cadastrar</button>

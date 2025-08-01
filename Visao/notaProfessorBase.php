@@ -383,7 +383,7 @@ $usuarioId = $_SESSION['idUtilizador'];
 
                                 <div class="col-md-3">
                                     <label><strong>Curso</strong></label>
-                                    <select id="cursoSelect" class="form-control input-rounded">
+                                    <select id="cursoSelect" name="idCurso" class="form-control input-rounded">
                                         <option value="">Selecione</option>
                                         <?php foreach ($cursos as $curso): ?>
                                             <option value="<?= $curso->getIdCurso() ?>"><?= htmlspecialchars($curso->getNomeCurso()) ?></option>
@@ -403,12 +403,13 @@ $usuarioId = $_SESSION['idUtilizador'];
                                 <div class="col-md-3">
                                     <label><strong>Turma</strong></label>
                                     <select id="turmaSelect" class="form-control input-rounded">
+                                        <option value="">Selecione a turma</option>
                                         <?php foreach ($turmas as $turma): ?>
-                                            <option value="">Selecione a turma</option>
                                             <option value="<?= $turma->getIdTurma() ?>"><?= htmlspecialchars($turma->getNomeTurma()) ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
+
                             </div>
 
                             <div class="form-group campo-condicional">
@@ -430,19 +431,39 @@ $usuarioId = $_SESSION['idUtilizador'];
                                     <?php endforeach; ?>
                                 </select>
                             </div>
-
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group campo-condicional">
-                                        <label class="mb-1"><strong>Tipo de Nota<b style="font-size: 14px;color: red;">*</b></strong></label>
-                                        <select class="form-control input-rounded" name="tipoNota" required>
-                                            <option value="">Selecione o Tipo de Nota</option>
+                                        <label class="mb-1">
+                                            <strong>Tipo de Nota <b style="font-size: 14px;color: red;">*</b></strong>
+                                        </label>
+                                        <select class="form-control input-rounded" name="tipoNota" id="tipoNotaSelect" required>
+                                            <option value="">Selecione o tipo de Nota</option>
                                             <option value="MAC">MAC</option>
-                                            <option value="NP1">NP1</option>
-                                            <option value="NP2">NP2</option>
+                                            <option value="NPP">NPP</option>
+                                            <option value="NPT">NPT</option>
                                         </select>
                                     </div>
                                 </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group campo-condicional">
+                                        <label class="mb-1">
+                                            <strong>Tipo de Avaliação <b style="font-size: 14px;color: red;">*</b></strong>
+                                        </label>
+                                        <select class="form-control input-rounded" name="tipoAvaliacaoNota" id="avaliacaoNotaSelect" required>
+                                            <option value="">Selecione o tipo de Avaliação</option>
+                                            <option value="Avaliação Continua">Avaliação Continua</option>
+                                            <option value="Prova do Professor">Prova do Professor</option>
+                                            <option value="Prova Trimestral">Prova Trimestral</option>
+                                            <option value="Exame">Exame</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="row">
                                 <div class="col-md-6">
 
                                     <div class="form-group campo-condicional">
@@ -455,21 +476,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                                         </select>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group campo-condicional">
-                                        <label class="mb-1"><strong>Tipo de avaliação<b style="font-size: 14px;color: red;">*</b></strong></label>
-                                        <select class="form-control input-rounded" name="tipoAvaliacaoNota" required>
-                                            <option value="">Selecione o tipo de avaliação</option>
-                                            <option value="Avaliação Continua">Avaliação Continua</option>
-                                            <option value="Prova do professor">Prova do professor</option>
-                                            <option value="Prova trimestral">Prova trimestral</option>
-                                            <option value="Exame">Exame</option>
 
-                                        </select>
-                                    </div>
-                                </div>
                                 <div class="col-md-3">
                                     <div class="form-group campo-condicional">
                                         <label class="mb-1"><strong>Valor<b style="font-size: 14px;color: red;">*</b></strong></label>
@@ -769,7 +776,35 @@ $usuarioId = $_SESSION['idUtilizador'];
 
 
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const tipoNotaSelect = document.getElementById("tipoNotaSelect");
+            const avaliacaoNotaSelect = document.getElementById("avaliacaoNotaSelect");
 
+            tipoNotaSelect.addEventListener("change", function() {
+                const tipoSelecionado = tipoNotaSelect.value;
+                let valorCorrespondente = "";
+
+                if (tipoSelecionado === "MAC") {
+                    valorCorrespondente = "Avaliação Continua";
+                } else if (tipoSelecionado === "NPP") {
+                    valorCorrespondente = "Prova do Professor";
+                } else if (tipoSelecionado === "NPT") {
+                    valorCorrespondente = "Prova Trimestral";
+                } else {
+                    valorCorrespondente = "";
+                }
+
+                // Percorre as opções e seleciona a que corresponde ao valor
+                for (let i = 0; i < avaliacaoNotaSelect.options.length; i++) {
+                    if (avaliacaoNotaSelect.options[i].value === valorCorrespondente) {
+                        avaliacaoNotaSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+            });
+        });
+    </script>
 
 </body>
 
