@@ -56,6 +56,28 @@ foreach ($notas as $nota) {
     }
 }
 
+foreach ($mapaNotas as $disciplina => &$trimestres) {
+    foreach (["1º Trimestre", "2º Trimestre", "3º Trimestre"] as $trimestre) {
+        $mac = $trimestres[$trimestre]['MAC'] ?? null;
+        $np1 = $trimestres[$trimestre]['NP1'] ?? null;
+        $np2 = $trimestres[$trimestre]['NP2'] ?? null;
+
+        if (is_numeric($mac) && is_numeric($np1) && is_numeric($np2)) {
+            $media = ($mac + $np1 + $np2) / 3;
+
+            $trimestres[$trimestre]['MT']  = round($media, 2); // Média com 2 casas decimais
+            $trimestres[$trimestre]['MT']  = ceil($media);     // Arredondado por excesso
+            $trimestres[$trimestre]['MT'] = floor($media);    // Arredondado por defeito
+        } else {
+            $trimestres[$trimestre]['MT']  = null;
+            $trimestres[$trimestre]['MT']  = null;
+            $trimestres[$trimestre]['MT'] = null;
+        }
+    }
+}
+unset($trimestres);
+
+
 // Buscar todas as disciplinas da classe e curso
 $disciplinasTodas = $disciplinaDAO->listarTodosCursoClasse($nomeCurso, $classeMatricula);
 
@@ -64,8 +86,6 @@ foreach ($disciplinasTodas as $disciplinaDTO) {
     $nomeDisciplina = $disciplinaDTO->getNomeDisciplina();
     if (!isset($mapaNotas[$nomeDisciplina])) {
         $mapaNotas[$nomeDisciplina] = [];
-    }else{
-        
     }
 }
 
@@ -91,6 +111,7 @@ function formatarNota($nota)
 // Gera HTML
 ob_start();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="pt">
@@ -234,17 +255,17 @@ ob_start();
                     <td><?= formatarNota(obterNota($mapaNotas, $disciplina, "1º Trimestre", "MAC")) ?></td>
                     <td><?= formatarNota(obterNota($mapaNotas, $disciplina, "1º Trimestre", "NP1")) ?></td>
                     <td><?= formatarNota(obterNota($mapaNotas, $disciplina, "1º Trimestre", "NP2")) ?></td>
-                    <td style="background-color: yellow;"><?= formatarNota(obterNota($mapaNotas, $disciplina, 1, "MT")) ?></td>
+                    <td style="background-color: yellow;"><?= formatarNota(obterNota($mapaNotas, $disciplina, "1º Trimestre", "MT")) ?></td>
                     <!-- 2º Trimestre -->
                     <td><?= formatarNota(obterNota($mapaNotas, $disciplina, "2º Trimestre", "MAC")) ?></td>
                     <td><?= formatarNota(obterNota($mapaNotas, $disciplina, "2º Trimestre", "NP1")) ?></td>
                     <td><?= formatarNota(obterNota($mapaNotas, $disciplina, "2º Trimestre", "NP2")) ?></td>
-                    <td style="background-color: yellow;"><?= formatarNota(obterNota($mapaNotas, $disciplina, 2, "MT")) ?></td>
+                    <td style="background-color: yellow;"><?= formatarNota(obterNota($mapaNotas, $disciplina, "2º Trimestre", "MT")) ?></td>
                     <!-- 3º Trimestre -->
                     <td><?= formatarNota(obterNota($mapaNotas, $disciplina, "3º Trimestre", "MAC")) ?></td>
                     <td><?= formatarNota(obterNota($mapaNotas, $disciplina, "3º Trimestre", "NP1")) ?></td>
                     <td><?= formatarNota(obterNota($mapaNotas, $disciplina, "3º Trimestre", "NP2")) ?></td>
-                    <td style="background-color: yellow;"><?= formatarNota(obterNota($mapaNotas, $disciplina, 3, "MT")) ?></td>
+                    <td style="background-color: yellow;"><?= formatarNota(obterNota($mapaNotas, $disciplina, "3º Trimestre", "MT")) ?></td>
                     <!-- Classificação Anual -->
                     <td><?= formatarNota(obterNota($mapaNotas, $disciplina, "final", "MFD")) ?></td>
                     <td><?= formatarNota(obterNota($mapaNotas, $disciplina, "final", "NE")) ?></td>

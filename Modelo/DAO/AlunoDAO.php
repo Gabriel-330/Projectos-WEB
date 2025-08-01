@@ -44,8 +44,7 @@ class AlunoDAO
 
             return $lastId; // opcionalmente retorna
         } catch (PDOException $e) {
-            die("Erro ao cadastrar aluno: " . $e->getMessage());
-            return false;
+            throw $e; // <-- lança para ser tratado externamente
         }
     }
 
@@ -255,8 +254,40 @@ class AlunoDAO
             throw new Exception("Erro ao verificar identificacacao do Aluno: " . $e->getMessage());
         }
     }
+    public function buscarPorFiltro($classe, $curso, $periodo, $turmaId)
+    {
+        try {
+            $stmt = $this->conexao->prepare("
+            SELECT aluno.idAluno, aluno.nomeAluno
+            FROM aluno
+            INNER JOIN matricula ON matricula.idAluno = aluno.idAluno
+            INNER JOIN turma ON turma.idTurma = matricula.idTurma
+            WHERE matricula.classeMatricula = :classe
+              AND matricula.idCurso = :curso
+              AND matricula.periodoMatricula = :periodo
+              AND turma.idTurma = :turma
+        ");
 
+            $stmt->bindParam(":classe", $classe);
+            $stmt->bindParam(":curso", $curso);
+            $stmt->bindParam(":periodo", $periodo);
+            $stmt->bindParam(":turma", $turmaId);
+            $stmt->execute();
 
+            $alunos = [];
+
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $dto = new AlunoDTO();
+                $dto->setIdAluno($row["idAluno"]);
+                $dto->setNomeAluno($row["nomeAluno"]);
+                $alunos[] = $dto;
+            }
+
+            return $alunos;
+        } catch (PDOException $e) {
+            throw new Exception("Erro ao buscar alunos: " . $e->getMessage());
+        }
+    }
 
 
     private function mapearParaDTO($linha)

@@ -48,6 +48,21 @@ $usuarioId = $_SESSION['idUtilizador'];
     <link href="assets/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet" type="text/css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet" type="text/css" />
     <link href="assets/css/style.css" rel="stylesheet" type="text/css" />
+
+    <style>
+        .campo-condicional {
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity 2s ease, max-height 2s ease;
+        }
+
+        .campo-condicional.visivel {
+            opacity: 1;
+            max-height: 500px;
+            /* ou um valor suficiente para o conteúdo */
+        }
+    </style>
 </head>
 
 <body onload="initProgressBars()">
@@ -339,6 +354,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                             require_once("../Modelo/DAO/AlunoDAO.php");
                             require_once("../Modelo/DAO/DisciplinaDAO.php");
                             require_once("../Modelo/DAO/CursoDAO.php");
+                            require_once("../Modelo/DAO/TurmaDAO.php");
 
                             $daoAluno = new AlunoDAO();
                             $alunos = $daoAluno->listarTodos();
@@ -348,40 +364,61 @@ $usuarioId = $_SESSION['idUtilizador'];
 
                             $daoDisciplina = new DisciplinaDAO();
                             $disciplinas = $daoDisciplina->listarTodos();
-                            ?>
-                            <div class="row">
-                                <div class="col-md-7">
-                                    <div class="form-group">
-                                        <label class="mb-1"><strong>Aluno<b style="font-size: 14px;color: red;">*</b></strong></label>
-                                        <select class="form-control input-rounded" name="idAluno" required>
-                                            <option value="">Selecione o aluno</option>
-                                            <?php foreach ($alunos as $aluno): ?>
-                                                <option value="<?= htmlspecialchars($aluno->getIdAluno()) ?>">
-                                                    <?= htmlspecialchars($aluno->getNomeAluno()) ?>
-                                                </option>
 
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
+                            $daoTurma = new TurmaDAO();
+                            $turmas = $daoTurma->listarTodos();
+                            ?>
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label><strong>Classe</strong></label>
+                                    <select id="classeSelect" class="form-control input-rounded">
+                                        <option value="">Selecione</option>
+                                        <option value="10">10ª</option>
+                                        <option value="11">11ª</option>
+                                        <option value="12">12ª</option>
+                                        <option value="13">13ª</option>
+                                    </select>
                                 </div>
-                                <div class="col-md-5">
-                                    <div class="form-group">
-                                        <label class="mb-1"><strong>Curso <b style="font-size: 14px;color: red">*</b></strong></label>
-                                        <select class="form-control input-rounded" name="idCurso" required>
-                                            <option value="">Selecione o curso</option>
-                                            <?php
-                                            foreach ($cursos as $curso): ?>
-                                                <option value="<?= htmlspecialchars($curso->getIdCurso()) ?>">
-                                                    <?= htmlspecialchars($curso->getNomeCurso()) ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
+
+                                <div class="col-md-3">
+                                    <label><strong>Curso</strong></label>
+                                    <select id="cursoSelect" class="form-control input-rounded">
+                                        <option value="">Selecione</option>
+                                        <?php foreach ($cursos as $curso): ?>
+                                            <option value="<?= $curso->getIdCurso() ?>"><?= htmlspecialchars($curso->getNomeCurso()) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label><strong>Período</strong></label>
+                                    <select id="periodoSelect" class="form-control input-rounded">
+                                        <option value="">Selecione</option>
+                                        <option value="Manhã">Manhã</option>
+                                        <option value="Tarde">Tarde</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label><strong>Turma</strong></label>
+                                    <select id="turmaSelect" class="form-control input-rounded">
+                                        <?php foreach ($turmas as $turma): ?>
+                                            <option value="">Selecione a turma</option>
+                                            <option value="<?= $turma->getIdTurma() ?>"><?= htmlspecialchars($turma->getNomeTurma()) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
                                 </div>
                             </div>
 
+                            <div class="form-group campo-condicional">
+                                <label class="mb-1"><strong>Aluno<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                <select id="alunoSelect" name="idAluno" class="form-control input-rounded" required>
+                                    <option value="">Selecione o aluno</option>
+                                </select>
+                            </div>
 
-                            <div class="form-group">
+                            <div class="form-group campo-condicional">
                                 <label class="mb-1"><strong>Disciplina<b style="font-size: 14px;color: red;">*</b></strong></label>
                                 <select class="form-control input-rounded" name="idDisciplina" required>
                                     <option value="">Selecione a disciplina</option>
@@ -396,19 +433,19 @@ $usuarioId = $_SESSION['idUtilizador'];
 
                             <div class="row">
                                 <div class="col-md-6">
-                                    <div class="form-group">
+                                    <div class="form-group campo-condicional">
                                         <label class="mb-1"><strong>Tipo de Nota<b style="font-size: 14px;color: red;">*</b></strong></label>
                                         <select class="form-control input-rounded" name="tipoNota" required>
                                             <option value="">Selecione o Tipo de Nota</option>
                                             <option value="MAC">MAC</option>
                                             <option value="NP1">NP1</option>
-                                            <option value="NP3">NP2</option>
+                                            <option value="NP2">NP2</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
 
-                                    <div class="form-group">
+                                    <div class="form-group campo-condicional">
                                         <label class="mb-1"><strong>Trimestre<b style="font-size: 14px;color: red;">*</b></strong></label>
                                         <select class="form-control input-rounded" name="trimestreNota" required>
                                             <option value="">Selecione o Trimestre</option>
@@ -421,7 +458,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <div class="form-group">
+                                    <div class="form-group campo-condicional">
                                         <label class="mb-1"><strong>Tipo de avaliação<b style="font-size: 14px;color: red;">*</b></strong></label>
                                         <select class="form-control input-rounded" name="tipoAvaliacaoNota" required>
                                             <option value="">Selecione o tipo de avaliação</option>
@@ -434,14 +471,14 @@ $usuarioId = $_SESSION['idUtilizador'];
                                     </div>
                                 </div>
                                 <div class="col-md-3">
-                                    <div class="form-group">
+                                    <div class="form-group campo-condicional">
                                         <label class="mb-1"><strong>Valor<b style="font-size: 14px;color: red;">*</b></strong></label>
                                         <input type="text" class="form-control input-rounded" name="valorNota" required>
                                     </div>
                                 </div>
 
                                 <div class="col-md-3">
-                                    <div class="form-group">
+                                    <div class="form-group campo-condicional">
                                         <label class="mb-1"><strong>Data da Avaliação<b style="font-size: 14px;color: red;">*</b></strong></label>
                                         <input type="datetime-local" class="form-control input-rounded" name="dataAvaliacaoNota" required>
                                     </div>
@@ -449,7 +486,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                             </div>
 
 
-                            <div class="text-center mt-4">
+                            <div class="text-center mt-4 campo-condicional">
                                 <button type="submit" class="btn btn-primary btn-rounded" name="cadastrarNota">Cadastrar</button>
                                 <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
                             </div>
@@ -667,6 +704,73 @@ $usuarioId = $_SESSION['idUtilizador'];
             });
         }
     </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const classe = document.getElementById("classeSelect");
+            const curso = document.getElementById("cursoSelect");
+            const periodo = document.getElementById("periodoSelect");
+            const turma = document.getElementById("turmaSelect");
+            const camposCondicionais = document.querySelectorAll(".campo-condicional");
+            const alunoSelect = document.getElementById("alunoSelect");
+
+            // Inicialmente oculta todos os campos
+            camposCondicionais.forEach(campo => campo.classList.remove("visivel"));
+
+            function carregarAlunos() {
+                const dados = {
+                    classe: classe.value,
+                    curso: curso.value,
+                    periodo: periodo.value,
+                    turma: turma.value
+                };
+
+                const todosSelecionados = dados.classe && dados.curso && dados.periodo && dados.turma;
+
+                if (!todosSelecionados) {
+                    alunoSelect.innerHTML = '<option value="">Selecione o aluno</option>';
+                    camposCondicionais.forEach(campo => campo.classList.remove("visivel"));
+                    return;
+                }
+
+                fetch("../Controle/carregarAlunos.php", {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(dados)
+                    })
+                    .then(res => res.json())
+                    .then(alunos => {
+                        alunoSelect.innerHTML = '<option value="">Selecione o aluno</option>';
+
+                        if (alunos && alunos.length > 0) {
+                            alunos.forEach(aluno => {
+                                alunoSelect.innerHTML += `<option value="${aluno.id}">${aluno.nome}</option>`;
+                            });
+                            camposCondicionais.forEach(campo => campo.classList.add("visivel"));
+                        } else {
+                            camposCondicionais.forEach(campo => campo.classList.remove("visivel"));
+                        }
+                    })
+                    .catch(err => {
+                        console.error("Erro ao carregar alunos:", err);
+                        alunoSelect.innerHTML = '<option value="">Erro ao carregar</option>';
+                        camposCondicionais.forEach(campo => campo.classList.remove("visivel"));
+                    });
+            }
+
+            classe.addEventListener("change", carregarAlunos);
+            curso.addEventListener("change", carregarAlunos);
+            periodo.addEventListener("change", carregarAlunos);
+            turma.addEventListener("change", carregarAlunos);
+        });
+    </script>
+
+
+
+
+
 </body>
 
 </html>
