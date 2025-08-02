@@ -55,7 +55,30 @@ $usuarioId = $_SESSION['idUtilizador'];
         .iti {
             width: 100%;
         }
+
+        .menu-user ul li.active a {
+            background-color: #0b5ed7;
+            /* cor de fundo ao clicar */
+            color: white;
+            /* cor do ícone ao clicar */
+            border-radius: 5px;
+        }
     </style>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const menuItems = document.querySelectorAll(".menu-user ul li");
+
+            menuItems.forEach(function(item) {
+                item.addEventListener("click", function() {
+                    // Remove a classe 'active' de todos os itens
+                    menuItems.forEach(i => i.classList.remove("active"));
+                    // Adiciona a classe 'active' ao item clicado
+                    item.classList.add("active");
+                });
+            });
+        });
+    </script>
 </head>
 
 <body onload="initProgressBars()">
@@ -222,7 +245,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                 <i class="fa-solid fa-user-graduate user-photo"></i>
                 <ul>
                     <li><a href="indexAdmin.php" title="Home"><i class="fa-solid fa-chalkboard"></i></a></li>
-                    <li><a href="#" title="Cadastrar Aluno"><i class="fa-regular fa fa-user"></i></a></li>
+                    <li class="active"><a href="#" title="Cadastrar Aluno"><i class="fa-regular fa fa-user"></i></a></li>
                     <li><a href="professorBase.php" title="Cadastrar professor"><i class="fa-solid fa-chalkboard-user"></i></a></li>
                     <li><a href="eventoBase.php" title="Calendário Académico"><i class="fa-regular fa-calendar"></i></a></li>
                     <li><a href="cursoBase.php" title="Cadastro de Cursos"><i class="fa-solid fa-book"></i></a></li>

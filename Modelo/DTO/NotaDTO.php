@@ -6,6 +6,7 @@ class NotaDTO
     private $idAluno;
     private $idDisciplina;
     private $idCurso;
+    private $idProfessor;
     private $valorNota;
     private $dataValorNota;
     private $tipoAvaliacaoNota;
@@ -59,6 +60,17 @@ class NotaDTO
     public function setIdCurso($idCurso)
     {
         $this->idCurso = $idCurso;
+    }
+
+      // ID Professor
+    public function getIdProfessor()
+    {
+        return $this->idProfessor;
+    }
+
+    public function setIdProfessor($idProfessor)
+    {
+        $this->idProfessor = $idProfessor;
     }
 
     // Valor da Nota

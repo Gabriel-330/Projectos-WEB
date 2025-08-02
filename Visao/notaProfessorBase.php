@@ -2,6 +2,8 @@
 session_start();
 require_once("../Modelo/DAO/NotificacoesDAO.php");
 require_once("../Modelo/DTO/NotificacoesDTO.php");
+require_once("../Modelo/DAO/ProfessorDAO.php");
+require_once("../Modelo/DTO/ProfessorDTO.php");
 // Verifica se o utilizador está autenticado
 if (!isset($_SESSION['idUtilizador']) || !isset($_SESSION['acesso'])) {
     header("Location: index.php"); // Redireciona para login se não estiver autenticado
@@ -9,6 +11,8 @@ if (!isset($_SESSION['idUtilizador']) || !isset($_SESSION['acesso'])) {
 }
 
 $acesso = strtoupper($_SESSION['acesso']);
+$professorDAO = new ProfessorDAO();
+$professor = $professorDAO->buscarPorUtilizador($_SESSION['idUtilizador']);
 
 // Verifica se o acesso é email de admin válido (ex: termina com @admin.estrela.com)
 if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {    // Se não for admin, redireciona para página de acesso negado ou login
@@ -21,6 +25,7 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {    // Se não for ad
 
 // Se chegou aqui, é admin autenticado e pode continuar
 $usuarioId = $_SESSION['idUtilizador'];
+
 ?>
 
 
@@ -45,6 +50,7 @@ $usuarioId = $_SESSION['idUtilizador'];
 
     <link href="assets/vendor/chartist/css/chartist.min.css" rel="stylesheet" type="text/css" />
     <link href="assets/vendor/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="assets/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet" type="text/css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet" type="text/css" />
     <link href="assets/css/style.css" rel="stylesheet" type="text/css" />
@@ -62,7 +68,31 @@ $usuarioId = $_SESSION['idUtilizador'];
             max-height: 500px;
             /* ou um valor suficiente para o conteúdo */
         }
+
+        .menu-user ul li.active a {
+            background-color: #0b5ed7;
+            /* cor de fundo ao clicar */
+            color: white;
+            /* cor do ícone ao clicar */
+            border-radius: 5px;
+        }
     </style>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const menuItems = document.querySelectorAll(".menu-user ul li");
+
+            menuItems.forEach(function(item) {
+                item.addEventListener("click", function() {
+                    // Remove a classe 'active' de todos os itens
+                    menuItems.forEach(i => i.classList.remove("active"));
+                    // Adiciona a classe 'active' ao item clicado
+                    item.classList.add("active");
+                });
+            });
+        });
+    </script>
+
 </head>
 
 <body onload="initProgressBars()">
@@ -225,8 +255,9 @@ $usuarioId = $_SESSION['idUtilizador'];
                 <i class="fa-solid fa-user-graduate user-photo"></i>
                 <ul>
                     <li><a href="indexProfessor.php" title="Home"><i class="fa-solid fa-chalkboard"></i></a></li>
-                    <li><a href="#" title="Lançar Nota"><i class="fa-solid fa-clipboard"></i></a></li>
+                    <li class="active"><a href="#" title="Consultar Nota"><i class="fa-solid fa-clipboard"></i></a></li>
                     <li><a href="horarioProfessorBase.php" title="Consultar Horário"><i class="fa-regular fa-calendar"></i></a></li>
+                    <li><a href="documentoProfessorBase.php" title="Solicitar Documentos"><i class="fa-regular fa-folder-open"></i></a></li>
                 </ul>
             </div>
         </nav>
@@ -240,6 +271,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Professor</a></li>
                     <li class="breadcrumb-item active"><a href="javascript:void(0)">Lançar Nota</a></li>
+
                 </ol>
             </div>
 
@@ -255,7 +287,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                 $notas = $dao->pesquisar($palavra);
             } else {
                 // Caso contrário, exibir todos os notas
-                $notas = $dao->listarTodos();
+                $notas = $dao->buscarPorProfessor($professor);
             }
             ?>
             <form action="notaProfessorBase.php" method="GET">
@@ -273,71 +305,140 @@ $usuarioId = $_SESSION['idUtilizador'];
             <div class="row">
                 <div class="col-lg-12">
                     <div class="card">
+                        <!-- Cabeçalho com botão -->
                         <div class="card-header d-flex justify-content-between align-items-center">
-                            <h4 class="card-title">Lista de horário</h4>
+                            <h4 class="card-title">Notas por Trimestre</h4>
                             <a href="../Controle/crudNota.php" class="btn btn-primary btn-rounded" data-bs-toggle="modal" data-bs-target="#modalNotaCadastrar">+ Adicionar nota</a>
                         </div>
+
                         <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-responsive-md">
-                                    <thead>
-                                        <tr>
+                            <?php
+                            $notasPorTrimestre = [];
 
-                                            <th style="width:50px;"><strong>#</strong></th>
-                                            <th><strong>ALUNO</strong></th>
-                                            <th><strong>CURSO</strong></th>
-                                            <th><strong>DISCIPLINA</strong></th>
-                                            <th><strong>VALOR</strong></th>
-                                            <th><strong>DATA DE AVALIAÇÃO</strong></th>
-                                            <th><strong>TIPO DE AVALIAÇÃO</strong></th>
-                                            <th><strong>TIPO NOTA</strong></th>
-                                            <th><strong>PERÍODO</strong></th>
+                            function normalizarTrimestre($valor)
+                            {
+                                $valor = trim(strtolower($valor));
+                                return match ($valor) {
+                                    '1', '1º', 'primeiro', '1º trimestre', 'primeiro trimestre' => '1º Trimestre',
+                                    '2', '2º', 'segundo', '2º trimestre', 'segundo trimestre' => '2º Trimestre',
+                                    '3', '3º', 'terceiro', '3º trimestre', 'terceiro trimestre' => '3º Trimestre',
+                                    '-', 'exame', 'exame final' => 'Exame',
+                                    default => $valor ?: 'Outro',
+                                };
+                            }
 
+                            function idSeguro($str)
+                            {
+                                return preg_replace('/[^a-z0-9]/', '', strtolower(iconv('UTF-8', 'ASCII//TRANSLIT', $str)));
+                            }
 
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php $cont = 1;
-                                        foreach ($notas as $nota): ?>
-                                            <tr>
-                                                <td><strong><?= $cont++; ?></strong></td>
-                                                <td><?= htmlspecialchars($nota->getNomeAluno()); ?></td>
-                                                <td><?= htmlspecialchars($nota->getNomeCurso()); ?></td>
-                                                <td><?= htmlspecialchars($nota->getNomeDisciplina()); ?></td>
-                                                <td><?= htmlspecialchars($nota->getValorNota()); ?></td>
-                                                <td><?= htmlspecialchars($nota->getDataValorNota()); ?></td>
-                                                <td><?= htmlspecialchars($nota->getTipoAvaliacaoNota()); ?></td>
-                                                <td><?= htmlspecialchars($nota->getTipoNota()); ?></td>
-                                                <td><?= htmlspecialchars($nota->getTrimestreNota()); ?></td>
+                            foreach ($notas as $nota) {
+                                $trimestreFormatado = normalizarTrimestre($nota->getTrimestreNota());
+                                $notasPorTrimestre[$trimestreFormatado][] = $nota;
+                            }
 
-                                                <td>
-                                                    <div class="dropdown">
-                                                        <button type="button" class="btn btn-primary light sharp" data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1">
-                                                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                                                    <rect x="0" y="0" width="24" height="24"></rect>
-                                                                    <circle fill="#000000" cx="5" cy="12" r="2"></circle>
-                                                                    <circle fill="#000000" cx="12" cy="12" r="2"></circle>
-                                                                    <circle fill="#000000" cx="19" cy="12" r="2"></circle>
-                                                                </g>
-                                                            </svg>
-                                                        </button>
-                                                        <div class="dropdown-menu">
-                                                            <a class="dropdown-item btn-apagar-nota" data-bs-toggle="modal" data-bs-target="#modalNotaApagar" href="#" data-id="<?= $nota->getIdNota() ?>">Apagar</a>
-                                                            <a class="dropdown-item btn-editar-nota" data-bs-toggle="modal" data-bs-target="#modalNotaEditar" href="#" data-id="<?= $nota->getIdNota() ?>">Editar</a>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
+                            uksort($notasPorTrimestre, function ($a, $b) {
+                                $ordem = ['1º Trimestre' => 1, '2º Trimestre' => 2, '3º Trimestre' => 3, 'Exame' => 4];
+                                return ($ordem[$a] ?? 99) <=> ($ordem[$b] ?? 99);
+                            });
+                            ?>
 
-                                </table>
+                            <!-- Nav Tabs -->
+                            <ul class="nav nav-tabs mt-3" id="trimestreTabs" role="tablist">
+                                <?php $active = true;
+                                foreach ($notasPorTrimestre as $trimestre => $notasTrimestre):
+                                    $idTab = idSeguro($trimestre); ?>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link <?= $active ? 'active' : '' ?>" id="tab-<?= $idTab ?>-tab"
+                                            data-bs-toggle="tab" data-bs-target="#tab-<?= $idTab ?>"
+                                            type="button" role="tab">
+                                            <?= htmlspecialchars($trimestre) ?>
+                                        </button>
+                                    </li>
+                                <?php $active = false;
+                                endforeach; ?>
+                            </ul>
+
+                            <!-- Tab Contents -->
+                            <div class="tab-content p-3 border border-top-0 rounded-bottom shadow-sm bg-white" id="trimestreTabsContent">
+                                <?php $active = true;
+                                foreach ($notasPorTrimestre as $trimestre => $notasTrimestre):
+                                    $idTab = idSeguro($trimestre); ?>
+                                    <div class="tab-pane fade <?= $active ? 'show active' : '' ?>" id="tab-<?= $idTab ?>" role="tabpanel">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-hover table-bordered">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>ALUNO</th>
+                                                        <th>CURSO</th>
+                                                        <th>DISCIPLINA</th>
+                                                        <th>VALOR</th>
+                                                        <th>DATA DE AVALIAÇÃO</th>
+                                                        <th>TIPO DE AVALIAÇÃO</th>
+                                                        <th>TIPO NOTA</th>
+                                                        <th>PERÍODO</th>
+                                                        <th>AÇÕES</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php $cont = 1;
+                                                    foreach ($notasTrimestre as $nota):
+                                                        $valor = floatval($nota->getValorNota());
+
+                                                        if ($valor >= 10) {
+                                                            $classeNota = 'badge bg-primary';
+                                                            $tooltip = 'Nota positiva';
+                                                            $icone = '<i class="bi bi-check-circle-fill me-1"></i>';
+                                                        } else {
+                                                            $classeNota = 'badge bg-danger';
+                                                            $tooltip = 'Nota negativa';
+                                                            $icone = '<i class="bi bi-x-circle-fill me-1"></i>';
+                                                        }
+                                                    ?>
+                                                        <tr>
+                                                            <td><strong><?= $cont++; ?></strong></td>
+                                                            <td><?= htmlspecialchars($nota->getNomeAluno()); ?></td>
+                                                            <td><?= htmlspecialchars($nota->getNomeCurso()); ?></td>
+                                                            <td><?= htmlspecialchars($nota->getNomeDisciplina()); ?></td>
+                                                            <td>
+                                                                <span class="<?= $classeNota ?>" data-bs-toggle="tooltip" title="<?= $tooltip ?>">
+                                                                    <?= $icone ?><?= htmlspecialchars($nota->getValorNota()); ?>
+                                                                </span>
+                                                            </td>
+                                                            <td><?= htmlspecialchars($nota->getDataValorNota()); ?></td>
+                                                            <td><?= htmlspecialchars($nota->getTipoAvaliacaoNota()); ?></td>
+                                                            <td><?= htmlspecialchars($nota->getTipoNota()); ?></td>
+                                                            <td><?= htmlspecialchars($nota->getTrimestreNota()); ?></td>
+                                                            <td>
+                                                                <div class="dropdown">
+                                                                    <button type="button" class="btn btn-primary light sharp" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                        <svg width="20px" height="20px" viewBox="0 0 24 24">
+                                                                            <circle fill="#000" cx="5" cy="12" r="2"></circle>
+                                                                            <circle fill="#000" cx="12" cy="12" r="2"></circle>
+                                                                            <circle fill="#000" cx="19" cy="12" r="2"></circle>
+                                                                        </svg>
+                                                                    </button>
+                                                                    <div class="dropdown-menu">
+                                                                        <a class="dropdown-item btn-apagar-nota" data-bs-toggle="modal" data-bs-target="#modalNotaApagar" href="#" data-id="<?= $nota->getIdNota() ?>">Apagar</a>
+                                                                        <a class="dropdown-item btn-editar-nota" data-bs-toggle="modal" data-bs-target="#modalNotaEditar" href="#" data-id="<?= $nota->getIdNota() ?>">Editar</a>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                <?php $active = false;
+                                endforeach; ?>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
 
         <div class="modal fade" id="modalNotaCadastrar">
@@ -349,6 +450,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                     </div>
                     <div class="modal-body">
                         <form action="../Controle/crudNota.php" method="POST">
+                            <input type="hidden" name="idProfessor" value="<?= $professor ?>">
 
                             <?php
                             require_once("../Modelo/DAO/AlunoDAO.php");
@@ -363,7 +465,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                             $cursos = $daoCurso->Mostrar();
 
                             $daoDisciplina = new DisciplinaDAO();
-                            $disciplinas = $daoDisciplina->listarTodos();
+                            $disciplinas = $daoDisciplina->listarPorProfessor($professor);
 
                             $daoTurma = new TurmaDAO();
                             $turmas = $daoTurma->listarTodos();
@@ -442,6 +544,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                                             <option value="MAC">MAC</option>
                                             <option value="NPP">NPP</option>
                                             <option value="NPT">NPT</option>
+                                            <option value="NE">NE</option>
                                         </select>
                                     </div>
                                 </div>
@@ -473,6 +576,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                                             <option value="1º Trimestre">1º Trimestre</option>
                                             <option value="2º Trimestre">2º Trimestre</option>
                                             <option value="3º Trimestre">3º Trimestre</option>
+                                            <option value="-">-</option>
                                         </select>
                                     </div>
                                 </div>
@@ -791,6 +895,8 @@ $usuarioId = $_SESSION['idUtilizador'];
                     valorCorrespondente = "Prova do Professor";
                 } else if (tipoSelecionado === "NPT") {
                     valorCorrespondente = "Prova Trimestral";
+                } else if (tipoSelecionado === "NE") {
+                    valorCorrespondente = "Exame";
                 } else {
                     valorCorrespondente = "";
                 }
@@ -803,6 +909,13 @@ $usuarioId = $_SESSION['idUtilizador'];
                     }
                 }
             });
+        });
+    </script>
+
+    <script>
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        tooltipTriggerList.map(function(el) {
+            return new bootstrap.Tooltip(el)
         });
     </script>
 

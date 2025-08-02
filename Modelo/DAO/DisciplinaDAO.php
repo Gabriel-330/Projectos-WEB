@@ -109,6 +109,35 @@ class DisciplinaDAO
         }
     }
 
+    public function listarPorProfessor($idProfessor)
+    {
+        try {
+            $sql = "SELECT d.*, c.nomeCurso, p.nomeProfessor
+                FROM disciplina d
+                INNER JOIN curso c ON d.idCurso = c.idCurso
+                INNER JOIN professor p ON d.idProfessor = p.idProfessor
+                WHERE d.idProfessor = :idProfessor";
+
+            $stmt = $this->conexao->prepare($sql);
+            $stmt->bindParam(":idProfessor", $idProfessor, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $resultado = [];
+
+            foreach ($registros as $linha) {
+                $resultado[] = $this->mapearParaDTO($linha);
+            }
+
+            return $resultado;
+        } catch (PDOException $e) {
+            echo "Erro ao listar disciplinas: " . $e->getMessage();
+            return false;
+        }
+    }
+
+
+
 
     public function listarTodosCursoClasse($curso, $classe)
     {

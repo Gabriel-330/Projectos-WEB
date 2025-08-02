@@ -94,6 +94,7 @@ class ProfessorDAO
             return false;
         }
     }
+
     public function pesquisar($palavra)
     {
         try {
@@ -147,6 +148,23 @@ class ProfessorDAO
         }
     }
 
+    public function buscarPorUtilizador($id)
+    {
+        try {
+            $sql = "SELECT idProfessor FROM professor WHERE idUtilizador = :id";
+            $stmt = $this->conexao->prepare($sql);
+            $stmt->bindValue(':id', $id);
+            $stmt->execute();
+
+            $linha = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $linha ? $linha['idProfessor'] : null;
+        } catch (PDOException $e) {
+            die("Erro ao buscar ID do professor por utilizador: " . $e->getMessage());
+            return null;
+        }
+    }
+
+
     public function apagar(ProfessorDTO $professor)
     {
         try {
@@ -174,7 +192,7 @@ class ProfessorDAO
         }
     }
 
-        public function ExisteEmail($email)
+    public function ExisteEmail($email)
     {
         try {
             $sql = "SELECT COUNT(*) as total FROM Professor WHERE emailProfessor = :email";
@@ -188,7 +206,7 @@ class ProfessorDAO
         }
     }
 
-        public function ExisteTelefone($telefone)
+    public function ExisteTelefone($telefone)
     {
         try {
             $sql = "SELECT COUNT(*) as total FROM Professor WHERE contactoProfessor = :contacto";
@@ -210,6 +228,7 @@ class ProfessorDAO
         $dto->setNomeProfessor($linha['nomeProfessor']);
         $dto->setGeneroProfessor($linha['generoProfessor']);
         $dto->setEmailProfessor($linha['emailProfessor']);
+        $dto->setIdProfessor($linha['idProfessor']);
         $dto->setMoradaProfessor($linha['moradaProfessor']);
         $dto->setDataDeNascimentoProfessor($linha['dataNascProfessor']);
         $dto->setDataContProfessor($linha['dataContProfessor']);

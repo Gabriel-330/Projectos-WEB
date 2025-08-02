@@ -11,7 +11,7 @@ $acesso = $_SESSION['acesso'];
 $id = $_SESSION['idUtilizador'];
 
 // Verifica se o 'acesso' corresponde ao padrão de aluno (ex: 009266492HA041)
-if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)){
+if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
     // Se não for admin, redireciona para página de acesso negado ou login
     $_SESSION['success'] = "Acesso negado! Apenas professores podem aceder.";
     $_SESSION['icon'] = "error";
@@ -48,6 +48,32 @@ $usuarioId = $_SESSION['idUtilizador'];
     <link href="assets/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet" type="text/css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet" type="text/css" />
     <link href="assets/css/style.css" rel="stylesheet" type="text/css" />
+
+    <style>
+
+        .menu-user ul li.active a {
+            background-color: #0b5ed7;
+            /* cor de fundo ao clicar */
+            color: white;
+            /* cor do ícone ao clicar */
+            border-radius: 5px;
+        }
+    </style>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const menuItems = document.querySelectorAll(".menu-user ul li");
+
+            menuItems.forEach(function(item) {
+                item.addEventListener("click", function() {
+                    // Remove a classe 'active' de todos os itens
+                    menuItems.forEach(i => i.classList.remove("active"));
+                    // Adiciona a classe 'active' ao item clicado
+                    item.classList.add("active");
+                });
+            });
+        });
+    </script>
 </head>
 
 <body onload="initProgressBars()">
@@ -211,7 +237,8 @@ $usuarioId = $_SESSION['idUtilizador'];
                 <ul>
                     <li><a href="indexProfessor.php" title="Home"><i class="fa-solid fa-chalkboard"></i></a></li>
                     <li><a href="notaProfessorBase.php" title="Consultar Nota"><i class="fa-solid fa-clipboard"></i></a></li>
-                    <li><a href="#" title="Consultar Horário"><i class="fa-regular fa-calendar"></i></a></li>
+                    <li class="active"><a href="#" title="Consultar Horário"><i class="fa-regular fa-calendar"></i></a></li>
+                    <li><a href="documentoProfessorBase.php" title="Solicitar Documentos"><i class="fa-regular fa-folder-open"></i></a></li>
                 </ul>
             </div>
         </nav>
@@ -226,7 +253,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                     <li class="breadcrumb-item active"><a href="javascript:void(0)">Horário</a></li>
                 </ol>
             </div>
-      <?php
+            <?php
             require_once("../Modelo/DAO/HorarioDAO.php");
 
             $dao = new HorarioDAO();
@@ -254,7 +281,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                 </div>
             </form>
 
-       
+
 
             <div class="row">
                 <div class="col-lg-12">
@@ -275,8 +302,9 @@ $usuarioId = $_SESSION['idUtilizador'];
 
                                         </tr>
                                     </thead>
-                                     <tbody>
-                                        <?php $cont = 1; foreach ($horarios as $horario): ?>
+                                    <tbody>
+                                        <?php $cont = 1;
+                                        foreach ($horarios as $horario): ?>
                                             <tr>
                                                 <td><strong><?= $cont++; ?></strong></td>
                                                 <td><?= htmlspecialchars($horario->getTurma()); ?></td>
@@ -285,7 +313,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                                                 <td><?= htmlspecialchars($horario->getDiaSemana()); ?></td>
                                                 <td><?= htmlspecialchars($horario->getHoraInicio()); ?></td>
                                                 <td><?= htmlspecialchars($horario->getHoraFim()); ?></td>
-                        
+
                                                 <td>
                                                     <div class="dropdown">
                                                         <button type="button" class="btn btn-primary light sharp" data-bs-toggle="dropdown" aria-expanded="false">

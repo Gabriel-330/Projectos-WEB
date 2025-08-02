@@ -14,7 +14,7 @@ $acesso = strtoupper($_SESSION['acesso']);
 if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {    // Se não for admin, redireciona para página de acesso negado ou login
     $_SESSION['success'] = "Acesso negado! Apenas professores podem aceder.";
     $_SESSION['icon'] = "error";
-     header("Location: index.php");
+    header("Location: index.php");
     exit();
 }
 
@@ -43,9 +43,35 @@ $usuarioId = $_SESSION['idUtilizador'];
     <link href="assets/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet" type="text/css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet" type="text/css" />
     <link href="assets/css/style.css" rel="stylesheet" type="text/css" />
+     <link href="css/style-home.css" rel="stylesheet" type="text/css" />
     <script src="assets/js/alertsMessage.js"></script>
     <script src="assets/js/sweetalert.js"></script>
 </head>
+
+<style>
+    .menu-user ul li.active a {
+        background-color: #0b5ed7;
+        /* cor de fundo ao clicar */
+        color: white;
+        /* cor do ícone ao clicar */
+        border-radius: 5px;
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const menuItems = document.querySelectorAll(".menu-user ul li");
+
+        menuItems.forEach(function(item) {
+            item.addEventListener("click", function() {
+                // Remove a classe 'active' de todos os itens
+                menuItems.forEach(i => i.classList.remove("active"));
+                // Adiciona a classe 'active' ao item clicado
+                item.classList.add("active");
+            });
+        });
+    });
+</script>
 
 <body onload="initProgressBars()">
     <?php
@@ -158,7 +184,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                                                         <i class="fa <?= $icone ?>"></i>
                                                     </div>
                                                     <div class="media-body">
-                                                        <h6 class="mb-1"><?= $mensagem->getMensagemNotificacoes()?></h6>
+                                                        <h6 class="mb-1"><?= $mensagem->getMensagemNotificacoes() ?></h6>
                                                         <small class="d-block">
                                                             <?php
                                                             $data = new DateTime($mensagem->getDataNotificacoes());
@@ -203,13 +229,17 @@ $usuarioId = $_SESSION['idUtilizador'];
                 </div>
             </nav>
         </div>
+
+     <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
         <nav class="menu-user">
             <div class="menu-content">
                 <i class="fa-solid fa-user-graduate user-photo"></i>
                 <ul>
-                    <li><a href="#" title="Home"><i class="fa-solid fa-chalkboard"></i></a></li>
+                    <li class="active"><a href="#" title="Home"><i class="fa-solid fa-chalkboard"></i></a></li>
                     <li><a href="notaProfessorBase.php" title="Lançar Nota"><i class="fa-solid fa-clipboard"></i></a></li>
                     <li><a href="horarioProfessorBase.php" title="Consultar Horário"><i class="fa-regular fa-calendar"></i></a></li>
+                    <li><a href="documentoProfessorBase.php" title="Solicitar Documentos"><i class="fa-regular fa-folder-open"></i></a></li>
                 </ul>
             </div>
         </nav>
@@ -306,7 +336,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                                             <div class="card height415 dz-scroll" id="appointment-schedule">
                                                 <div class="card-header border-0 pb-0">
                                                     <h4 class="card-title">Próximos Eventos Académicos</h4>
-                                                
+
                                                 </div>
                                                 <div class="card-body">
 
@@ -409,6 +439,17 @@ $usuarioId = $_SESSION['idUtilizador'];
             });
         });
     </script>
+    <script>
+        function toggleMenu() {
+            const menu = document.querySelector('.menu-user');
+            if (menu.style.display === 'block') {
+                menu.style.display = 'none';
+            } else {
+                menu.style.display = 'block';
+            }
+        }
+    </script>
+
 
 </body>
 

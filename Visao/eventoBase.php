@@ -48,6 +48,32 @@ $usuarioId = $_SESSION['idUtilizador'];
     <link href="assets/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet" type="text/css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet" type="text/css" />
     <link href="assets/css/style.css" rel="stylesheet" type="text/css" />
+
+        <style>
+ 
+        .menu-user ul li.active a {
+            background-color: #0b5ed7;
+            /* cor de fundo ao clicar */
+            color: white;
+            /* cor do ícone ao clicar */
+            border-radius: 5px;
+        }
+    </style>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const menuItems = document.querySelectorAll(".menu-user ul li");
+
+            menuItems.forEach(function(item) {
+                item.addEventListener("click", function() {
+                    // Remove a classe 'active' de todos os itens
+                    menuItems.forEach(i => i.classList.remove("active"));
+                    // Adiciona a classe 'active' ao item clicado
+                    item.classList.add("active");
+                });
+            });
+        });
+    </script>
 </head>
 
 <body onload="initProgressBars()">
@@ -214,7 +240,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                     <li><a href="indexAdmin.php" title="Home"><i class="fa-solid fa-chalkboard"></i></a></li>
                     <li><a href="alunoBase.php" title="Cadastrar Aluno"><i class="fa-regular fa fa-user"></i></a></li>
                     <li><a href="professorBase.php" title="Cadastrar Professor"><i class="fa-solid fa-chalkboard-user"></i></a></li>
-                    <li><a href="#" title="Calendário Académico"><i class="fa-regular fa-calendar"></i></a></li>
+                    <li class="active"><a href="#" title="Calendário Académico"><i class="fa-regular fa-calendar"></i></a></li>
                     <li><a href="cursoBase.php" title="Cursos"><i class="fa-solid fa-book"></i></a></li>
                     <li><a href="horarioBase.php" title="Horários"><i class="fa-solid fa-clock"></i></a></li>
                     <li><a href="turmaBase.php" title="Turmas"><i class="fa-solid fa-users"></i></a></li>

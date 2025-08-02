@@ -32,11 +32,12 @@ class NotaDAO
     public function cadastrar(NotaDTO $notaDTO)
     {
         try {
-            $stmt = $this->conexao->prepare("INSERT INTO nota (idAluno, idDisciplina,idCurso, valorNota, dataAvaliacaoNota, tipoAvaliacaoNota,tipoNota, trimestreNota) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt = $this->conexao->prepare("INSERT INTO nota (idAluno, idDisciplina,idCurso,idProfessor, valorNota, dataAvaliacaoNota, tipoAvaliacaoNota,tipoNota, trimestreNota) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)");
             $stmt->execute([
                 $notaDTO->getIdAluno(),
                 $notaDTO->getIdDisciplina(),
                 $notaDTO->getIdCurso(),
+                $notaDTO->getIdProfessor(),
                 $notaDTO->getValorNota(),
                 $notaDTO->getDataValorNota(),
                 $notaDTO->getTipoAvaliacaoNota(),
@@ -53,12 +54,13 @@ class NotaDAO
     public function actualizar(NotaDTO $notaDTO)
     {
         try {
-            $sql = "UPDATE nota SET idAluno = :idAluno, idDisciplina = :idDisciplina, idCurso = :idCurso, valorNota = :valorNota, dataValorNota = :dataValorNota, tipoAvaliacaoNota = :tipoAvaliacaoNota, tipoNota = :tipoNota, trimestreNota = :trimestreNota WHERE idNota = :idNota";
+            $sql = "UPDATE nota SET idAluno = :idAluno, idDisciplina = :idDisciplina, idCurso = :idCurso, idProfessor = :idProfessor, valorNota = :valorNota, dataValorNota = :dataValorNota, tipoAvaliacaoNota = :tipoAvaliacaoNota, tipoNota = :tipoNota, trimestreNota = :trimestreNota WHERE idNota = :idNota";
             $stmt = $this->conexao->prepare($sql);
 
             $stmt->bindValue(":idAluno", $notaDTO->getIdAluno());
             $stmt->bindValue(":idDisciplina", $notaDTO->getIdDisciplina());
             $stmt->bindValue(":idCurso", $notaDTO->getIdCurso());
+            $stmt->bindValue(":idProfessor", $notaDTO->getIdProfessor());
             $stmt->bindValue(":valorNota", $notaDTO->getValorNota());
             $stmt->bindValue(":dataValorNota", $notaDTO->getDataValorNota());
             $stmt->bindValue(":tipoAvaliacaoNota", $notaDTO->getTipoAvaliacaoNota());
@@ -81,6 +83,7 @@ class NotaDAO
                 FROM nota 
                 INNER JOIN disciplina ON nota.idDisciplina = disciplina.idDisciplina
                 INNER JOIN aluno ON nota.idAluno = aluno.idAluno
+                INNER JOIN professor ON nota.idProfessor = professor.idProfessor
                 INNER JOIN curso ON nota.idCurso = curso.idCurso
                 WHERE nota.idAluno = :idAluno";
 
@@ -110,6 +113,7 @@ class NotaDAO
                 FROM nota 
                 INNER JOIN disciplina ON nota.idDisciplina = disciplina.idDisciplina
                 INNER JOIN aluno ON nota.idAluno = aluno.idAluno
+                INNER JOIN professor ON nota.idProfessor = professor.idProfessor
                 INNER JOIN curso ON nota.idCurso = curso.idCurso
                 WHERE disciplina.nomeDisciplina = :nomeDisciplina AND curso.nomeCurso = :nomeCurso";
 
@@ -139,6 +143,7 @@ class NotaDAO
                     FROM nota 
                     INNER JOIN disciplina ON nota.idDisciplina = disciplina.idDisciplina
                     INNER JOIN aluno ON nota.idAluno = aluno.idAluno
+                    INNER JOIN professor ON nota.idProfessor = professor.idProfessor
                     INNER JOIN curso ON nota.idCurso = curso.idCurso";
             $stmt = $this->conexao->query($sql);
             $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -162,6 +167,7 @@ class NotaDAO
                     FROM nota 
                     INNER JOIN disciplina ON nota.idDisciplina = disciplina.idDisciplina
                     INNER JOIN aluno ON nota.idAluno = aluno.idAluno
+                    INNER JOIN professor ON nota.idProfessor = professor.idProfessor
                     INNER JOIN curso ON nota.idCurso = curso.idCurso
                     WHERE nota.idNota = :idNota";
             $stmt = $this->conexao->prepare($sql);
@@ -172,6 +178,33 @@ class NotaDAO
             return $this->mapearNota($linha);
         } catch (Exception $e) {
             die("Erro ao buscar nota: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function buscarPorProfessor($idProfessor)
+    {
+        try {
+            $sql = "SELECT nota.*, disciplina.nomeDisciplina, curso.nomeCurso, aluno.nomeAluno, aluno.dataNascimentoAluno, aluno.responsavelAluno
+                FROM nota 
+                INNER JOIN disciplina ON nota.idDisciplina = disciplina.idDisciplina
+                INNER JOIN aluno ON nota.idAluno = aluno.idAluno
+                INNER JOIN professor ON nota.idProfessor = professor.idProfessor
+                INNER JOIN curso ON nota.idCurso = curso.idCurso
+                WHERE nota.idProfessor = :idProfessor";
+
+            $stmt = $this->conexao->prepare($sql);
+            $stmt->bindValue(':idProfessor', $idProfessor);
+            $stmt->execute();
+
+            $resultados = [];
+            while ($linha = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $resultados[] = $this->mapearNota($linha);
+            }
+
+            return $resultados;
+        } catch (Exception $e) {
+            die("Erro ao buscar notas por professor: " . $e->getMessage());
             return false;
         }
     }
@@ -223,6 +256,7 @@ class NotaDAO
         $dto->setIdNota($linha['idNota']);
         $dto->setIdCurso($linha['idCurso']);
         $dto->setIdAluno($linha['idAluno']);
+        $dto->setIdProfessor($linha['idProfessor']);
         $dto->setIdDisciplina($linha['idDisciplina']);
         $dto->setValorNota($linha['valorNota']);
         $dto->setDataValorNota($linha['dataAvaliacaoNota']);

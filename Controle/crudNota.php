@@ -34,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // === CADASTRAR NOTA ===
     if (isset($_POST['cadastrarNota'])) {
         $idAluno = intval($_POST['idAluno'] ?? 0);
+        $idProfessor = intval($_POST['idProfessor'] ?? 0);
         $idDisciplina = intval($_POST['idDisciplina'] ?? 0);
         $idCurso = intval($_POST['idCurso'] ?? 0);
         $valorNota = floatval($_POST['valorNota'] ?? 0);
@@ -47,6 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($idAluno && $idDisciplina && $valorNota && $dataAvaliacao && $tipoAvaliacao) {
             $notaDTO = new NotaDTO();
             $notaDTO->setIdAluno($idAluno);
+            $notaDTO->setIdProfessor($idProfessor);
             $notaDTO->setIdDisciplina($idDisciplina);
             $notaDTO->setIdCurso($idCurso);
             $notaDTO->setValorNota($valorNota);
@@ -80,6 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // === ATUALIZAR NOTA ===
     if (isset($_POST['actualizar'])) {
         $idNota = intval($_POST['idNota'] ?? 0);
+        $idProfessor = intval($_POST['idProfessor'] ?? 0);
         $idAluno = intval($_POST['idAluno'] ?? 0);
         $idDisciplina = intval($_POST['idDisciplina'] ?? 0);
         $idCurso = intval($_POST['idCurso'] ?? 0);
@@ -95,6 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $notaDTO = new NotaDTO();
             $notaDTO->setIdNota($idNota);
             $notaDTO->setIdAluno($idAluno);
+            $notaDTO->setIdProfessor($idProfessor);
             $notaDTO->setIdDisciplina($idDisciplina);
             $notaDTO->setIdCurso($idCurso);
             $notaDTO->setValorNota($valorNota);
@@ -152,6 +156,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 }
-
-
-

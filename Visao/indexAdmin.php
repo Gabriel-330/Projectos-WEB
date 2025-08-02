@@ -46,6 +46,31 @@ $usuarioId = $_SESSION['idUtilizador'];
     <link href="assets/css/style.css" rel="stylesheet" type="text/css" />
     <script src="assets/js/alertsMessage.js"></script>
     <script src="assets/js/sweetalert.js"></script>
+
+        <style>
+        .menu-user ul li.active a {
+            background-color: #0b5ed7;
+            /* cor de fundo ao clicar */
+            color: white;
+            /* cor do ícone ao clicar */
+            border-radius: 5px;
+        }
+    </style>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const menuItems = document.querySelectorAll(".menu-user ul li");
+
+            menuItems.forEach(function(item) {
+                item.addEventListener("click", function() {
+                    // Remove a classe 'active' de todos os itens
+                    menuItems.forEach(i => i.classList.remove("active"));
+                    // Adiciona a classe 'active' ao item clicado
+                    item.classList.add("active");
+                });
+            });
+        });
+    </script>
 </head>
 
 <body onload="initProgressBars()">
