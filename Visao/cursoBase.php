@@ -235,18 +235,17 @@ $usuarioId = $_SESSION['idUtilizador'];
         <nav class="menu-user">
             <div class="menu-content">
                 <i class="fa-solid fa-user-graduate user-photo"></i>
-                <ul>
-                    <li><a href="indexAdmin.php" title="Home"><i class="fa-solid fa-chalkboard"></i></a></li>
-                    <li><a href="alunoBase.php" title="Cadastrar Aluno"><i class="fa-regular fa fa-user"></i></a></li>
-                    <li><a href="professorBase.php" title="Cadastrar Professor"><i class="fa-solid fa-chalkboard-user"></i></a></li>
-                    <li><a href="eventoBase.php" title="Calendário Académico"><i class="fa-regular fa-calendar"></i></a></li>
-                    <li class="active"><a href="#" title="Cadastro de Cursos"><i class="fa-solid fa-book"></i></a></li>
-                    <li><a href="horarioBase.php" title="Cadastro de Horários"><i class="fa-solid fa-clock"></i></a></li>
-                    <li><a href="turmaBase.php" title="Cadastro de Turmas"><i class="fa-solid fa-users"></i></a></li>
-                    <li><a href="disciplinaBase.php" title="Cadastro de Disciplinas"><i class="fa-solid fa-book-open"></i></a></li>
-                    <li><a href="matriculaBase.php" title="Matrícula"><i class="fa-solid fa-file-signature"></i></a></li>
-                    
-                </ul>
+               <ul>
+    <li><a href="indexAdmin.php" title="Home"><i class="fa-solid fa-chalkboard"></i><span>Início</span></a></li>
+    <li class="active"><a href="#" title="Cadastrar Aluno"><i class="fa-regular fa fa-user"></i><span>Cadastrar</span></a></li>
+    <li><a href="professorBase.php" title="Cadastrar professor"><i class="fa-solid fa-chalkboard-user"></i><span>Professor</span></a></li>
+    <li><a href="eventoBase.php" title="Calendário Académico"><i class="fa-regular fa-calendar"></i><span>Eventos</span></a></li>
+    <li class="active"><a href="#" title="Cadastro de Cursos"><i class="fa-solid fa-book"></i><span>Cursos</span></a></li>
+    <li><a href="horarioBase.php" title="Cadastro de Horários"><i class="fa-solid fa-clock"></i><span>Horários</span></a></li>
+    <li><a href="turmaBase.php" title="Cadastro de Turmas"><i class="fa-solid fa-users"></i><span>Turmas</span></a></li>
+    <li><a href="disciplinaBase.php" title="Cadastro de Disciplinas"><i class="fa-solid fa-book-open"></i><span>Disciplinas</span></a></li>
+    <li><a href="matriculaBase.php" title="Matrícula"><i class="fa-solid fa-file-signature"></i><span>Matrícula</span></a></li>
+</ul>
             </div>
         </nav>
     </div>
