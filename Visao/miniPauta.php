@@ -70,6 +70,7 @@ foreach ($mapaNotas as $idAluno => &$disciplinas) {
             $npp = $trimestres[$trimestre]['NPP'] ?? null;
             $npt = $trimestres[$trimestre]['NPT'] ?? null;
 
+            // Calcular Média Trimestral (MT)
             if (is_numeric($mac) && is_numeric($npp) && is_numeric($npt)) {
                 $media = ($mac + $npp + $npt) / 3;
                 $trimestres[$trimestre]["MT"] = round($media);
@@ -77,22 +78,33 @@ foreach ($mapaNotas as $idAluno => &$disciplinas) {
             } else {
                 $trimestres[$trimestre]["MT"] = null;
             }
-        }
-    }
-}
 
-// Calcular MFD (Média Final do Discente)
-foreach ($mapaNotas as $idAluno => &$disciplinas) {
-    foreach ($disciplinas as $disciplina => &$trimestres) {
-        $mt1 = $trimestres['final']['MT1'] ?? null;
+            // Se a nota for PG neste trimestre, já guardar
+            if (isset($trimestres[$trimestre]['PG']) && is_numeric($trimestres[$trimestre]['PG'])) {
+                $trimestres['final']['PG'] = $trimestres[$trimestre]['PG'];
+            }
+        }
+
+        // Cálculo CF, CFX, PGX, PA (por disciplina)
         $mt2 = $trimestres['final']['MT2'] ?? null;
         $mt3 = $trimestres['final']['MT3'] ?? null;
+        $pg = $trimestres['final']['PG'] ?? null;
 
-        if (is_numeric($mt1) && is_numeric($mt2) && is_numeric($mt3)) {
-            $mediaFinal = ($mt1 + $mt2 + $mt3) / 3;
-            $trimestres['final']['MFD'] = round($mediaFinal); // arredondamento padrão
-        } else {
-            $trimestres['final']['MFD'] = null;
+        if (is_numeric($mt2) && is_numeric($mt3)) {
+            $cf = ($mt2 + $mt3) / 2;
+            $cfx = $cf * 0.6;
+            $trimestres['final']['CF'] = round($cf);
+            $trimestres['final']['CFX'] = round($cfx);
+        }
+
+        if (is_numeric($pg)) {
+            $pgx = $pg * 0.4;
+            $trimestres['final']['PGX'] = round($pgx);
+        }
+
+        if (isset($trimestres['final']['CFX'], $trimestres['final']['PGX'])) {
+            $pa = ($trimestres['final']['CFX'] + $trimestres['final']['PGX']);
+            $trimestres['final']['PA'] = round($pa);
         }
     }
 }
@@ -215,7 +227,7 @@ ob_start();
         <div class="col">
 
             <strong>Curso:</strong> <?= $nomeCurso ?><br>
-            <strong>Periodo:</strong> <?= $periodoMatricula?><br>
+            <strong>Periodo:</strong> <?= $periodoMatricula ?><br>
             <strong>Ano lectivo:</strong> <?= $anoLectico ?>
         </div>
 
@@ -227,7 +239,7 @@ ob_start();
                 <th colspan="4">1º Trimestre</th>
                 <th colspan="4">2º Trimestre</th>
                 <th colspan="4">3º Trimestre</th>
-                <th colspan="4">Classificação Geral</th>
+                <th colspan="5">Classificação Final</th>
             </tr>
             <tr>
                 <th>MAC</th>
@@ -242,10 +254,11 @@ ob_start();
                 <th>NPP</th>
                 <th>NPT</th>
                 <th>MT3</th>
-                <th>MT1</th>
-                <th>MT2</th>
-                <th>MT3</th>
-                <th>MFD</th>
+                <th>CF</th>
+                <th>CFX</th>
+                <th>PG</th>
+                <th>PGX</th>
+                <th>PA</th>
             </tr>
         </thead>
         <tbody>
@@ -264,15 +277,15 @@ ob_start();
                         <td style="background-color: yellow;"><?= formatarNota($mapaNotas[$idAluno][$disciplinaFiltrada][$trimestre]['MT'] ?? null) ?></td>
                     <?php endforeach; ?>
 
-                    <td><?= formatarNota($mapaNotas[$idAluno][$disciplinaFiltrada]['final']['MT1'] ?? null) ?></td>
-                    <td><?= formatarNota($mapaNotas[$idAluno][$disciplinaFiltrada]['final']['MT2'] ?? null) ?></td>
-                    <td><?= formatarNota($mapaNotas[$idAluno][$disciplinaFiltrada]['final']['MT3'] ?? null) ?></td>
-                    <td><?= formatarNota($mapaNotas[$idAluno][$disciplinaFiltrada]['final']['MFD'] ?? null) ?></td>
-
-                <?php endforeach; ?>
+                    <td><?= formatarNota($mapaNotas[$idAluno][$disciplinaFiltrada]['final']['CF'] ?? null) ?></td>
+                    <td><?= formatarNota($mapaNotas[$idAluno][$disciplinaFiltrada]['final']['CFX'] ?? null) ?></td>
+                    <td><?= formatarNota($mapaNotas[$idAluno][$disciplinaFiltrada]['final']['PG'] ?? null) ?></td>
+                    <td><?= formatarNota($mapaNotas[$idAluno][$disciplinaFiltrada]['final']['PGX'] ?? null) ?></td>
+                    <td><?= formatarNota($mapaNotas[$idAluno][$disciplinaFiltrada]['final']['PA'] ?? null) ?></td>
+                </tr>
+            <?php endforeach; ?>
         </tbody>
     </table>
-
     <div class="assinaturas">
         <div class="assinatura">
             Professor

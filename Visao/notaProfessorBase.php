@@ -2,8 +2,7 @@
 session_start();
 require_once("../Modelo/DAO/NotificacoesDAO.php");
 require_once("../Modelo/DTO/NotificacoesDTO.php");
-require_once("../Modelo/DAO/ProfessorDAO.php");
-require_once("../Modelo/DTO/ProfessorDTO.php");
+
 // Verifica se o utilizador está autenticado
 if (!isset($_SESSION['idUtilizador']) || !isset($_SESSION['acesso'])) {
     header("Location: index.php"); // Redireciona para login se não estiver autenticado
@@ -254,10 +253,10 @@ $usuarioId = $_SESSION['idUtilizador'];
             <div class="menu-content">
                 <i class="fa-solid fa-user-graduate user-photo"></i>
                 <ul>
-                    <li><a href="indexProfessor.php" title="Home"><i class="fa-solid fa-chalkboard"></i><span>Ínicio</span></a></li>
-                    <li class="active"><a href="#" title="Consultar Nota"><i class="fa-solid fa-clipboard"></i><span>Nota</span></a></li>
-                    <li><a href="horarioProfessorBase.php" title="Consultar Horário"><i class="fa-regular fa-calendar"></i><span>Horário</span></a></li>
-                    <li><a href="documentoProfessorBase.php" title="Solicitar Documentos"><i class="fa-regular fa-folder-open"></i><span>Documentos</span></a></li>
+                    <li><a href="indexProfessor.php" title="Home"><i class="fa-solid fa-chalkboard"></i></a></li>
+                    <li class="active"><a href="#" title="Consultar Nota"><i class="fa-solid fa-clipboard"></i></a></li>
+                    <li><a href="horarioProfessorBase.php" title="Consultar Horário"><i class="fa-regular fa-calendar"></i></a></li>
+                    <li><a href="documentoProfessorBase.php" title="Solicitar Documentos"><i class="fa-regular fa-folder-open"></i></a></li>
                 </ul>
             </div>
         </nav>
@@ -545,6 +544,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                                             <option value="NPP">NPP</option>
                                             <option value="NPT">NPT</option>
                                             <option value="NE">NE</option>
+                                            <option value="PG">PG</option>
                                         </select>
                                     </div>
                                 </div>
@@ -893,7 +893,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                     valorCorrespondente = "Avaliação Continua";
                 } else if (tipoSelecionado === "NPP") {
                     valorCorrespondente = "Prova do Professor";
-                } else if (tipoSelecionado === "NPT") {
+                } else if (tipoSelecionado === "NPT" || tipoSelecionado === "PG") {
                     valorCorrespondente = "Prova Trimestral";
                 } else if (tipoSelecionado === "NE") {
                     valorCorrespondente = "Exame";

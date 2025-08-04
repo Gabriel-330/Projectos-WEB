@@ -2,6 +2,8 @@
 session_start();
 require_once("../Modelo/DAO/NotificacoesDAO.php");
 require_once("../Modelo/DTO/NotificacoesDTO.php");
+require_once("../Modelo/DAO/ProfessorDAO.php");
+require_once("../Modelo/DTO/ProfessorDTO.php");
 // Verifica se o utilizador está autenticados
 if (!isset($_SESSION['idUtilizador']) || !isset($_SESSION['acesso'])) {
     header("Location: index.php"); // Redireciona para login se não estiver autenticado
@@ -9,7 +11,10 @@ if (!isset($_SESSION['idUtilizador']) || !isset($_SESSION['acesso'])) {
 }
 
 $acesso = $_SESSION['acesso'];
-
+$professorDAO = new ProfessorDAO();
+$professor = $professorDAO->buscarPorUtilizador($_SESSION['idUtilizador']);
+require_once("../Modelo/DAO/ProfessorDAO.php");
+require_once("../Modelo/DTO/ProfessorDTO.php");
 // Verifica se o 'acesso' corresponde ao padrão de aluno (ex: 009266492HA041)
 if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
     // Se não for aluno, redireciona com mensagem
@@ -47,8 +52,7 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
     <link href="assets/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet" type="text/css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet" type="text/css" />
     <link href="assets/css/style.css" rel="stylesheet" type="text/css" />
-
-    <style>
+     <style>
         .menu-user ul li.active a {
             background-color: #0b5ed7;
             /* cor de fundo ao clicar */
@@ -230,10 +234,10 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
             <div class="menu-content">
                 <i class="fa-solid fa-user-graduate user-photo"></i>
                 <ul>
-                    <li><a href="indexProfessor.php" title="Home"><i class="fa-solid fa-chalkboard"></i><span>Ínicio</span></a></li>
-                    <li><a href="notaProfessorBase.php" title="Consultar Nota"><i class="fa-solid fa-clipboard"></i><span>Nota</span></a></li>
-                    <li><a href="#" title="Consultar Horário"><i class="fa-regular fa-calendar"></i><span>Horário</span></a></li>
-                    <li class="active"><a href="#" title="Solicitar Documentos"><i class="fa-regular fa-folder-open"></i><span>Documentos</span></a></li>
+                    <li><a href="indexProfessor.php" title="Home"><i class="fa-solid fa-chalkboard"></i></a></li>
+                    <li><a href="notaProfessorBase.php" title="Consultar Nota"><i class="fa-solid fa-clipboard"></i></a></li>
+                    <li><a href="#" title="Consultar Horário"><i class="fa-regular fa-calendar"></i></a></li>
+                    <li class="active"><a href="#" title="Solicitar Documentos"><i class="fa-regular fa-folder-open"></i></a></li>
                 </ul>
             </div>
         </nav>
@@ -263,8 +267,8 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                     <div class="card">
                         <div class="card-header">
                             <h4 class="card-title">Busca de Documentos</h4>
-                            <a href="#" class="btn btn-primary btn-rounded float-right">
-                                <i class="fa fa-upload mr-2"></i>
+                            <a href="#" class="btn btn-primary btn-rounded float-right" data-bs-toggle="modal" data-bs-target="#modalDocumentoSolicitar">
+                                <i class="fa fa-upload mr-2" ></i>
                                 Solicitar documento
                             </a>
                         </div>
@@ -446,6 +450,93 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                 </div>
             </div>
         </div>
+ <div class="modal fade" id="modalDocumentoSolicitar">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Solicitar Documento</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="/Projectos-WEB/Visao/miniPauta.php" method="POST">
+                           
+
+                            <?php
+                            /*
+                            require_once("../Modelo/DAO/AlunoDAO.php");
+                            require_once("../Modelo/DAO/DisciplinaDAO.php");
+                            require_once("../Modelo/DAO/CursoDAO.php");
+                            require_once("../Modelo/DAO/TurmaDAO.php");
+
+                            $daoAluno = new AlunoDAO();
+                            $alunos = $daoAluno->listarTodos();
+
+                            $daoCurso = new CursoDAO();
+                            $cursos = $daoCurso->Mostrar();
+
+                            $daoDisciplina = new DisciplinaDAO();
+                            $disciplinas = $daoDisciplina->listarPorProfessor($professor);
+
+                            $daoTurma = new TurmaDAO();
+                            $turmas = $daoTurma->listarTodos();
+                            */
+                            ?>
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label><strong>Classe</strong></label>
+                                    <select id="classeSelect" class="form-control input-rounded" name="classe">
+                                        <option value="">Selecione</option>
+                                        <option value="10">10ª</option>
+                                        <option value="11">11ª</option>
+                                        <option value="12">12ª</option>
+                                        <option value="13">13ª</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label><strong>Curso</strong></label>
+                                    <select id="cursoSelect" name="idCurso" class="form-control input-rounded">
+                                        <option value="">Selecione</option>
+                                        <?php foreach ($cursos as $curso): ?>
+                                            <option value="<?= $curso->getIdCurso() ?>"><?= htmlspecialchars($curso->getNomeCurso()) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label><strong>Período</strong></label>
+                                    <select id="periodoSelect" class="form-control input-rounded" name="periodo">
+                                        <option value="">Selecione</option>
+                                        <option value="Manhã">Manhã</option>
+                                        <option value="Tarde">Tarde</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label><strong>Turma</strong></label>
+                                    <select id="turmaSelect" class="form-control input-rounded" name="idTurma">
+                                        <option value="">Selecione a turma</option>
+                                        <?php foreach ($turmas as $turma): ?>
+                                            <option value="<?= $turma->getIdTurma() ?>"><?= htmlspecialchars($turma->getNomeTurma()) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-primary btn-rounded" name="solicitarDocumento">Solicitar</button>
+                                
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
     </div>
     <div class="footer">
         <div class="copyright">
@@ -462,6 +553,8 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
     <script src="assets/vendor/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
     <script src="assets/js/custom.min.js" type="text/javascript"></script>
     <script src="assets/js/deznav-init.js" type="text/javascript"></script>
+   
+
     <script>
         function initProgressBars() {
             document.querySelectorAll('.progress-fill').forEach(bar => {
