@@ -480,13 +480,12 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                                             <option value="Boletim">Boletim</option>
                                             <option value="Certificado">Certificado</option>
                                             <option value="Declaração">Declaração</option>
-                                            
                                         </select>
                                     </div>    
                                 </div>
-                                <div class="text-center mt-4 campo-condicional">
+                                <div class="text-center mt-4">
                                     <button type="submit" class="btn btn-primary btn-rounded" name="solicitarDocumento">Solicitar Documento</button>
-                                    <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
+                                    
                                 </div>
                             </form>
                         </div>
