@@ -52,7 +52,7 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
     <link href="assets/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet" type="text/css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet" type="text/css" />
     <link href="assets/css/style.css" rel="stylesheet" type="text/css" />
-     <style>
+    <style>
         .menu-user ul li.active a {
             background-color: #0b5ed7;
             /* cor de fundo ao clicar */
@@ -234,10 +234,10 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
             <div class="menu-content">
                 <i class="fa-solid fa-user-graduate user-photo"></i>
                 <ul>
-                    <li><a href="indexProfessor.php" title="Home"><i class="fa-solid fa-chalkboard"></i></a></li>
-                    <li><a href="notaProfessorBase.php" title="Consultar Nota"><i class="fa-solid fa-clipboard"></i></a></li>
-                    <li><a href="#" title="Consultar Horário"><i class="fa-regular fa-calendar"></i></a></li>
-                    <li class="active"><a href="#" title="Solicitar Documentos"><i class="fa-regular fa-folder-open"></i></a></li>
+                    <li><a href="indexProfessor.php" title="Home"><i class="fa-solid fa-chalkboard"></i><span>Ínicio</span></a></li>
+                    <li><a href="notaProfessorBase.php" title="Consultar Nota"><i class="fa-solid fa-clipboard"></i><span>Notas</span></a></li>
+                    <li><a href="#" title="Consultar Horário"><i class="fa-regular fa-calendar"></i><span>Horários</span></a></li>
+                    <li class="active"><a href="#" title="Solicitar Documentos"><i class="fa-regular fa-folder-open"></i><span>Documentos</span></a></li>
                 </ul>
             </div>
         </nav>
@@ -268,7 +268,7 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                         <div class="card-header">
                             <h4 class="card-title">Busca de Documentos</h4>
                             <a href="#" class="btn btn-primary btn-rounded float-right" data-bs-toggle="modal" data-bs-target="#modalDocumentoSolicitar">
-                                <i class="fa fa-upload mr-2" ></i>
+                                <i class="fa fa-upload mr-2"></i>
                                 Solicitar documento
                             </a>
                         </div>
@@ -450,7 +450,7 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                 </div>
             </div>
         </div>
- <div class="modal fade" id="modalDocumentoSolicitar">
+        <div class="modal fade" id="modalDocumentoSolicitar">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -459,7 +459,7 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                     </div>
                     <div class="modal-body">
                         <form action="/Projectos-WEB/Visao/miniPauta.php" method="POST">
-                           
+
 
                             <?php
                             /*
@@ -527,7 +527,7 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
 
                             <div class="text-center mt-4">
                                 <button type="submit" class="btn btn-primary btn-rounded" name="solicitarDocumento">Solicitar</button>
-                                
+
                             </div>
                         </form>
                     </div>
@@ -553,7 +553,7 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
     <script src="assets/vendor/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
     <script src="assets/js/custom.min.js" type="text/javascript"></script>
     <script src="assets/js/deznav-init.js" type="text/javascript"></script>
-   
+
 
     <script>
         function initProgressBars() {
