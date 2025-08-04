@@ -1,10 +1,11 @@
 <?php
 class Conn
 {
+    //Adcionei a palavra passe
     private $host = "127.0.0.1";
     private $dbname = "SGWA"; 
     private $usuario = "root";
-    private $senha = "";
+    private $senha = "1234";
     private $porta = "3306";
     private $conexao;
 
