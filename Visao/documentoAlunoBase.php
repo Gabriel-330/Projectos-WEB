@@ -2,6 +2,8 @@
 session_start();
 require_once("../Modelo/DAO/NotificacoesDAO.php");
 require_once("../Modelo/DTO/NotificacoesDTO.php");
+require_once("../Modelo/DTO/ProfessorDTO.php");
+require_once("../Modelo/DAO/ProfessorDAO.php");
 // Verifica se o utilizador está autenticado
 if (!isset($_SESSION['idUtilizador']) || !isset($_SESSION['acesso'])) {
     header("Location: index.php"); // Redireciona para login se não estiver autenticado
@@ -9,7 +11,8 @@ if (!isset($_SESSION['idUtilizador']) || !isset($_SESSION['acesso'])) {
 }
 
 $acesso = $_SESSION['acesso'];
-
+$professorDAO = new ProfessorDAO();
+$professor = $professorDAO->buscarPorUtilizador($_SESSION['idUtilizador']);
 // Verifica se o 'acesso' corresponde ao padrão de aluno (ex: 009266492HA041)
 if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
     // Se não for aluno, redireciona com mensagem
@@ -48,7 +51,20 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet" type="text/css" />
     <link href="assets/css/style.css" rel="stylesheet" type="text/css" />
 
-    <style>
+     <style> 
+        .campo-condicional {
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity 2s ease, max-height 2s ease;
+        }
+
+        .campo-condicional.visivel {
+            opacity: 1;
+            max-height: 500px;
+            /* ou um valor suficiente para o conteúdo */
+        }
+
         .menu-user ul li.active a {
             background-color: #0b5ed7;
             /* cor de fundo ao clicar */
@@ -262,7 +278,7 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                     <div class="card">
                         <div class="card-header">
                             <h4 class="card-title">Busca de Documentos</h4>
-                            <a href="#" class="btn btn-primary btn-rounded float-right">
+                            <a href="#" class="btn btn-primary btn-rounded float-right" class="btn btn-primary btn-rounded" data-bs-toggle="modal" data-bs-target="#modalNotaCadastrar">
                                 <i class="fa fa-upload mr-2"></i>
                                 Solicitar documento
                             </a>
@@ -449,160 +465,27 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title">Cadastrar Nota</h5>
+                            <h5 class="modal-title">Solicitar Documento</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body">
-                            <form action="../Controle/crudNota.php" method="POST">
-                                <input type="hidden" name="idProfessor" value="<?= $professor ?>">
-
-                                <?php
-                                require_once("../Modelo/DAO/AlunoDAO.php");
-                                require_once("../Modelo/DAO/DisciplinaDAO.php");
-                                require_once("../Modelo/DAO/CursoDAO.php");
-                                require_once("../Modelo/DAO/TurmaDAO.php");
-
-                                $daoAluno = new AlunoDAO();
-                                $alunos = $daoAluno->listarTodos();
-
-                                $daoCurso = new CursoDAO();
-                                $cursos = $daoCurso->Mostrar();
-
-                                $daoDisciplina = new DisciplinaDAO();
-                                $disciplinas = $daoDisciplina->listarPorProfessor($professor);
-
-                                $daoTurma = new TurmaDAO();
-                                $turmas = $daoTurma->listarTodos();
-                                ?>
+                            <form action="../Controle/crudDocumento" method="POST">
+                               
 
                                 <div class="row">
                                     <div class="col-md-3">
-                                        <label><strong>Classe</strong></label>
+                                        <label><strong>Tipo de Documento</strong></label>
                                         <select id="classeSelect" class="form-control input-rounded">
                                             <option value="">Selecione</option>
-                                            <option value="10">10ª</option>
-                                            <option value="11">11ª</option>
-                                            <option value="12">12ª</option>
-                                            <option value="13">13ª</option>
+                                            <option value="Boletim">Boletim</option>
+                                            <option value="Certificado">Certificado</option>
+                                            <option value="Declaração">Declaração</option>
+                                            
                                         </select>
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <label><strong>Curso</strong></label>
-                                        <select id="cursoSelect" name="idCurso" class="form-control input-rounded">
-                                            <option value="">Selecione</option>
-                                            <?php foreach ($cursos as $curso): ?>
-                                                <option value="<?= $curso->getIdCurso() ?>"><?= htmlspecialchars($curso->getNomeCurso()) ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <label><strong>Período</strong></label>
-                                        <select id="periodoSelect" class="form-control input-rounded">
-                                            <option value="">Selecione</option>
-                                            <option value="Manhã">Manhã</option>
-                                            <option value="Tarde">Tarde</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <label><strong>Turma</strong></label>
-                                        <select id="turmaSelect" class="form-control input-rounded">
-                                            <option value="">Selecione a turma</option>
-                                            <?php foreach ($turmas as $turma): ?>
-                                                <option value="<?= $turma->getIdTurma() ?>"><?= htmlspecialchars($turma->getNomeTurma()) ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-
+                                    </div>    
                                 </div>
-
-                                <div class="form-group campo-condicional">
-                                    <label class="mb-1"><strong>Aluno<b style="font-size: 14px;color: red;">*</b></strong></label>
-                                    <select id="alunoSelect" name="idAluno" class="form-control input-rounded" required>
-                                        <option value="">Selecione o aluno</option>
-                                    </select>
-                                </div>
-
-                                <div class="form-group campo-condicional">
-                                    <label class="mb-1"><strong>Disciplina<b style="font-size: 14px;color: red;">*</b></strong></label>
-                                    <select class="form-control input-rounded" name="idDisciplina" required>
-                                        <option value="">Selecione a disciplina</option>
-                                        <?php foreach ($disciplinas as $disciplina): ?>
-                                            <option value="<?= htmlspecialchars($disciplina->getIdDisciplina()) ?>">
-                                                <?= htmlspecialchars($disciplina->getNomeDisciplina()) ?>
-                                            </option>
-
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group campo-condicional">
-                                            <label class="mb-1">
-                                                <strong>Tipo de Nota <b style="font-size: 14px;color: red;">*</b></strong>
-                                            </label>
-                                            <select class="form-control input-rounded" name="tipoNota" id="tipoNotaSelect" required>
-                                                <option value="">Selecione o tipo de Nota</option>
-                                                <option value="MAC">MAC</option>
-                                                <option value="NPP">NPP</option>
-                                                <option value="NPT">NPT</option>
-                                                <option value="NE">NE</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <div class="form-group campo-condicional">
-                                            <label class="mb-1">
-                                                <strong>Tipo de Avaliação <b style="font-size: 14px;color: red;">*</b></strong>
-                                            </label>
-                                            <select class="form-control input-rounded" name="tipoAvaliacaoNota" id="avaliacaoNotaSelect" required>
-                                                <option value="">Selecione o tipo de Avaliação</option>
-                                                <option value="Avaliação Continua">Avaliação Continua</option>
-                                                <option value="Prova do Professor">Prova do Professor</option>
-                                                <option value="Prova Trimestral">Prova Trimestral</option>
-                                                <option value="Exame">Exame</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-
-                                <div class="row">
-                                    <div class="col-md-6">
-
-                                        <div class="form-group campo-condicional">
-                                            <label class="mb-1"><strong>Trimestre<b style="font-size: 14px;color: red;">*</b></strong></label>
-                                            <select class="form-control input-rounded" name="trimestreNota" required>
-                                                <option value="">Selecione o Trimestre</option>
-                                                <option value="1º Trimestre">1º Trimestre</option>
-                                                <option value="2º Trimestre">2º Trimestre</option>
-                                                <option value="3º Trimestre">3º Trimestre</option>
-                                                <option value="-">-</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <div class="form-group campo-condicional">
-                                            <label class="mb-1"><strong>Valor<b style="font-size: 14px;color: red;">*</b></strong></label>
-                                            <input type="text" class="form-control input-rounded" name="valorNota" required>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <div class="form-group campo-condicional">
-                                            <label class="mb-1"><strong>Data da Avaliação<b style="font-size: 14px;color: red;">*</b></strong></label>
-                                            <input type="datetime-local" class="form-control input-rounded" name="dataAvaliacaoNota" required>
-                                        </div>
-                                    </div>
-                                </div>
-
-
                                 <div class="text-center mt-4 campo-condicional">
-                                    <button type="submit" class="btn btn-primary btn-rounded" name="cadastrarNota">Cadastrar</button>
+                                    <button type="submit" class="btn btn-primary btn-rounded" name="solicitarDocumento">Solicitar Documento</button>
                                     <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
                                 </div>
                             </form>
