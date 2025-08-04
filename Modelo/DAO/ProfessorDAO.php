@@ -15,7 +15,7 @@ class ProfessorDAO
             die("Erro: Falha ao obter a conexão com o banco de dados.");
         }
     }
-
+//Adcionei o método cadastrar para inserir um novo professor no banco de dados
     public function cadastrar(ProfessorDTO $professor)
     {
         try {
