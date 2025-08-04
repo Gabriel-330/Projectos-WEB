@@ -228,8 +228,8 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                 <i class="fa-solid fa-user-graduate user-photo"></i>
                 <ul>
                     <li><a href="indexAluno.php" title="Home"><i class="fa-solid fa-chalkboard"></i><span>Ínicio</span></a></li>
-                    <li><a href="notaAlunoBase.php" title="Consultar Nota"><i class="fa-solid fa-clipboard"></i><span>Nota</span></a></li>
-                    <li class="active"><a href="#" title="Consultar Horário"><i class="fa-regular fa-calendar"></i><span>Horário</span></a></li>
+                    <li><a href="notaAlunoBase.php" title="Consultar Nota"><i class="fa-solid fa-clipboard"></i><span>Notas</span></a></li>
+                    <li class="active"><a href="#" title="Consultar Horário"><i class="fa-regular fa-calendar"></i><span>Horários</span></a></li>
                     <li><a href="documentoAlunoBase.php" title="Solicitar Documentos"><i class="fa-regular fa-folder-open"></i><span>Documentos</span></a></li>
                 </ul>
             </div>

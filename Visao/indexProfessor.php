@@ -237,8 +237,8 @@ $usuarioId = $_SESSION['idUtilizador'];
                 <i class="fa-solid fa-user-graduate user-photo"></i>
                 <ul>
                     <li class="active"><a href="#" title="Home"><i class="fa-solid fa-chalkboard"></i><span>Ínicio</span></a></li>
-                    <li><a href="notaProfessorBase.php" title="Lançar Nota"><i class="fa-solid fa-clipboard"></i><span>Nota</span></a></li>
-                    <li><a href="horarioProfessorBase.php" title="Consultar Horário"><i class="fa-regular fa-calendar"></i><span>Horário</span></a></li>
+                    <li><a href="notaProfessorBase.php" title="Lançar Nota"><i class="fa-solid fa-clipboard"></i><span>Notas</span></a></li>
+                    <li><a href="horarioProfessorBase.php" title="Consultar Horário"><i class="fa-regular fa-calendar"></i><span>Horários</span></a></li>
                     <li><a href="documentoProfessorBase.php" title="Solicitar Documentos"><i class="fa-regular fa-folder-open"></i><span>Documentos</span></a></li>
                 </ul>
             </div>

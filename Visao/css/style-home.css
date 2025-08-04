@@ -93,26 +93,50 @@ nav.menu-user ul li a {
 }
 
 nav.menu-user ul li a span {
-    font-size: 11px;
-    margin-top: 3px;
+    font-size: 10px;
+    margin-top: 2px;
     color: #555;
     line-height: 1;
     text-align: center;
     display: block;
 }
 
-
-.btn-primary.active,
-nav.menu-user ul li a:hover,
-nav.menu-user ul li a:focus {
-    background-color: #0b5ed7;
-    color: #fff;
-    transform: scale(0.98);
-    outline: none;
+nav.menu-user ul li a {
+  width: 50px;
+  height: 50px;
+  padding: 6px;
+  border-radius: 6px;
 }
 
+
+.btn-primary.active,
+nav.menu-user ul li a{
+  color: #999;
+  transform: translateY(-5px); /* começa mais acima */
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+nav.menu-user ul li a:hover ,
+nav.menu-user ul li a:focus {
+    background-color: #0b5ed7;
+  color: #fff;
+  transform: translateY(0); /* desce suavemente */
+}
+/* ESTADO NORMAL */
+nav.menu-user ul li a span {
+  color: #999;
+  transition: color 0.3s ease;
+}
+
+/* QUANDO O ITEM É INTERAGIDO */
+nav.menu-user ul li a:hover span,
+nav.menu-user ul li a:focus span{
+  color: #fff;
+}
+
+
 nav.menu-user ul li a i {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
 }
 
 /* BOTÃO HAMBURGUER */
