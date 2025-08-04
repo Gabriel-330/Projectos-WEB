@@ -234,9 +234,9 @@ $idAluno = $alunoDAO->retornarDadosPorUtilizador($id);
             <div class="menu-content">
                 <i class="fa-solid fa-user-graduate user-photo"></i>
                 <ul>
-                    <li><a href="indexAluno.php" title="Home"><i class="fa-solid fa-chalkboard"></i><span>Ínicio</span></a></li>
-                    <li class="active"><a href="#" title="Consultar Nota"><i class="fa-solid fa-clipboard"></i><span>Nota</span></a></li>
-                    <li><a href="horarioAlunoBase.php" title="Consultar Horário"><i class="fa-regular fa-calendar"></i><span>Horário</span></a></li>
+                    <li><a href="indexAluno.php" title="Home"><i class="fa-solid fa-chalkboard"></i><span>Dashboard</span></a></li>
+                    <li class="active"><a href="#" title="Consultar Nota"><i class="fa-solid fa-clipboard"></i><span class="text-white">Notas</span></a></li>
+                    <li><a href="horarioAlunoBase.php" title="Consultar Horário"><i class="fa-regular fa-calendar"></i><span>Horários</span></a></li>
                     <li><a href="documentoAlunoBase.php" title="Solicitar Documentos"><i class="fa-regular fa-folder-open"></i><span>Documentos</span></a></li>
                 </ul>
             </div>
