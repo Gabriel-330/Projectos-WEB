@@ -7,7 +7,7 @@ if (!isset($_SESSION['idUtilizador']) || !isset($_SESSION['acesso'])) {
     header("Location: index.php"); // Redireciona para login se não estiver autenticado
     exit();
 }
-
+//sdsdfsd
 $acesso = strtoupper($_SESSION['acesso']);
 
 // Verifica se o acesso é email de admin válido (ex: termina com @admin.estrela.com)
