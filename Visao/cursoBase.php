@@ -7,7 +7,7 @@ if (!isset($_SESSION['idUtilizador']) || !isset($_SESSION['acesso'])) {
     header("Location: index.php"); // Redireciona para login se não estiver autenticado
     exit();
 }
- 
+
 $acesso = strtoupper($_SESSION['acesso']);
 
 // Verifica se o acesso é email de admin válido (ex: termina com @admin.estrela.com)
@@ -47,8 +47,7 @@ $usuarioId = $_SESSION['idUtilizador'];
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet" type="text/css" />
     <link href="assets/css/style.css" rel="stylesheet" type="text/css" />
 
-        <style>
-
+    <style>
         .menu-user ul li.active a {
             background-color: #0b5ed7;
             /* cor de fundo ao clicar */
@@ -129,7 +128,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                                 <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M22.75 15.8385V13.0463C22.7471 10.8855 21.9385 8.80353 20.4821 7.20735C19.0258 5.61116 17.0264 4.61555 14.875 4.41516V2.625C14.875 2.39294 14.7828 2.17038 14.6187 2.00628C14.4546 1.84219 14.2321 1.75 14 1.75C13.7679 1.75 13.5454 1.84219 13.3813 2.00628C13.2172 2.17038 13.125 2.39294 13.125 2.625V4.41534C10.9736 4.61572 8.97429 5.61131 7.51794 7.20746C6.06159 8.80361 5.25291 10.8855 5.25 13.0463V15.8383C4.26257 16.0412 3.37529 16.5784 2.73774 17.3593C2.10019 18.1401 1.75134 19.1169 1.75 20.125C1.75076 20.821 2.02757 21.4882 2.51969 21.9803C3.01181 22.4724 3.67904 22.7492 4.375 22.75H9.71346C9.91521 23.738 10.452 24.6259 11.2331 25.2636C12.0142 25.9013 12.9916 26.2497 14 26.2497C15.0084 26.2497 15.9858 25.9013 16.7669 25.2636C17.548 24.6259 18.0848 23.738 18.2865 22.75H23.625C24.321 22.7492 24.9882 22.4724 25.4803 21.9803C25.9724 21.4882 26.2492 20.821 26.25 20.125C26.2486 19.117 25.8998 18.1402 25.2622 17.3594C24.6247 16.5786 23.7374 16.0414 22.75 15.8385Z" fill="#007bff" />
                                 </svg>
-                                <span class="badge light text-white bg-primary"> <?=$n_Notificacoes?></span>
+                                <span class="badge light text-white bg-primary"> <?= $n_Notificacoes ?></span>
                             </a>
                             <div class="dropdown-menu dropdown-menu-end p-0">
                                 <div id="DZ_W_Notification1" class="widget-media dz-scroll p-3" style="max-height: 380px; overflow-y: auto;">
@@ -235,17 +234,17 @@ $usuarioId = $_SESSION['idUtilizador'];
         <nav class="menu-user">
             <div class="menu-content">
                 <i class="fa-solid fa-user-graduate user-photo"></i>
-               <ul>
-    <li><a href="indexAdmin.php" title="Home"><i class="fa-solid fa-chalkboard"></i><span>Início</span></a></li>
-    <li class="active"><a href="#" title="Cadastrar Aluno"><i class="fa-regular fa fa-user"></i><span>Cadastrar</span></a></li>
-    <li><a href="professorBase.php" title="Cadastrar professor"><i class="fa-solid fa-chalkboard-user"></i><span>Professor</span></a></li>
-    <li><a href="eventoBase.php" title="Calendário Académico"><i class="fa-regular fa-calendar"></i><span>Eventos</span></a></li>
-    <li class="active"><a href="#" title="Cadastro de Cursos"><i class="fa-solid fa-book"></i><span>Cursos</span></a></li>
-    <li><a href="horarioBase.php" title="Cadastro de Horários"><i class="fa-solid fa-clock"></i><span>Horários</span></a></li>
-    <li><a href="turmaBase.php" title="Cadastro de Turmas"><i class="fa-solid fa-users"></i><span>Turmas</span></a></li>
-    <li><a href="disciplinaBase.php" title="Cadastro de Disciplinas"><i class="fa-solid fa-book-open"></i><span>Disciplinas</span></a></li>
-    <li><a href="matriculaBase.php" title="Matrícula"><i class="fa-solid fa-file-signature"></i><span>Matrícula</span></a></li>
-</ul>
+                <ul>
+                    <li><a href="indexAdmin.php" title="Home"><i class="fa-solid fa-chalkboard"></i><span>Início</span></a></li>
+                    <li class="active"><a href="#" title="Cadastrar Aluno"><i class="fa-regular fa fa-user"></i><span>Cadastrar</span></a></li>
+                    <li><a href="professorBase.php" title="Cadastrar professor"><i class="fa-solid fa-chalkboard-user"></i><span>Professor</span></a></li>
+                    <li><a href="eventoBase.php" title="Calendário Académico"><i class="fa-regular fa-calendar"></i><span>Eventos</span></a></li>
+                    <li class="active"><a href="#" title="Cadastro de Cursos"><i class="fa-solid fa-book"></i><span>Cursos</span></a></li>
+                    <li><a href="horarioBase.php" title="Cadastro de Horários"><i class="fa-solid fa-clock"></i><span>Horários</span></a></li>
+                    <li><a href="turmaBase.php" title="Cadastro de Turmas"><i class="fa-solid fa-users"></i><span>Turmas</span></a></li>
+                    <li><a href="disciplinaBase.php" title="Cadastro de Disciplinas"><i class="fa-solid fa-book-open"></i><span>Disciplinas</span></a></li>
+                    <li><a href="matriculaBase.php" title="Matrícula"><i class="fa-solid fa-file-signature"></i><span>Matrícula</span></a></li>
+                </ul>
             </div>
         </nav>
     </div>
@@ -253,100 +252,101 @@ $usuarioId = $_SESSION['idUtilizador'];
 
 
     <div class="content-body" style="margin-top: -30px;">
-    <!-- row -->
-    <div class="container-fluid">
-        <div class="page-titles">
-            <h4>Gestão de Cursos</h4>
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="javascript:void(0)">Administração</a></li>
-                <li class="breadcrumb-item active"><a href="javascript:void(0)">Gestão de Cursos</a></li>
-            </ol>
-        </div>
-
-        <?php
-        require_once("../Modelo/DAO/CursoDAO.php");
-
-        $dao = new CursoDAO();
-        $palavra = $_GET['palavra'] ?? '';
-
-        // Verificar se algum filtro foi aplicado
-        if ($palavra) {
-            // Se filtros estiverem preenchidos, realizar pesquisa
-            $cursos = $dao->pesquisar($palavra);
-        } else {
-            // Caso contrário, exibir todos os cursos
-            $cursos = $dao->Mostrar();
-        }
-        ?>
-
-        <!-- Formulário de pesquisa -->
-        <form action="cursoBase.php" method="GET">
-            <div class="col-md-5">
-                <div class="form-group d-flex">
-                    <input type="text" class="form-control input-rounded flex-grow-1 me-2" style="width: 200px;" placeholder="Pesquisar curso..." name="palavra" value="<?= htmlspecialchars($palavra) ?>">
-
-                    <button type="submit" class="btn btn-primary btn-rounded" style="flex-shrink: 0;">
-                        <i class="fa fa-search mr-2"></i> Buscar
-                    </button>
-                </div>
+        <!-- row -->
+        <div class="container-fluid">
+            <div class="page-titles">
+                <h4>Gestão de Cursos</h4>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Administração</a></li>
+                    <li class="breadcrumb-item active"><a href="javascript:void(0)">Gestão de Cursos</a></li>
+                </ol>
             </div>
-        </form>
 
-        <!-- Lista de Cursos -->
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h4 class="card-title">Lista de Cursos</h4>
-                        <a href="criarCurso.php" class="btn btn-success btn-rounded" data-bs-toggle="modal" data-bs-target="#modalCursoCadastrar">+ Adicionar curso</a>
+            <?php
+            require_once("../Modelo/DAO/CursoDAO.php");
+
+            $dao = new CursoDAO();
+            $palavra = $_GET['palavra'] ?? '';
+
+            // Verificar se algum filtro foi aplicado
+            if ($palavra) {
+                // Se filtros estiverem preenchidos, realizar pesquisa
+                $cursos = $dao->pesquisar($palavra);
+            } else {
+                // Caso contrário, exibir todos os cursos
+                $cursos = $dao->Mostrar();
+            }
+            ?>
+
+            <!-- Formulário de pesquisa -->
+            <form action="cursoBase.php" method="GET">
+                <div class="col-md-5">
+                    <div class="form-group d-flex">
+                        <input type="text" class="form-control input-rounded flex-grow-1 me-2" style="width: 200px;" placeholder="Pesquisar curso..." name="palavra" value="<?= htmlspecialchars($palavra) ?>">
+
+                        <button type="submit" class="btn btn-primary btn-rounded" style="flex-shrink: 0;">
+                            <i class="fa fa-search mr-2"></i> Buscar
+                        </button>
                     </div>
+                </div>
+            </form>
 
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-responsive-md text-center">
-                                <thead>
-                                    <tr>
-                                        <th style="width:50px;"><strong>#</strong></th>
-                                        <th><strong>NOME DO CURSO</strong></th>
-                                        <th><strong>AÇÕES</strong></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php $cont = 1; foreach ($cursos as $curso): ?>
+            <!-- Lista de Cursos -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4 class="card-title">Lista de Cursos</h4>
+                            <a href="criarCurso.php" class="btn btn-success btn-rounded" data-bs-toggle="modal" data-bs-target="#modalCursoCadastrar">+ Adicionar curso</a>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-responsive-md text-center">
+                                    <thead>
                                         <tr>
-                                            <td><strong><?= $cont++; ?></strong></td>
-                                            <td><?= htmlspecialchars($curso->getNomeCurso()); ?></td>
-
-                                            <td>
-                                                <div class="dropdown">
-                                                    <button type="button" class="btn btn-primary light sharp" data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1">
-                                                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                                                <rect x="0" y="0" width="24" height="24"></rect>
-                                                                <circle fill="#000000" cx="5" cy="12" r="2"></circle>
-                                                                <circle fill="#000000" cx="12" cy="12" r="2"></circle>
-                                                                <circle fill="#000000" cx="19" cy="12" r="2"></circle>
-                                                            </g>
-                                                        </svg>
-                                                    </button>
-                                                    <div class="dropdown-menu">
-                                                        <a class="dropdown-item btn-apagar-curso" data-bs-toggle="modal" data-bs-target="#modalCursoApagar" data-id="<?= $curso->getIdCurso() ?>">Apagar</a>
-                                                        <a class="dropdown-item btn-editar-curso" data-bs-toggle="modal" data-bs-target="#modalCursoEditar" data-id="<?= $curso->getIdCurso() ?>">Editar</a>
-                                                    </div>
-                                                </div>
-                                            </td>
+                                            <th style="width:50px;"><strong>#</strong></th>
+                                            <th><strong>NOME DO CURSO</strong></th>
+                                            <th><strong>AÇÕES</strong></th>
                                         </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        <?php $cont = 1;
+                                        foreach ($cursos as $curso): ?>
+                                            <tr>
+                                                <td><strong><?= $cont++; ?></strong></td>
+                                                <td><?= htmlspecialchars($curso->getNomeCurso()); ?></td>
+
+                                                <td>
+                                                    <div class="dropdown">
+                                                        <button type="button" class="btn btn-primary light sharp" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1">
+                                                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                                    <rect x="0" y="0" width="24" height="24"></rect>
+                                                                    <circle fill="#000000" cx="5" cy="12" r="2"></circle>
+                                                                    <circle fill="#000000" cx="12" cy="12" r="2"></circle>
+                                                                    <circle fill="#000000" cx="19" cy="12" r="2"></circle>
+                                                                </g>
+                                                            </svg>
+                                                        </button>
+                                                        <div class="dropdown-menu">
+                                                            <a class="dropdown-item btn-apagar-curso" data-bs-toggle="modal" data-bs-target="#modalCursoApagar" data-id="<?= $curso->getIdCurso() ?>">Apagar</a>
+                                                            <a class="dropdown-item btn-editar-curso" data-bs-toggle="modal" data-bs-target="#modalCursoEditar" data-id="<?= $curso->getIdCurso() ?>">Editar</a>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-<div class="modal fade" id="modalCursoCadastrar">
+        <div class="modal fade" id="modalCursoCadastrar">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -354,19 +354,19 @@ $usuarioId = $_SESSION['idUtilizador'];
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                       <form action="../Controle/crudCurso.php" method="POST">
-									<div class="form-group">
-										<label class="mb-1"><strong>Nome do Curso</strong></label>
-										<input type="text" class="form-control input-rounded" name="nomeCurso" required>
-									</div>
+                        <form action="../Controle/crudCurso.php" method="POST">
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Nome do Curso</strong></label>
+                                <input type="text" class="form-control input-rounded" name="nomeCurso" required>
+                            </div>
 
 
 
-									<div class="text-center mt-4">
-										<button type="submit" class="btn btn-primary btn-rounded" name="criarCurso">Cadastrar</button>
-										<a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
-									</div>
-								</form>
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-primary btn-rounded" name="criarCurso">Cadastrar</button>
+                                <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
+                            </div>
+                        </form>
                     </div>
 
 
@@ -384,20 +384,20 @@ $usuarioId = $_SESSION['idUtilizador'];
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                       <form action="../Controle/crudCurso.php" method="POST">
-                         <input type="hidden" name="idCurso" id="idCursoEditar" required>
-									<div class="form-group">
-										<label class="mb-1"><strong>Nome do Curso</strong></label>
-										<input type="text" class="form-control input-rounded" id="nomeCursoEditar"  name="nomeCurso" required>
-									</div>
+                        <form action="../Controle/crudCurso.php" method="POST">
+                            <input type="hidden" name="idCurso" id="idCursoEditar" required>
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Nome do Curso</strong></label>
+                                <input type="text" class="form-control input-rounded" id="nomeCursoEditar" name="nomeCurso" required>
+                            </div>
 
 
 
-									<div class="text-center mt-4">
-										<button type="submit" class="btn btn-primary btn-rounded" name="actualizarCurso">Salvar Alterações</button>
-										<a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
-									</div>
-								</form>
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-primary btn-rounded" name="actualizarCurso">Salvar Alterações</button>
+                                <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
+                            </div>
+                        </form>
                     </div>
 
 
@@ -431,9 +431,9 @@ $usuarioId = $_SESSION['idUtilizador'];
         </div>
 
 
-</div>
+    </div>
 
-<script src="assets/js/jquery-3.6.0.min.js">
+    <script src="assets/js/jquery-3.6.0.min.js">
 
     </script>
 
@@ -457,7 +457,7 @@ $usuarioId = $_SESSION['idUtilizador'];
             });
         });
     </script>
-<script>
+    <script>
         $(document).on('click', '.btn-apagar-curso', function() {
             const id = $(this).data('id');
 

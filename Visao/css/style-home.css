@@ -95,6 +95,15 @@ nav.menu-user ul li a {
     /* espaço entre ícone e texto */
 }
 
+nav.menu-user ul li a span {
+    font-size: 11px !important;
+    margin-top: 3px;
+    color: #555;
+    line-height: 1;
+    text-align: center;
+    display: block;
+}
+
 
 .btn-primary.active,
 nav.menu-user ul li a:hover,

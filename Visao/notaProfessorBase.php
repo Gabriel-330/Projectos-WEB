@@ -252,7 +252,12 @@ $usuarioId = $_SESSION['idUtilizador'];
         <nav class="menu-user">
             <div class="menu-content">
                 <i class="fa-solid fa-user-graduate user-photo"></i>
-            
+                <ul>
+                    <li><a href="indexProfessor.php" title="Home"><i class="fa-solid fa-chalkboard"></i></a></li>
+                    <li class="active"><a href="#" title="Consultar Nota"><i class="fa-solid fa-clipboard"></i></a></li>
+                    <li><a href="horarioProfessorBase.php" title="Consultar Horário"><i class="fa-regular fa-calendar"></i></a></li>
+                    <li><a href="documentoProfessorBase.php" title="Solicitar Documentos"><i class="fa-regular fa-folder-open"></i></a></li>
+                </ul>
             </div>
         </nav>
     </div>

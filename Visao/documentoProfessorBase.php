@@ -233,7 +233,12 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
         <nav class="menu-user">
             <div class="menu-content">
                 <i class="fa-solid fa-user-graduate user-photo"></i>
-              
+                <ul>
+                    <li><a href="indexProfessor.php" title="Home"><i class="fa-solid fa-chalkboard"></i></a></li>
+                    <li><a href="notaProfessorBase.php" title="Consultar Nota"><i class="fa-solid fa-clipboard"></i></a></li>
+                    <li><a href="#" title="Consultar Horário"><i class="fa-regular fa-calendar"></i></a></li>
+                    <li class="active"><a href="#" title="Solicitar Documentos"><i class="fa-regular fa-folder-open"></i></a></li>
+                </ul>
             </div>
         </nav>
     </div>
