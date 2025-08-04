@@ -17,7 +17,7 @@
 
 <body>
     <?php
-    // Verifica se a variável de sessão com a mensagem está definida
+    // Verifica se a dvariável de sessão com a mensagem está definida
     if (isset($_SESSION['success']) && $_SESSION['success'] != '') {
 
     ?>
