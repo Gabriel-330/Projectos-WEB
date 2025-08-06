@@ -2,6 +2,8 @@
 session_start();
 require_once("../Modelo/DAO/NotificacoesDAO.php");
 require_once("../Modelo/DTO/NotificacoesDTO.php");
+require_once("../Modelo/DAO/ProfessorDAO.php");
+require_once("../Modelo/DTO/ProfessorDTO.php");
 
 // Verifica se o utilizador está autenticado
 if (!isset($_SESSION['idUtilizador']) || !isset($_SESSION['acesso'])) {

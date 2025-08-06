@@ -136,6 +136,35 @@ class NotaDAO
         }
     }
 
+      public function listarPorCurso($curso)
+    {
+        try {
+            $sql = "SELECT nota.*, disciplina.nomeDisciplina, curso.nomeCurso, aluno.nomeAluno, aluno.dataNascimentoAluno, aluno.responsavelAluno
+                FROM nota 
+                INNER JOIN disciplina ON nota.idDisciplina = disciplina.idDisciplina
+                INNER JOIN aluno ON nota.idAluno = aluno.idAluno
+                INNER JOIN professor ON nota.idProfessor = professor.idProfessor
+                INNER JOIN curso ON nota.idCurso = curso.idCurso
+                WHERE curso.nomeCurso = :nomeCurso";
+
+            $stmt = $this->conexao->prepare($sql);
+            $stmt->bindParam(':nomeCurso', $curso, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $resultado = [];
+
+            foreach ($registros as $linha) {
+                $resultado[] = $this->mapearNota($linha);
+            }
+
+            return $resultado;
+        } catch (Exception $ex) {
+            die ("Erro ao listar notas do aluno: " . $ex->getMessage());
+            return false;
+        }
+    }
+
     public function listarTodos()
     {
         try {

@@ -6,9 +6,14 @@ require_once("../Modelo/DAO/conn.php");
 require_once("../Modelo/DAO/AlunoDAO.php");
 require_once("../Modelo/DAO/NotaDAO.php");
 require_once("../Modelo/DTO/AlunoDTO.php");
+require_once '../Modelo/DTO/DisciplinaDTO.php';
+require_once '../Modelo/DAO/DisciplinaDAO.php';
+require_once '../Modelo/DAO/MatriculaDAO.php';
 require_once("../Modelo/DTO/NotaDTO.php");
 require_once '../Modelo/DAO/MatriculaDAO.php';
 require_once '../Modelo/DTO/MatriculaDTO.php';
+require_once '../Modelo/DAO/CursoDAO.php';
+require_once '../Modelo/DTO/CursoDTO.php';
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -16,6 +21,8 @@ use Dompdf\Options;
 $alunoDAO = new AlunoDAO();
 $notaDAO = new NotaDAO();
 $matriculasDAO = new MatriculaDAO();
+$disciplinaDAO = new DisciplinaDAO();
+$cursoDAO = new CursoDAO();
 
 
 $anoAtual = date("Y");
@@ -26,15 +33,19 @@ $classe = "12";
 $periodo = "Tarde";
 $curso = "Informática";
 $turma = "A";
-$disciplinaFiltrada = "Empreendedorismo"; // <-- Altere para a disciplina desejada
 
-// Obter lista de todos os alunos por classe, periodo, curso e turma
+
+
+$idCurso = $cursoDAO->buscarIdPorNomeCurso($curso);
+$disciplinasFixas = $disciplinaDAO->listarDisciplinaPorCurso($idCurso);
+
+// Obter alunos
 $matriculas = $matriculasDAO->listarMatriculaPorCPCT($classe, $periodo, $curso, $turma);
 
-// Obter notas de todos os alunos
-$notas = $notaDAO->listarPorDC($disciplinaFiltrada, $curso);
+// Obter todas as notas para o curso
+$notas = $notaDAO->listarPorCurso($curso); // <-- Use notas por curso
 
-// Mapa de notas no formato: $mapaNotas[disciplina][trimestre][tipo]
+// Construir o mapa de notas
 $mapaNotas = [];
 
 $matricula = !empty($matriculas) ? $matriculas[0] : null;
@@ -47,7 +58,6 @@ if ($matricula) {
 }
 
 foreach ($notas as $nota) {
-
     $disciplina = $nota->getNomeDisciplina();
     $idAluno = $nota->getIdAluno();
     $trimestre = $nota->getTrimestreNota();
@@ -56,36 +66,40 @@ foreach ($notas as $nota) {
 
     $mapaNotas[$idAluno][$disciplina][$trimestre][$tipo] = $valor;
 
-    // Se for tipo final (MT1, MT2, MFD etc), armazena também
     if (in_array($tipo, ["MT1P", "MT2", "MT3", "MFD", "MPP", "MFA", "MEC"])) {
         $mapaNotas[$idAluno][$disciplina]['final'][$tipo] = $valor;
     }
 }
 
+// Cálculo das médias
+foreach ($matriculas as $aluno) {
+    $idAluno = $aluno->getIdAluno();
 
-foreach ($mapaNotas as $idAluno => &$disciplinas) {
-    foreach ($disciplinas as $disciplina => &$trimestres) {
+    foreach ($disciplinasFixas as $disciplina) {
+        if (!isset($mapaNotas[$idAluno][$disciplina->getNomeDisciplina()])) {
+            $mapaNotas[$idAluno][$disciplina->getNomeDisciplina()] = [];
+        }
+
+        $trimestres = &$mapaNotas[$idAluno][$disciplina->getNomeDisciplina()];
+
         foreach (["1º Trimestre", "2º Trimestre", "3º Trimestre"] as $i => $trimestre) {
             $mac = $trimestres[$trimestre]['MAC'] ?? null;
             $npp = $trimestres[$trimestre]['NPP'] ?? null;
             $npt = $trimestres[$trimestre]['NPT'] ?? null;
 
-            // Calcular Média Trimestral (MT)
             if (is_numeric($mac) && is_numeric($npp) && is_numeric($npt)) {
                 $media = ($mac + $npp + $npt) / 3;
                 $trimestres[$trimestre]["MT"] = round($media);
-                $trimestres['final']["MT" . ($i + 1)] = round($media); // MT1, MT2, MT3
+                $trimestres['final']["MT" . ($i + 1)] = round($media);
             } else {
                 $trimestres[$trimestre]["MT"] = null;
             }
 
-            // Se a nota for PG neste trimestre, já guardar
             if (isset($trimestres[$trimestre]['PG']) && is_numeric($trimestres[$trimestre]['PG'])) {
                 $trimestres['final']['PG'] = $trimestres[$trimestre]['PG'];
             }
         }
 
-        // Cálculo CF, CFX, PGX, PA (por disciplina)
         $mt2 = $trimestres['final']['MT2'] ?? null;
         $mt3 = $trimestres['final']['MT3'] ?? null;
         $pg = $trimestres['final']['PG'] ?? null;
@@ -104,18 +118,12 @@ foreach ($mapaNotas as $idAluno => &$disciplinas) {
 
         if (isset($trimestres['final']['CFX'], $trimestres['final']['PGX'])) {
             $pa = ($trimestres['final']['CFX'] + $trimestres['final']['PGX']);
-            $trimestres['final']['PA'] = round($pa);
+            $trimestres['final']['CA'] = round($pa);
         }
     }
 }
 
-// Função segura para obter nota
-function obterNota($mapaNotas, $disciplina, $trimestre, $tipo)
-{
-    return $mapaNotas[$disciplina][$trimestre][$tipo] ?? '-';
-}
-
-// Função para formatar a nota com cor
+// Funções auxiliares
 function formatarNota($nota)
 {
     if ($nota === '-' || $nota === null) {
@@ -128,7 +136,6 @@ function formatarNota($nota)
 // Gerar HTML
 ob_start();
 ?>
-
 <!DOCTYPE html>
 <html lang="pt">
 
@@ -137,7 +144,6 @@ ob_start();
     <title>Mini Pauta</title>
     <style>
         body {
-
             font-family: Arial;
             font-size: 12px;
             margin: 10px;
@@ -219,46 +225,33 @@ ob_start();
 
     <div class="dados">
         <div class="col">
-            <strong>Disciplina:</strong> <?= $disciplinaFiltrada ?><br>
-            <strong>Turma:</strong> <?= $nomeTurma ?><br>
             <strong>Classe:</strong> <?= $classeMatricula ?><br>
-
+            <strong>Turma:</strong> <?= $nomeTurma ?><br>
         </div>
         <div class="col">
-
             <strong>Curso:</strong> <?= $nomeCurso ?><br>
-            <strong>Periodo:</strong> <?= $periodoMatricula ?><br>
-            <strong>Ano lectivo:</strong> <?= $anoLectico ?>
+            <strong>Período:</strong> <?= $periodoMatricula ?><br>
+            <strong>Ano Lectivo:</strong> <?= $anoLectico ?><br>
         </div>
-
     </div>
+
     <table class="header-tabela">
         <thead>
             <tr>
                 <th rowspan="2">Aluno</th>
-                <th colspan="4">1º Trimestre</th>
-                <th colspan="4">2º Trimestre</th>
-                <th colspan="4">3º Trimestre</th>
-                <th colspan="5">Classificação Final</th>
+                <?php foreach ($disciplinasFixas as $disciplina): ?>
+                    <th colspan="6"><?= htmlspecialchars($disciplina->getNomeDisciplina()) ?></th>
+                <?php endforeach; ?>
             </tr>
             <tr>
-                <th>MAC</th>
-                <th>NPP</th>
-                <th>NPT</th>
-                <th>MT1</th>
-                <th>MAC</th>
-                <th>NPP</th>
-                <th>NPT</th>
-                <th>MT2</th>
-                <th>MAC</th>
-                <th>NPP</th>
-                <th>NPT</th>
-                <th>MT3</th>
-                <th>CF</th>
-                <th>CFX</th>
-                <th>PG</th>
-                <th>PGX</th>
-                <th>PA</th>
+                <?php foreach ($disciplinasFixas as $disciplina): ?>
+                    <th>MT1</th>
+                    <th>MT2</th>
+                    <th>MT3</th>
+                    <th>CF</th>
+                    <th>PG</th>
+                    <th>CA</th>
+                <?php endforeach; ?>
             </tr>
         </thead>
         <tbody>
@@ -268,24 +261,20 @@ ob_start();
                 $nomeAluno = $aluno->getNomeAluno();
                 ?>
                 <tr>
-                    <td><?= htmlspecialchars($nomeAluno) ?></td>
-
-                    <?php foreach (["1º Trimestre", "2º Trimestre", "3º Trimestre"] as $i => $trimestre): ?>
-                        <td><?= formatarNota($mapaNotas[$idAluno][$disciplinaFiltrada][$trimestre]['MAC'] ?? null) ?></td>
-                        <td><?= formatarNota($mapaNotas[$idAluno][$disciplinaFiltrada][$trimestre]['NPP'] ?? null) ?></td>
-                        <td><?= formatarNota($mapaNotas[$idAluno][$disciplinaFiltrada][$trimestre]['NPT'] ?? null) ?></td>
-                        <td style="background-color: yellow;"><?= formatarNota($mapaNotas[$idAluno][$disciplinaFiltrada][$trimestre]['MT'] ?? null) ?></td>
+                    <td style="width: 200px;"><?= htmlspecialchars($nomeAluno) ?></td>
+                    <?php foreach ($disciplinasFixas as $disciplina): ?>
+                        <td><?= formatarNota($mapaNotas[$idAluno][$disciplina->getNomeDisciplina()]['final']['MT1'] ?? null) ?></td>
+                        <td><?= formatarNota($mapaNotas[$idAluno][$disciplina->getNomeDisciplina()]['final']['MT2'] ?? null) ?></td>
+                        <td><?= formatarNota($mapaNotas[$idAluno][$disciplina->getNomeDisciplina()]['final']['MT3'] ?? null) ?></td>
+                        <td><?= formatarNota($mapaNotas[$idAluno][$disciplina->getNomeDisciplina()]['final']['CF'] ?? null) ?></td>
+                        <td><?= formatarNota($mapaNotas[$idAluno][$disciplina->getNomeDisciplina()]['final']['PG'] ?? null) ?></td>
+                        <td style="background-color: yellow;"><?= formatarNota($mapaNotas[$idAluno][$disciplina->getNomeDisciplina()]['final']['CA'] ?? null) ?></td>
                     <?php endforeach; ?>
-
-                    <td><?= formatarNota($mapaNotas[$idAluno][$disciplinaFiltrada]['final']['CF'] ?? null) ?></td>
-                    <td><?= formatarNota($mapaNotas[$idAluno][$disciplinaFiltrada]['final']['CFX'] ?? null) ?></td>
-                    <td><?= formatarNota($mapaNotas[$idAluno][$disciplinaFiltrada]['final']['PG'] ?? null) ?></td>
-                    <td><?= formatarNota($mapaNotas[$idAluno][$disciplinaFiltrada]['final']['PGX'] ?? null) ?></td>
-                    <td><?= formatarNota($mapaNotas[$idAluno][$disciplinaFiltrada]['final']['PA'] ?? null) ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
     </table>
+
     <div class="assinaturas">
         <div class="assinatura">
             Professor
@@ -302,13 +291,13 @@ ob_start();
 <?php
 $html = ob_get_clean();
 
-// Configurações Dompdf
+// Gerar PDF
 $options = new Options();
 $options->set('isRemoteEnabled', true);
 $options->set('defaultFont', 'Arial');
 
 $dompdf = new Dompdf($options);
 $dompdf->loadHtml($html);
-$dompdf->setPaper('A4', 'landscape'); // Horizontal
+$dompdf->setPaper('A3', 'landscape');
 $dompdf->render();
 $dompdf->stream("miniPauta.pdf", ["Attachment" => false]);

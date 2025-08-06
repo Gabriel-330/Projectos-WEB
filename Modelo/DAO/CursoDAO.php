@@ -48,7 +48,7 @@ class CursoDAO
         }
     }
 
-public function actualizarCurso(CursoDTO $curso)
+    public function actualizarCurso(CursoDTO $curso)
     {
         try {
             $sql = "UPDATE curso SET nomeCurso = ? WHERE idCurso = ?";
@@ -56,7 +56,7 @@ public function actualizarCurso(CursoDTO $curso)
             return $stmt->execute([
                 $curso->getNomeCurso(),
                 $curso->getIdCurso(),
-                
+
             ]);
         } catch (PDOException $e) {
             error_log("Erro ao actualizar o Curso: " . $e->getMessage());
@@ -106,6 +106,24 @@ public function actualizarCurso(CursoDTO $curso)
             return false;
         }
     }
+
+    public function buscarIdPorNomeCurso($nomeCurso)
+    {
+        try {
+            $sql = "SELECT idCurso FROM curso WHERE nomeCurso = :nome";
+            $stmt = $this->conexao->prepare($sql);
+            $stmt->bindValue(':nome', $nomeCurso);
+            $stmt->execute();
+
+            $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            return $resultado ? $resultado['idCurso'] : null;
+        } catch (PDOException $e) {
+            echo "Erro ao buscar ID do curso pelo nome: " . $e->getMessage();
+            return false;
+        }
+    }
+
 
     public function Apagar(CursoDTO $curso)
     {

@@ -85,7 +85,7 @@ nav.menu-user ul li a {
     text-decoration: none;
     border-radius: 8px;
     font-weight: bold;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.2s ease, color 0.2s ease;
     box-sizing: border-box;
     padding: 10px;
     gap: 5px;
@@ -103,7 +103,7 @@ nav.menu-user ul li a::before {
     height: 0;
     background-color: #0b5ed7;
     z-index: 0;
-    transition: height 0.4s ease-in-out;
+    transition: height 0.2s ease-in-out;
     border-radius: 8px;
 }
 

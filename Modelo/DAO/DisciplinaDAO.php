@@ -104,10 +104,37 @@ class DisciplinaDAO
 
             return null; // Nenhuma disciplina encontrada
         } catch (PDOException $e) {
-            echo "Erro ao listar disciplina: " . $e->getMessage();
+            die("Erro ao listar disciplina: " . $e->getMessage());
             return null;
         }
     }
+
+    public function listarDisciplinaPorCurso($curso)
+    {
+        try {
+            $sql = "SELECT d.*, c.nomeCurso, p.nomeProfessor
+                FROM disciplina d
+                INNER JOIN curso c ON d.idCurso = c.idCurso
+                INNER JOIN professor p ON d.idProfessor = p.idProfessor
+                WHERE d.idCurso = :idCurso";
+            $stmt = $this->conexao->prepare($sql);
+            $stmt->bindParam(":idCurso", $curso, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $resultado = [];
+
+            foreach ($registros as $linha) {
+                $resultado[] = $this->mapearParaDTO($linha);
+            }
+
+            return $resultado;
+        } catch (PDOException $e) {
+            die("Erro ao listar disciplinas: " . $e->getMessage());
+            return false;
+        }
+    }
+
 
     public function listarPorProfessor($idProfessor)
     {
