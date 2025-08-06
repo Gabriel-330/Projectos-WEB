@@ -10,7 +10,6 @@ require_once '../Modelo/DTO/DisciplinaDTO.php';
 require_once '../Modelo/DAO/DisciplinaDAO.php';
 require_once '../Modelo/DAO/MatriculaDAO.php';
 require_once("../Modelo/DTO/NotaDTO.php");
-require_once '../Modelo/DAO/MatriculaDAO.php';
 require_once '../Modelo/DTO/MatriculaDTO.php';
 require_once '../Modelo/DAO/CursoDAO.php';
 require_once '../Modelo/DTO/CursoDTO.php';
@@ -24,7 +23,6 @@ $matriculasDAO = new MatriculaDAO();
 $disciplinaDAO = new DisciplinaDAO();
 $cursoDAO = new CursoDAO();
 
-
 $anoAtual = date("Y");
 $anoAnterior = $anoAtual - 1;
 $anoLectico = "$anoAnterior/$anoAtual";
@@ -34,8 +32,6 @@ $periodo = "Tarde";
 $curso = "Informática";
 $turma = "A";
 
-
-
 $idCurso = $cursoDAO->buscarIdPorNomeCurso($curso);
 $disciplinasFixas = $disciplinaDAO->listarDisciplinaPorCurso($idCurso);
 
@@ -43,7 +39,7 @@ $disciplinasFixas = $disciplinaDAO->listarDisciplinaPorCurso($idCurso);
 $matriculas = $matriculasDAO->listarMatriculaPorCPCT($classe, $periodo, $curso, $turma);
 
 // Obter todas as notas para o curso
-$notas = $notaDAO->listarPorCurso($curso); // <-- Use notas por curso
+$notas = $notaDAO->listarPorCurso($curso);
 
 // Construir o mapa de notas
 $mapaNotas = [];
@@ -123,7 +119,54 @@ foreach ($matriculas as $aluno) {
     }
 }
 
-// Funções auxiliares
+// Classificação final de cada aluno
+$classificacoesAlunos = [];
+
+foreach ($matriculas as $aluno) {
+    $idAluno = $aluno->getIdAluno();
+    $contadorNegativas = 0;
+    $recursos = [];
+    $notasEmFalta = false;
+
+    foreach ($disciplinasFixas as $disciplina) {
+        $nomeDisciplina = $disciplina->getNomeDisciplina();
+        $ca = $mapaNotas[$idAluno][$nomeDisciplina]['final']['CA'] ?? null;
+
+        if (!is_numeric($ca)) {
+            $notasEmFalta = true;
+            break; // não precisa verificar mais disciplinas
+        }
+
+        if ($ca < 10) {
+            $contadorNegativas++;
+            $recursos[] = $nomeDisciplina;
+        }
+    }
+
+    if ($notasEmFalta) {
+        $classificacoesAlunos[$idAluno] = [
+            "texto" => "Notas em falta",
+            "cor" => "#dc3545"
+        ];
+    } elseif ($contadorNegativas > 4) {
+        $classificacoesAlunos[$idAluno] = [
+            "texto" => "Reprovado",
+            "cor" => "#dc3545"
+        ];
+    } elseif ($contadorNegativas > 0) {
+        $classificacoesAlunos[$idAluno] = [
+            "texto" => "Recurso: " . implode(", ", $recursos),
+            "cor" => "#dc3545"
+        ];
+    } else {
+        $classificacoesAlunos[$idAluno] = [
+            "texto" => "Aprovado",
+            "cor" => "#0d6efd"
+        ];
+    }
+}
+
+// Função para formatar nota
 function formatarNota($nota)
 {
     if ($nota === '-' || $nota === null) {
@@ -136,12 +179,13 @@ function formatarNota($nota)
 // Gerar HTML
 ob_start();
 ?>
+
 <!DOCTYPE html>
 <html lang="pt">
 
 <head>
     <meta charset="UTF-8">
-    <title>Mini Pauta</title>
+    <title>Pauta</title>
     <style>
         body {
             font-family: Arial;
@@ -220,7 +264,7 @@ ob_start();
         Ministério da Educação<br>
         Governo da Província de Luanda<br>
         Instituto Politécnico Privado Estrela Dourada de Belas<br>
-        <h3>Mini Pauta</h3>
+        <h3>Pauta</h3>
     </div>
 
     <div class="dados">
@@ -242,6 +286,7 @@ ob_start();
                 <?php foreach ($disciplinasFixas as $disciplina): ?>
                     <th colspan="6"><?= htmlspecialchars($disciplina->getNomeDisciplina()) ?></th>
                 <?php endforeach; ?>
+                <th rowspan="2">Classificação</th>
             </tr>
             <tr>
                 <?php foreach ($disciplinasFixas as $disciplina): ?>
@@ -259,6 +304,7 @@ ob_start();
                 <?php
                 $idAluno = $aluno->getIdAluno();
                 $nomeAluno = $aluno->getNomeAluno();
+                $classificacao = $classificacoesAlunos[$idAluno] ?? ['texto' => '-', 'cor' => '#6c757d'];
                 ?>
                 <tr>
                     <td style="width: 200px;"><?= htmlspecialchars($nomeAluno) ?></td>
@@ -270,10 +316,14 @@ ob_start();
                         <td><?= formatarNota($mapaNotas[$idAluno][$disciplina->getNomeDisciplina()]['final']['PG'] ?? null) ?></td>
                         <td style="background-color: yellow;"><?= formatarNota($mapaNotas[$idAluno][$disciplina->getNomeDisciplina()]['final']['CA'] ?? null) ?></td>
                     <?php endforeach; ?>
+                    <td style="color: <?= $classificacao['cor'] ?>; font-weight: bold;">
+                        <?= htmlspecialchars($classificacao['texto']) ?>
+                    </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
     </table>
+
 
     <div class="assinaturas">
         <div class="assinatura">
@@ -300,4 +350,4 @@ $dompdf = new Dompdf($options);
 $dompdf->loadHtml($html);
 $dompdf->setPaper('A3', 'landscape');
 $dompdf->render();
-$dompdf->stream("miniPauta.pdf", ["Attachment" => false]);
+$dompdf->stream("pauta.pdf", ["Attachment" => false]);
