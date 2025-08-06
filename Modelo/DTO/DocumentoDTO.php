@@ -15,6 +15,7 @@ private $cursoDocumento;
 private $turmaDocumento;
 private $classeDocumento;
 private $periodoDocumento;
+private $disciplinaDocumento;
 
 public function setCursoDocumento($cursoDocumento){
 $this->cursoDocumento = $cursoDocumento;
@@ -39,6 +40,12 @@ $this->periodoDocumento=$periodoDocumento;
 }
 public function getPeriodoDocumento(){
     return $this->periodoDocumento;
+}
+public function setDisciplinaDocumento($disciplinaDocumento){
+$this->disciplinaDocumento=$disciplinaDocumento;
+}
+public function getDisciplinaDocumento(){
+    return $this->disciplinaDocumento;
 }
 // Id Do Documento:
 public function getIdDocumento() {
