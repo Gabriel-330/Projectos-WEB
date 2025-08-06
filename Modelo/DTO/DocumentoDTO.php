@@ -11,7 +11,35 @@ private $idNota;
 private $idDisciplina;
 private $idTurma;
 private $idProfessor;
+private $cursoDocumento;
+private $turmaDocumento;
+private $classeDocumento;
+private $periodoDocumento;
 
+public function setCursoDocumento($cursoDocumento){
+$this->cursoDocumento = $cursoDocumento;
+}
+public function getCursoDocumento(){
+    return $this->cursoDocumento;
+}
+public function setTurmaDocumento($turmaDocumento){
+$this->turmaDocumento=$turmaDocumento;
+}
+public function getTurmaDocumento(){
+    return $this->turmaDocumento;
+}
+public function setClasseDocumento($classeDocumento){
+$this->classeDocumento=$classeDocumento;
+}
+public function getClasseDocumento(){
+    return $this->classeDocumento;
+}
+public function setPeriodoDocumento($periodoDocumento){
+$this->periodoDocumento=$periodoDocumento;
+}
+public function getPeriodoDocumento(){
+    return $this->periodoDocumento;
+}
 // Id Do Documento:
 public function getIdDocumento() {
     return $this->idDocumento;
