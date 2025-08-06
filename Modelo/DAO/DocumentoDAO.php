@@ -50,6 +50,31 @@ class DocumentoDAO
             return false;
         }
     }
+public function mostrarDocumentoPorCPCT()
+{
+    try {
+        $sql = "SELECT cursoDocumento,turmaDocumento,classeDocumento,periodoDocumento FROM documento;";
+        $stmt = $this->conexao->query($sql);
+        $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $resultado = [];
+
+        foreach ($registros as $linha) {
+            $dto = new DocumentoDTO();
+            $dto->setCursoDocumento($linha['cursoDocumento']);
+            $dto->setTurmaDocumento($linha['turmaDocumento']);
+            $dto->setClasseDocumento($linha['classeDocumento']);
+            $dto->setPeriodoDocumento($linha['periodoDocumento']);
+
+            $resultado[] = $dto;
+        }
+
+        return $resultado;
+    } catch (PDOException $e) {
+        error_log("Erro ao mostrar os documentos: " . $e->getMessage());
+        return false;
+    }
+}
 
     public function contarTodos()
     {
