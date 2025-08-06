@@ -53,7 +53,7 @@ class DocumentoDAO
 public function mostrarDocumentoPorCPCT()
 {
     try {
-        $sql = "SELECT cursoDocumento,turmaDocumento,classeDocumento,periodoDocumento FROM documento;";
+        $sql = "SELECT cursoDocumento,turmaDocumento,classeDocumento,periodoDocumento, disciplinaDocumento FROM documento;";
         $stmt = $this->conexao->query($sql);
         $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -65,13 +65,14 @@ public function mostrarDocumentoPorCPCT()
             $dto->setTurmaDocumento($linha['turmaDocumento']);
             $dto->setClasseDocumento($linha['classeDocumento']);
             $dto->setPeriodoDocumento($linha['periodoDocumento']);
+            $dto->setDisciplinaDocumento($linha['disciplinaDocumento']);
 
             $resultado[] = $dto;
         }
 
         return $resultado;
     } catch (PDOException $e) {
-        error_log("Erro ao mostrar os documentos: " . $e->getMessage());
+        die ("Erro ao mostrar os documentos: " . $e->getMessage());
         return false;
     }
 }
