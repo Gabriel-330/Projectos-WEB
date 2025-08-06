@@ -3,14 +3,15 @@ class DocumentoDTO{
 
 private $idDocumento;
 private $tipoDocumento;
+private $estadoDocumento;
 private $dataEmissaoDocumento;
 private $caminhoArquivoDocumento;
-private $idAluno;
+private $aluno_idAluno;
 private $idCurso;
 private $idNota;
 private $idDisciplina;
 private $idTurma;
-private $idProfessor;
+private $professor_idProfessor;
 private $cursoDocumento;
 private $turmaDocumento;
 private $classeDocumento;
@@ -64,6 +65,13 @@ public function getTipoDocumento() {
 public function setTipoDocumento($tipoDocumento) {
     $this->tipoDocumento = $tipoDocumento;
 }
+//Estado do documento
+public function setEstadoDocumento($estadoDocumento){
+$this->estadoDocumento = $estadoDocumento;
+}
+public function getEstadoDocumento(){
+    return $this->estadoDocumento;
+}
 
 // Data Da Emissão Do Documento:
 public function getDataEmissaoDocumento() {
@@ -84,12 +92,12 @@ public function setCaminhoArquivoDocumento($caminhoArquivoDocumento) {
 }
 
 // Id Do Aluno:
-public function getIdAluno() {
-    return $this->idAluno;
+public function getAluno_IdAluno() {
+    return $this->aluno_idAluno;
 }
 
-public function setIdAluno($idAluno) {
-    $this->idAluno = $idAluno;
+public function setAluno_IdAluno($aluno_idAluno) {
+    $this->aluno_idAluno = $aluno_idAluno;
 }
 
 // Id Do Curso:
@@ -129,12 +137,12 @@ public function setIdTurma($idTurma) {
 }
 
 // Id Do Professor:
-public function getIdProfessor() {
-    return $this->idProfessor;
+public function getProfessor_IdProfessor() {
+    return $this->professor_idProfessor;
 }
 
-public function setIdProfessor($idProfessor) {
-    $this->idProfessor = $idProfessor;
+public function setProfessor_IdProfessor($professor_idProfessor) {
+    $this->professor_idProfessor = $professor_idProfessor;
 }
 
 }

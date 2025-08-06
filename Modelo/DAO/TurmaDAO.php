@@ -120,9 +120,9 @@ class TurmaDAO
     public function buscarPorId($id)
     {
         try {
-            $sql = "SELECT * FROM turma WHERE id = :idTurma";
+            $sql = "SELECT * FROM turma WHERE idTurma = :idTurma";
             $stmt = $this->conexao->prepare($sql);
-            $stmt->bindValue(':id', $id);
+            $stmt->bindValue(':idTurma', $id);
             $stmt->execute();
 
             $linha = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -173,8 +173,6 @@ class TurmaDAO
         $dto = new TurmaDTO();
         $dto->setIdTurma($linha['idTurma']);
         $dto->setNomeTurma($linha['nomeTurma']);
-        $dto->setNomeCurso($linha['nomeCurso']);
-        $dto->setNomeProfessor($linha['nomeProfessor']);
         $dto->setSalaTurma($linha['salaTurma']);
         $dto->setIdCurso($linha['idCurso']);
         $dto->setIdProfessor($linha['idProfessor']);

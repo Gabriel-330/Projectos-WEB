@@ -52,7 +52,7 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
     <link href="assets/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet" type="text/css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet" type="text/css" />
     <link href="assets/css/style.css" rel="stylesheet" type="text/css" />
-     <style>
+    <style>
         .menu-user ul li.active a {
             background-color: #0b5ed7;
             /* cor de fundo ao clicar */
@@ -268,7 +268,7 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                         <div class="card-header">
                             <h4 class="card-title">Busca de Documentos</h4>
                             <a href="#" class="btn btn-primary btn-rounded float-right" data-bs-toggle="modal" data-bs-target="#modalDocumentoSolicitar">
-                                <i class="fa fa-upload mr-2" ></i>
+                                <i class="fa fa-upload mr-2"></i>
                                 Solicitar documento
                             </a>
                         </div>
@@ -450,7 +450,7 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                 </div>
             </div>
         </div>
- <div class="modal fade" id="modalDocumentoSolicitar">
+        <div class="modal fade" id="modalDocumentoSolicitar">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -458,28 +458,25 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <form action="/Projectos-WEB/Visao/miniPauta.php" method="POST">
-                           
+                        <form action="../Controle/crudDocumento.php" method="POST">
+
 
                             <?php
-                            /*
+
                             require_once("../Modelo/DAO/AlunoDAO.php");
                             require_once("../Modelo/DAO/DisciplinaDAO.php");
                             require_once("../Modelo/DAO/CursoDAO.php");
                             require_once("../Modelo/DAO/TurmaDAO.php");
 
-                            $daoAluno = new AlunoDAO();
-                            $alunos = $daoAluno->listarTodos();
-
                             $daoCurso = new CursoDAO();
                             $cursos = $daoCurso->Mostrar();
 
-                            $daoDisciplina = new DisciplinaDAO();
-                            $disciplinas = $daoDisciplina->listarPorProfessor($professor);
 
                             $daoTurma = new TurmaDAO();
                             $turmas = $daoTurma->listarTodos();
-                            */
+
+                            $daoDisciplina = new DisciplinaDAO();
+                            $disciplinas = $daoDisciplina->listarPorProfessor($professor);
                             ?>
 
                             <div class="row">
@@ -500,6 +497,15 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                                         <option value="">Selecione</option>
                                         <?php foreach ($cursos as $curso): ?>
                                             <option value="<?= $curso->getIdCurso() ?>"><?= htmlspecialchars($curso->getNomeCurso()) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label><strong>Disciplina</strong></label>
+                                    <select id="cursoSelect" name="idDisciplina" class="form-control input-rounded">
+                                        <option value="">Selecione</option>
+                                        <?php foreach ($disciplinas as $disciplina): ?>
+                                            <option value="<?= $disciplina->getIdDisciplina() ?>"><?= htmlspecialchars($disciplina->getNomeDisciplina()) ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
@@ -527,7 +533,7 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
 
                             <div class="text-center mt-4">
                                 <button type="submit" class="btn btn-primary btn-rounded" name="solicitarDocumento">Solicitar</button>
-                                
+
                             </div>
                         </form>
                     </div>
@@ -553,7 +559,7 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
     <script src="assets/vendor/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
     <script src="assets/js/custom.min.js" type="text/javascript"></script>
     <script src="assets/js/deznav-init.js" type="text/javascript"></script>
-   
+
 
     <script>
         function initProgressBars() {

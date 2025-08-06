@@ -9,24 +9,28 @@ require_once("../Modelo/DTO/AlunoDTO.php");
 require_once("../Modelo/DTO/NotaDTO.php");
 require_once '../Modelo/DAO/MatriculaDAO.php';
 require_once '../Modelo/DTO/MatriculaDTO.php';
-
+require_once '../Modelo/DAO/DocumentoDAO.php';
 use Dompdf\Dompdf;
 use Dompdf\Options;
-
+$DAO = new DocumentoDAO();
 $alunoDAO = new AlunoDAO();
 $notaDAO = new NotaDAO();
 $matriculasDAO = new MatriculaDAO();
-
+$doc = $DAO->mostrarDocumentoPorCPCT();
 
 $anoAtual = date("Y");
 $anoAnterior = $anoAtual - 1;
 $anoLectico = "$anoAnterior/$anoAtual";
+foreach($doc as $documento){
+$classe = $documento->getClasseDocumento();
+$periodo =$documento->getPeriodoDocumento() ;
+$curso = $documento->getCursoDocumento();
+$turma = $documento->getTurmaDocumento();
+$disciplinaFiltrada = $documento->getDisciplinaDocumento();
+}
 
-$classe = "12";
-$periodo = "Tarde";
-$curso = "Informática";
-$turma = "A";
-$disciplinaFiltrada = "TLP (Técnica de Linguagem de Programação)"; // <-- Altere para a disciplina desejada
+
+ // <-- Altere para a disciplina desejada
 
 // Obter lista de todos os alunos por classe, periodo, curso e turma
 $matriculas = $matriculasDAO->listarMatriculaPorCPCT($classe, $periodo, $curso, $turma);
@@ -208,14 +212,14 @@ ob_start();
     <div class="dados">
         <div class="col">
             <strong>Disciplina:</strong> <?= $disciplinaFiltrada ?><br>
-            <strong>Turma:</strong> <?= $nomeTurma ?><br>
-            <strong>Classe:</strong> <?= $classeMatricula ?><br>
+            <strong>Turma:</strong> <?= $turma ?><br>
+            <strong>Classe:</strong> <?= $classe ?><br>
 
         </div>
         <div class="col">
 
-            <strong>Curso:</strong> <?= $nomeCurso ?><br>
-            <strong>Periodo:</strong> <?= $periodoMatricula?><br>
+            <strong>Curso:</strong> <?= $curso ?><br>
+            <strong>Periodo:</strong> <?= $periodo?><br>
             <strong>Ano lectivo:</strong> <?= $anoLectico ?>
         </div>
 

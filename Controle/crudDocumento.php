@@ -5,7 +5,10 @@ require_once("../Modelo/DAO/DocumentoDAO.php");
 require_once("../Modelo/DTO/DocumentoDTO.php");
 require_once("../Modelo/DAO/NotificacoesDAO.php");
 require_once("../Modelo/DTO/NotificacoesDTO.php");
-
+require_once("../Modelo/DAO/CursoDAO.php");
+require_once("../Modelo/DAO/TurmaDAO.php");
+require_once("../Modelo/DAO/ProfessorDAO.php");
+require_once("../Modelo/DAO/DisciplinaDAO.php");
 $notificacaoDTO = new NotificacoesDTO();
 $notificacaoDAO = new NotificacoesDAO();
 $documentoDAO = new DocumentoDAO();
@@ -39,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         //$numeroDocumento = trim(filter_input(INPUT_POST, 'numeroDocumento', FILTER_SANITIZE_STRING)); // Comentado propositalmente
 
         if ($idAluno && $tipoDocumento) {
-            $documentoDTO->setIdAluno($idAluno);
+            $documentoDTO->setAluno_IdAluno($idAluno);
             $documentoDTO->setTipoDocumento($tipoDocumento);
             //$documentoDTO->setNumeroDocumento($numeroDocumento);
 
@@ -63,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($id && $idAluno && $tipoDocumento) {
             $documentoDTO->setIdDocumento($id);
-            $documentoDTO->setIdAluno($idAluno);
+            $documentoDTO->setAluno_IdAluno($idAluno);
             $documentoDTO->setTipoDocumento($tipoDocumento);
             //$documentoDTO->setNumeroDocumento($numeroDocumento);
 
@@ -91,6 +94,54 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         } else {
             redirecionar("Documento inválido para eliminar.", "warning", "../Visao/documentoBase.php");
+        }
+    }
+    if (isset($_POST['solicitarDocumento'])) {
+        if (
+            isset(
+                $_POST["classe"],
+                $_POST["idCurso"],
+                $_POST["periodo"],
+                $_POST["idTurma"],
+                $_POST["idDisciplina"]
+            )
+        ) {
+            $professorDAO = new ProfessorDAO();
+            $cursoDAO = new CursoDAO();
+            $turmaDAO = new TurmaDAO();
+            $disciplinaDAO = new DisciplinaDAO();
+            $dao = new DocumentoDAO();
+            $doc = new DocumentoDTO();
+            $disciplinaDTO = $disciplinaDAO->buscarPorId($_POST['idDisciplina']);
+            $cursoDTO = $cursoDAO->MostrarPorID($_POST['idCurso']);
+            $turmaDTO = $turmaDAO->buscarPorId($_POST['idTurma']);
+
+            if ($cursoDTO && $turmaDTO && $disciplinaDTO) {
+                $curso = $cursoDTO->getNomeCurso();
+                $turma = $turmaDTO->getNomeTurma();
+                $disciplina = $disciplinaDTO->getNomeDisciplina();
+            } else {
+                $curso = null;
+                $turma = null;
+                $disciplina = null;
+            }
+            $id = $professorDAO->buscarPorUtilizador($_SESSION['idUtilizador']);
+            $doc->setClasseDocumento($_POST['classe']);
+            $doc->setPeriodoDocumento($_POST['periodo']);
+            $doc->setCursoDocumento($curso);
+            $doc->setTurmaDocumento($turma);
+            $doc->setDisciplinaDocumento($disciplina);
+            $doc->setTipoDocumento("Mini-pauta");
+            $doc->setEstadoDocumento("Em Validação");
+            $doc->setProfessor_IdProfessor($id);
+            if ($dao->cadastrar($doc)) {
+                criarNotificacao("Cadastro de documento", "Foi solicitado um documento: $tipoDocumento", $notificacaoDTO, $notificacaoDAO);
+                redirecionar("Documento cadastrado com sucesso!", "success", "../Visao/documentoProfessorBase.php");
+            } else {
+                redirecionar("Erro ao cadastrar documento.", "error", "../Visao/documentoProfessorBase.php");
+            }
+        } else {
+            redirecionar("Preencha todos os campos obrigatórios.", "warning", "../Visao/documentoProfessorBase.php");
         }
     }
 }

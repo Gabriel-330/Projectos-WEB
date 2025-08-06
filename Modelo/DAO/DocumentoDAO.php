@@ -21,27 +21,27 @@ class DocumentoDAO
         try {
             $sql = "INSERT INTO documento (
                         tipoDocumento,
-                        dataEmissaoDocumento,
-                        caminhoArquivoDocumento,
-                        idAluno,
-                        idCurso,
-                        idNota,
-                        idDisciplina,
-                        idTurma,
-                        idProfessor
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                        estadoDocumento,
+                        aluno_idAluno,
+                        classeDocumento,
+                        cursoDocumento,
+                        disciplinaDocumento,
+                        turmaDocumento,
+                        periodoDocumento,
+                        professor_idProfessor
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?,?,?)";
 
             $stmt = $this->conexao->prepare($sql);
             $stmt->execute([
                 $doc->getTipoDocumento(),
-                $doc->getDataEmissaoDocumento(),
-                $doc->getCaminhoArquivoDocumento(),
-                $doc->getIdAluno(),
-                $doc->getIdCurso(),
-                $doc->getIdNota(),
-                $doc->getIdDisciplina(),
-                $doc->getIdTurma(),
-                $doc->getIdProfessor()
+                $doc->getEstadoDocumento(),
+                $doc->getAluno_IdAluno(),
+                $doc->getClasseDocumento(),
+                $doc->getCursoDocumento(),
+                $doc->getDisciplinaDocumento(),
+                $doc->getTurmaDocumento(),
+                $doc->getPeriodoDocumento(),
+                $doc->getProfessor_IdProfessor()
             ]);
 
             return true;
@@ -50,32 +50,32 @@ class DocumentoDAO
             return false;
         }
     }
-public function mostrarDocumentoPorCPCT()
-{
-    try {
-        $sql = "SELECT cursoDocumento,turmaDocumento,classeDocumento,periodoDocumento, disciplinaDocumento FROM documento;";
-        $stmt = $this->conexao->query($sql);
-        $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    public function mostrarDocumentoPorCPCT()
+    {
+        try {
+            $sql = "SELECT cursoDocumento,turmaDocumento,classeDocumento,periodoDocumento, disciplinaDocumento FROM documento WHERE professor_;";
+            $stmt = $this->conexao->query($sql);
+            $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $resultado = [];
+            $resultado = [];
 
-        foreach ($registros as $linha) {
-            $dto = new DocumentoDTO();
-            $dto->setCursoDocumento($linha['cursoDocumento']);
-            $dto->setTurmaDocumento($linha['turmaDocumento']);
-            $dto->setClasseDocumento($linha['classeDocumento']);
-            $dto->setPeriodoDocumento($linha['periodoDocumento']);
-            $dto->setDisciplinaDocumento($linha['disciplinaDocumento']);
+            foreach ($registros as $linha) {
+                $dto = new DocumentoDTO();
+                $dto->setCursoDocumento($linha['cursoDocumento']);
+                $dto->setTurmaDocumento($linha['turmaDocumento']);
+                $dto->setClasseDocumento($linha['classeDocumento']);
+                $dto->setPeriodoDocumento($linha['periodoDocumento']);
+                $dto->setDisciplinaDocumento($linha['disciplinaDocumento']);
 
-            $resultado[] = $dto;
+                $resultado[] = $dto;
+            }
+
+            return $resultado;
+        } catch (PDOException $e) {
+            die("Erro ao mostrar os documentos: " . $e->getMessage());
+            return false;
         }
-
-        return $resultado;
-    } catch (PDOException $e) {
-        die ("Erro ao mostrar os documentos: " . $e->getMessage());
-        return false;
     }
-}
 
     public function contarTodos()
     {
@@ -144,12 +144,12 @@ public function mostrarDocumentoPorCPCT()
                 $doc->getTipoDocumento(),
                 $doc->getDataEmissaoDocumento(),
                 $doc->getCaminhoArquivoDocumento(),
-                $doc->getIdAluno(),
+                $doc->getAluno_IdAluno(),
                 $doc->getIdCurso(),
                 $doc->getIdNota(),
                 $doc->getIdDisciplina(),
                 $doc->getIdTurma(),
-                $doc->getIdProfessor(),
+                $doc->getProfessor_IdProfessor(),
                 $doc->getIdDocumento() // supondo que o DTO tem o campo "id"
             ]);
         } catch (PDOException $e) {
@@ -179,12 +179,12 @@ public function mostrarDocumentoPorCPCT()
         if (isset($linha['tipoDocumento'])) $dto->setTipoDocumento($linha['tipoDocumento']);
         if (isset($linha['dataEmissaoDocumento'])) $dto->setDataEmissaoDocumento($linha['dataEmissaoDocumento']);
         if (isset($linha['caminhoArquivoDocumento'])) $dto->setCaminhoArquivoDocumento($linha['caminhoArquivoDocumento']);
-        if (isset($linha['idAluno'])) $dto->setIdAluno($linha['idAluno']);
+        if (isset($linha['idAluno'])) $dto->setAluno_IdAluno($linha['idAluno']);
         if (isset($linha['idCurso'])) $dto->setIdCurso($linha['idCurso']);
         if (isset($linha['idNota'])) $dto->setIdNota($linha['idNota']);
         if (isset($linha['idDisciplina'])) $dto->setIdDisciplina($linha['idDisciplina']);
         if (isset($linha['idTurma'])) $dto->setIdTurma($linha['idTurma']);
-        if (isset($linha['idProfessor'])) $dto->setIdProfessor($linha['idProfessor']);
+        if (isset($linha['idProfessor'])) $dto->setProfessor_IdProfessor($linha['idProfessor']);
 
         return $dto;
     }
