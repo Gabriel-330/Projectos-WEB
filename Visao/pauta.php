@@ -316,7 +316,7 @@ ob_start();
                         <td><?= formatarNota($mapaNotas[$idAluno][$disciplina->getNomeDisciplina()]['final']['PG'] ?? null) ?></td>
                         <td style="background-color: yellow;"><?= formatarNota($mapaNotas[$idAluno][$disciplina->getNomeDisciplina()]['final']['CA'] ?? null) ?></td>
                     <?php endforeach; ?>
-                    <td style="color: <?= $classificacao['cor'] ?>; font-weight: bold;">
+                    <td style="color: <?= $classificacao['cor'] ?>; font-weight: bold; text-transform: uppercase;">
                         <?= htmlspecialchars($classificacao['texto']) ?>
                     </td>
                 </tr>
