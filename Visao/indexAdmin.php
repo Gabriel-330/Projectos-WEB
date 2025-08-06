@@ -231,9 +231,12 @@ $usuarioId = $_SESSION['idUtilizador'];
                 </div>
             </nav>
         </div>
-
+<!-- Botão do menu hamburger -->
+<button id="menuToggle" class="menu-toggle">
+  <i class="fa fa-bars"></i>
+</button>
         
-        <nav class="menu-user">
+        <nav id="menuUser" class="menu-user">
             <div class="menu-content">
                 <i class="fa-solid fa-user-graduate user-photo"></i>
                 <ul>
@@ -490,6 +493,14 @@ $usuarioId = $_SESSION['idUtilizador'];
                 });
             </script>
 
+<script>
+  const toggleButton = document.getElementById('menuToggle');
+  const menu = document.getElementById('menuUser');
+
+  toggleButton.addEventListener('click', () => {
+    menu.classList.toggle('active');
+  });
+</script>
 
 
 
