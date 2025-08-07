@@ -22,7 +22,8 @@ if ($Professor) {
         'dataContProfessor'       => $Professor->getDataContProfessor(),
         'tipoContProfessor'        => $Professor->getTipoContratoProfessor(),
         'moradaProfessor'   => $Professor->getMoradaProfessor(),
-        'nIdentificacaoProfessor'        => $Professor->getnIdentificacao()
+        'nIdentificacaoProfessor'        => $Professor->getnIdentificacao(),
+        'contactoProfessor'        => $Professor->getContactoProfessor()
     ]);
 } else {
     http_response_code(404);

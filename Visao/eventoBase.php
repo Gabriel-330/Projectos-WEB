@@ -246,6 +246,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                     <li><a href="turmaBase.php" title="Turmas"><i class="fa-solid fa-users"></i><span>Turmas</span></a></li>
                     <li><a href="disciplinaBase.php" title="Disciplinas"><i class="fa-solid fa-book-open"></i><span>Disciplinas</span></a></li>
                     <li><a href="matriculaBase.php" title="Matrícula"><i class="fa-solid fa-file-signature"></i><span>Matrícula</span></a></li>
+                    <li><a href="documentoBase.php" title="Aceitar Documentos"><i class="fa-regular fa-folder-open"></i><span class="text-white">Documentos</span></a></li>
 
                 </ul>
             </div>

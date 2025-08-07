@@ -10,21 +10,26 @@ if (!isset($_GET['id'])) {
 
 $id = intval($_GET['id']);
 $dao = new AlunoDAO();
-$Aluno = $dao->buscarPorId($id); // Ajusta o nome do método se for diferente
+$aluno = $dao->buscarPorId($id); // Ajusta se usares outro nome
 
-if ($Aluno) {
+if ($aluno) {
     echo json_encode([
-        'idAluno'           => $Aluno->getIdAluno(),
-        'nomeAluno'           => $Aluno->getNomeAluno(),
-        'generoAluno'   => $Aluno->getGeneroAluno(),
-        'dataNascimentoAluno'         => $Aluno->getDataNascimentoAluno(),
-        'moradaAluno'       => $Aluno->getMoradaAluno(),
-        'responsavelAluno'   => $Aluno->getResponsavelAluno(),
-        'contactoResponsavelAluno'        => $Aluno->getContactoResponsavelAluno(),
-        'nIdentificacao' =>$Aluno->getnIdentificacao(),
-        'idCurso'        => $Aluno->getIdCurso(),
-        'idTurma'        => $Aluno->getIdCurso()
-
+        'idAluno'                  => $aluno->getIdAluno(),
+        'nomeAluno'               => $aluno->getNomeAluno(),
+        'nIdentificacao'          => $aluno->getnIdentificacao(),
+        'moradaAluno'             => $aluno->getMoradaAluno(),
+        'dataNascimentoAluno'     => $aluno->getDataNascimentoAluno(),
+        'generoAluno'             => $aluno->getGeneroAluno(),
+        'fotoAluno'               => $aluno->getFotoAluno(),
+        'responsavelAluno'        => $aluno->getResponsavelAluno(),
+        'contactoResponsavelAluno'=> $aluno->getContactoResponsavelAluno(),
+        'anoIngressoAluno'        => $aluno->getAnoIngressoAluno(),
+        'idUtilizador'            => $aluno->getIdUtilizador(),
+        'idCurso'                 => $aluno->getIdCurso(),
+        'idTurma'                 => $aluno->getIdTurma(),
+        'nomeCurso'               => $aluno->getNomeCurso(),
+        'nomeUtilizador'          => $aluno->getNomeUtilizador(),
+        'nomeTurma'               => $aluno->getNomeTurma()
     ]);
 } else {
     http_response_code(404);

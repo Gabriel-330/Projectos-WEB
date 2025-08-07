@@ -9,7 +9,7 @@ if (!isset($_SESSION['idUtilizador']) || !isset($_SESSION['acesso'])) {
 }
 
 $acesso = strtoupper($_SESSION['acesso']);
- 
+
 // Verifica se o acesso é email de admin válido (ex: termina com @admin.estrela.com)
 if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
     // Se não for admin, redireciona para página de acesso negado ou login
@@ -47,7 +47,7 @@ $usuarioId = $_SESSION['idUtilizador'];
     <script src="assets/js/alertsMessage.js"></script>
     <script src="assets/js/sweetalert.js"></script>
 
-        <style>
+    <style>
         .menu-user ul li.active a {
             background-color: #0b5ed7;
             /* cor de fundo ao clicar */
@@ -129,7 +129,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                                 <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M22.75 15.8385V13.0463C22.7471 10.8855 21.9385 8.80353 20.4821 7.20735C19.0258 5.61116 17.0264 4.61555 14.875 4.41516V2.625C14.875 2.39294 14.7828 2.17038 14.6187 2.00628C14.4546 1.84219 14.2321 1.75 14 1.75C13.7679 1.75 13.5454 1.84219 13.3813 2.00628C13.2172 2.17038 13.125 2.39294 13.125 2.625V4.41534C10.9736 4.61572 8.97429 5.61131 7.51794 7.20746C6.06159 8.80361 5.25291 10.8855 5.25 13.0463V15.8383C4.26257 16.0412 3.37529 16.5784 2.73774 17.3593C2.10019 18.1401 1.75134 19.1169 1.75 20.125C1.75076 20.821 2.02757 21.4882 2.51969 21.9803C3.01181 22.4724 3.67904 22.7492 4.375 22.75H9.71346C9.91521 23.738 10.452 24.6259 11.2331 25.2636C12.0142 25.9013 12.9916 26.2497 14 26.2497C15.0084 26.2497 15.9858 25.9013 16.7669 25.2636C17.548 24.6259 18.0848 23.738 18.2865 22.75H23.625C24.321 22.7492 24.9882 22.4724 25.4803 21.9803C25.9724 21.4882 26.2492 20.821 26.25 20.125C26.2486 19.117 25.8998 18.1402 25.2622 17.3594C24.6247 16.5786 23.7374 16.0414 22.75 15.8385Z" fill="#007bff" />
                                 </svg>
-                                <span class="badge light text-white bg-primary"> <?=$n_Notificacoes?></span>
+                                <span class="badge light text-white bg-primary"> <?= $n_Notificacoes ?></span>
                             </a>
                             <div class="dropdown-menu dropdown-menu-end p-0">
                                 <div id="DZ_W_Notification1" class="widget-media dz-scroll p-3" style="max-height: 380px; overflow-y: auto;">
@@ -232,7 +232,7 @@ $usuarioId = $_SESSION['idUtilizador'];
             </nav>
         </div>
 
-        
+
         <nav class="menu-user">
             <div class="menu-content">
                 <i class="fa-solid fa-user-graduate user-photo"></i>
@@ -246,6 +246,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                     <li><a href="turmaBase.php" title="Cadastro de Turmas"><i class="fa-solid fa-users"></i><span>Turmas</span></a></li>
                     <li><a href="disciplinaBase.php" title="Cadastro de Disciplinas"><i class="fa-solid fa-book-open"></i><span>Disciplinas</span></a></li>
                     <li><a href="matriculaBase.php" title="Matrícula"><i class="fa-solid fa-file-signature"></i><span>Matrículas</span></a></li>
+                    <li><a href="documentoBase.php" title="Aceitar Documentos"><i class="fa-regular fa-folder-open"></i><span class="text-white">Documentos</span></a></li>
                 </ul>
             </div>
         </nav>
@@ -369,7 +370,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                                             <div class="card height415 dz-scroll" id="appointment-schedule">
                                                 <div class="card-header border-0 pb-0">
                                                     <h4 class="card-title">Próximos Eventos Académicos</h4>
-                                                
+
                                                 </div>
                                                 <div class="card-body">
 

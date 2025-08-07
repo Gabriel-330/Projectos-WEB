@@ -49,8 +49,6 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
     <link href="assets/css/style.css" rel="stylesheet" type="text/css" />
 
     <style>
-   
-
         .menu-user ul li.active a {
             background-color: #0b5ed7;
             /* cor de fundo ao clicar */
@@ -264,7 +262,7 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                     <div class="card">
                         <div class="card-header">
                             <h4 class="card-title">Busca de Documentos</h4>
-                            <a href="#" class="btn btn-primary btn-rounded float-right">
+                            <a href="#" class="btn btn-primary btn-rounded float-right" data-bs-toggle="modal" data-bs-target="#modalDocumentoSolicitar">
                                 <i class="fa fa-upload mr-2"></i>
                                 Solicitar documento
                             </a>
@@ -335,6 +333,20 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                             <hr class="mt-4 mb-4">
 
                             <div class="table-responsive">
+                                <?php
+
+                                require_once("../Modelo/DAO/DocumentoDAO.php");
+                                require_once("../Modelo/DAO/ProfessorDAO.php");
+                                require_once("../Modelo/DTO/DocumentoDTO.php");
+
+
+                                $documentoDAO = new DocumentoDAO();
+                                $professorDAO = new ProfessorDAO();
+
+                                $id = $professorDAO->buscarPorUtilizador($_SESSION['idUtilizador']);
+                                $documentos = $documentoDAO->buscarPorAluno($id);
+
+                                ?>
                                 <table class="table table-striped">
                                     <thead>
                                         <tr>
@@ -345,91 +357,69 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fa fa-file-pdf text-danger mr-3 fa-2x"></i>
+                                        <?php if (!empty($documentos)): ?>
+                                            <?php foreach ($documentos as $documento): ?>
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="fa fa-file-pdf text-danger mr-3 fa-2x"></i>
+                                                            <div>
+                                                                <strong><?= htmlspecialchars($documento->getTipoDocumento()) ?></strong>
+                                                            </div>
+                                                        </div>
+                                                    </td>
 
-                                                    <div>
-                                                        <strong>Boletim</strong><br>
+                                                    <td><?= date('d/m/Y', strtotime($documento->getDataEmissaoDocumento())) ?></td>
 
-                                                    </div>
-                                                </div>
-                                            </td>
+                                                    <td>
+                                                        <?php
+                                                        $status = $documento->getEstadoDocumento();
+                                                        $badgeClass = 'secondary';
+                                                        if ($status === 'Recebido') $badgeClass = 'success';
+                                                        elseif ($status === 'Em processamento') $badgeClass = 'warning';
+                                                        elseif ($status === 'Recusado') $badgeClass = 'danger';
+                                                        ?>
+                                                        <span class="badge badge-<?= $badgeClass ?>"><?= $status ?></span>
+                                                    </td>
 
-                                            <td>01/06/2025</td>
-
-                                            <td><span class="badge badge-success">Recebido</span></td>
-                                            <td>
-                                                <div class="dropdown">
-                                                    <button class="btn btn-primary light btn-rounded btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                        Ações
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <li><a class="dropdown-item" href="boletim.php"><i class="fa fa-eye me-2"></i>Visualizar</a></li>
-                                                        <li><a class="dropdown-item" href="#"><i class="fa fa-download me-2"></i>Baixar</a></li>
-                                                        <li><a class="dropdown-item" href="#"><i class="fa fa-edit me-2"></i>Editar</a></li>
-                                                        <li><a class="dropdown-item text-danger" href="#"><i class="fa fa-trash me-2"></i>Excluir</a></li>
-                                                    </ul>
-                                                </div>
-
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fa fa-file-pdf text-danger mr-3 fa-2x"></i>
-                                                    <div>
-                                                        <strong>Certificado</strong><br>
-
-                                                    </div>
-                                                </div>
-                                            </td>
-
-                                            <td>10/02/2025</td>
-                                            <td><span class="badge badge-warning">Em processamento</span></td>
-                                            <td>
-                                                <div class="dropdown">
-                                                    <button class="btn btn-primary light btn-rounded btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                        Ações
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <li><a class="dropdown-item" href="miniPauta.php"><i class="fa fa-eye me-2"></i>Visualizar</a></li>
-                                                        <li><a class="dropdown-item" href="#"><i class="fa fa-download me-2"></i>Baixar</a></li>
-                                                        <li><a class="dropdown-item" href="#"><i class="fa fa-edit me-2"></i>Editar</a></li>
-                                                        <li><a class="dropdown-item text-danger" href="#"><i class="fa fa-trash me-2"></i>Excluir</a></li>
-                                                    </ul>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fa fa-file-pdf text-danger mr-3 fa-2x"></i>
-                                                    <div>
-                                                        <strong>Declaração </strong><br>
-
-                                                    </div>
-                                                </div>
-                                            </td>
-
-                                            <td>05/02/2025</td>
-                                            <td><span class="badge badge-danger">Recusado</span></td>
-                                            <td>
-                                                <div class="dropdown">
-                                                    <button class="btn btn-primary light btn-rounded btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                        Ações
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <li><a class="dropdown-item" href="pauta.php"><i class="fa fa-eye me-2"></i>Visualizar</a></li>
-                                                        <li><a class="dropdown-item" href="#"><i class="fa fa-download me-2"></i>Baixar</a></li>
-                                                        <li><a class="dropdown-item" href="#"><i class="fa fa-edit me-2"></i>Editar</a></li>
-                                                        <li><a class="dropdown-item text-danger" href="#"><i class="fa fa-trash me-2"></i>Excluir</a></li>
-                                                    </ul>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                                    <td>
+                                                        <div class="dropdown">
+                                                            <button class="btn btn-primary light btn-rounded btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                Ações
+                                                            </button>
+                                                            <ul class="dropdown-menu">
+                                                                <li>
+                                                                    <a class="dropdown-item" href="visualizarDocumento.php?id=<?= $documento->getIdDocumento() ?>">
+                                                                        <i class="fa fa-eye me-2"></i>Visualizar
+                                                                    </a>
+                                                                </li>
+                                                                <li>
+                                                                    <a class="dropdown-item" href="downloadDocumento.php?id=<?= $documento->getIdDocumento() ?>">
+                                                                        <i class="fa fa-download me-2"></i>Baixar
+                                                                    </a>
+                                                                </li>
+                                                                <li>
+                                                                    <a class="dropdown-item" href="editarDocumento.php?id=<?= $documento->getIdDocumento() ?>">
+                                                                        <i class="fa fa-edit me-2"></i>Editar
+                                                                    </a>
+                                                                </li>
+                                                                <li>
+                                                                    <a class="dropdown-item text-danger" href="excluirDocumento.php?id=<?= $documento->getIdDocumento() ?>" onclick="return confirm('Tem certeza que deseja excluir este documento?')">
+                                                                        <i class="fa fa-trash me-2"></i>Excluir
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <tr>
+                                                <td colspan="4" class="text-center text-muted">Nenhum documento solicitado.</td>
+                                            </tr>
+                                        <?php endif; ?>
                                     </tbody>
+
                                 </table>
                             </div>
 
@@ -447,6 +437,41 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="modalDocumentoSolicitar">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Solicitar Documento</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <form action="../Controle/crudDocumento.php" method="POST">
+                            <input type="hidden" name="estadoDocumento" value="Em validação">
+
+                            <div class="col-md-12">
+                                <label><strong>Tipo de Documento</strong></label>
+                                <select id="classeSelect" class="form-control input-rounded" name="tipoDocumento">
+                                    <option value="">Selecione o tipo de Documento</option>
+                                    <option value="Boletim">Boletim</option>
+                                    <option value="Certificado">Certificado</option>
+                                    <option value="Declaração">Declaração</option>
+                                </select>
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-primary btn-rounded w-50" name="solicitarDocumento">Solicitar</button>
+
+                            </div>
+                    </div>
+
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     </div>
     <div class="footer">
         <div class="copyright">

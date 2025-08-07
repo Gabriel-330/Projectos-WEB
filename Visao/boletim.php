@@ -322,11 +322,11 @@ ob_start();
 
     <div class="assinaturas">
         <div class="assinatura">
-            Director de Turma
+            DIRECTOR DE TURMA
             <hr>
         </div>
         <div class="assinatura" style="float: right;">
-            Director Pedagógico
+            DIRECTOR PEDAGÓGICO
             <hr>
         </div>
     </div>

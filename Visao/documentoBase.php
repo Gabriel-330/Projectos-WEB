@@ -2,20 +2,14 @@
 session_start();
 require_once("../Modelo/DAO/NotificacoesDAO.php");
 require_once("../Modelo/DTO/NotificacoesDTO.php");
-require_once("../Modelo/DAO/ProfessorDAO.php");
-require_once("../Modelo/DTO/ProfessorDTO.php");
-// Verifica se o utilizador está autenticados
+// Verifica se o utilizador está autenticado
 if (!isset($_SESSION['idUtilizador']) || !isset($_SESSION['acesso'])) {
     header("Location: index.php"); // Redireciona para login se não estiver autenticado
     exit();
 }
 
 $acesso = $_SESSION['acesso'];
-$professorDAO = new ProfessorDAO();
-$professor = $professorDAO->buscarPorUtilizador($_SESSION['idUtilizador']);
 
-require_once("../Modelo/DAO/ProfessorDAO.php");
-require_once("../Modelo/DTO/ProfessorDTO.php");
 // Verifica se o 'acesso' corresponde ao padrão de aluno (ex: 009266492HA041)
 if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
     // Se não for aluno, redireciona com mensagem
@@ -53,6 +47,7 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
     <link href="assets/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet" type="text/css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet" type="text/css" />
     <link href="assets/css/style.css" rel="stylesheet" type="text/css" />
+
     <style>
         .menu-user ul li.active a {
             background-color: #0b5ed7;
@@ -60,19 +55,6 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
             color: white;
             /* cor do ícone ao clicar */
             border-radius: 5px;
-        }
-
-        .campo-condicional {
-            opacity: 0;
-            max-height: 0;
-            overflow: hidden;
-            transition: opacity 2s ease, max-height 2s ease;
-        }
-
-        .campo-condicional.visivel {
-            opacity: 1;
-            max-height: 500px;
-            /* ou um valor suficiente para o conteúdo */
         }
     </style>
 
@@ -243,14 +225,13 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                 </div>
             </nav>
         </div>
-        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
         <nav class="menu-user">
             <div class="menu-content">
                 <i class="fa-solid fa-user-graduate user-photo"></i>
                 <ul>
-                    <li><a href="indexProfessor.php" title="Home"><i class="fa-solid fa-chalkboard"></i><span>Dashboard</span></a></li>
-                    <li><a href="notaProfessorBase.php" title="Consultar Nota"><i class="fa-solid fa-clipboard"></i><span>Notas</span></a></li>
-                    <li><a href="horarioProfessorBase.php" title="Consultar Horário"><i class="fa-regular fa-calendar"></i><span>Horários</span></a></li>
+                    <li><a href="indexAluno.php" title="Home"><i class="fa-solid fa-chalkboard"></i><span>Dashboard</span></a></li>
+                    <li><a href="notaAlunoBase.php" title="Consultar Nota"><i class="fa-solid fa-clipboard"></i><span>Notas</span></a></li>
+                    <li><a href="notaAlunoBase.php" title="Consultar Horário"><i class="fa-regular fa-calendar"></i><span>Horários</span></a></li>
                     <li class="active"><a href="#" title="Solicitar Documentos"><i class="fa-regular fa-folder-open"></i><span class="text-white">Documentos</span></a></li>
                 </ul>
             </div>
@@ -355,15 +336,13 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                                 <?php
 
                                 require_once("../Modelo/DAO/DocumentoDAO.php");
-                                require_once("../Modelo/DAO/ProfessorDAO.php");
                                 require_once("../Modelo/DTO/DocumentoDTO.php");
 
 
                                 $documentoDAO = new DocumentoDAO();
-                                $professorDAO = new ProfessorDAO();
+                     
 
-                                $id = $professorDAO->buscarPorUtilizador($_SESSION['idUtilizador']);
-                                $documentos = $documentoDAO->buscarPorProfessor($id);
+                                $documentos = $documentoDAO->listarTodos();
 
                                 ?>
                                 <table class="table table-striped">
@@ -440,7 +419,6 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                                     </tbody>
 
                                 </table>
-
                             </div>
 
                             <nav class="mt-4">
@@ -465,106 +443,32 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <?php
 
-                        require_once("../Modelo/DAO/AlunoDAO.php");
-                        require_once("../Modelo/DAO/DisciplinaDAO.php");
-                        require_once("../Modelo/DAO/CursoDAO.php");
-                        require_once("../Modelo/DAO/TurmaDAO.php");
-
-                        $daoCurso = new CursoDAO();
-                        $cursos = $daoCurso->Mostrar();
-
-
-                        $daoTurma = new TurmaDAO();
-                        $turmas = $daoTurma->listarTodos();
-
-                        $daoDisciplina = new DisciplinaDAO();
-                        $disciplinas = $daoDisciplina->listarPorProfessor($professor);
-                        ?>
                         <form action="../Controle/crudDocumento.php" method="POST">
-                            <input type="hidden" name="estadoDocumento" value="Validado">
+                            <input type="hidden" name="estadoDocumento" value="Em validação">
 
                             <div class="col-md-12">
                                 <label><strong>Tipo de Documento</strong></label>
-                                <select id="tipoDocumentoSelect" class="form-control input-rounded" name="tipoDocumento" required>
+                                <select id="classeSelect" class="form-control input-rounded" name="tipoDocumento">
                                     <option value="">Selecione o tipo de Documento</option>
-                                    <option value="Mini Pauta">Mini Pauta</option>
+                                    <option value="Boletim">Boletim</option>
+                                    <option value="Certificado">Certificado</option>
+                                    <option value="Declaração">Declaração</option>
                                 </select>
                             </div>
 
-                            <div class="campo-condicional mt-2">
-                                <div class="row">
-                                    <!-- Curso -->
-                                    <div class="col-md-6">
-                                        <label><strong>Curso</strong></label>
-                                        <select id="cursoSelect" name="idCurso" class="form-control input-rounded" required>
-                                            <option value="">Selecione</option>
-                                            <?php foreach ($cursos as $curso): ?>
-                                                <option value="<?= $curso->getIdCurso() ?>"><?= htmlspecialchars($curso->getNomeCurso()) ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-
-                                    <!-- Disciplina -->
-                                    <div class="col-md-6">
-                                        <label><strong>Disciplina</strong></label>
-                                        <select id="disciplinaSelect" name="idDisciplina" class="form-control input-rounded" required>
-                                            <option value="">Selecione</option>
-                                            <?php foreach ($disciplinas as $disciplina): ?>
-                                                <option value="<?= $disciplina->getIdDisciplina() ?>"><?= htmlspecialchars($disciplina->getNomeDisciplina()) ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="row mt-2">
-                                    <!-- Classe -->
-                                    <div class="col-md-4">
-                                        <label><strong>Classe</strong></label>
-                                        <select id="classeSelect" class="form-control input-rounded" name="classe" required>
-                                            <option value="">Selecione</option>
-                                            <option value="10">10ª</option>
-                                            <option value="11">11ª</option>
-                                            <option value="12">12ª</option>
-                                            <option value="13">13ª</option>
-                                        </select>
-                                    </div>
-                                    <!-- Período -->
-                                    <div class="col-md-4">
-                                        <label><strong>Período</strong></label>
-                                        <select id="periodoSelect" class="form-control input-rounded" name="periodo" required>
-                                            <option value="">Selecione</option>
-                                            <option value="Manhã">Manhã</option>
-                                            <option value="Tarde">Tarde</option>
-                                        </select>
-                                    </div>
-
-                                    <!-- Turma -->
-                                    <div class="col-md-4">
-                                        <label><strong>Turma</strong></label>
-                                        <select id="turmaSelect" class="form-control input-rounded" name="idTurma" required>
-                                            <option value="">Selecione a turma</option>
-                                            <?php foreach ($turmas as $turma): ?>
-                                                <option value="<?= $turma->getIdTurma() ?>"><?= htmlspecialchars($turma->getNomeTurma()) ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-
                             <div class="text-center mt-4">
-                                <button type="submit" class="btn btn-primary btn-rounded" name="solicitarDocumento">Solicitar</button>
+                                <button type="submit" class="btn btn-primary btn-rounded w-50" name="solicitarDocumento">Solicitar</button>
 
                             </div>
-                        </form>
                     </div>
 
+                    </form>
                 </div>
+
             </div>
         </div>
-
+    </div>
 
     </div>
     <div class="footer">
@@ -582,8 +486,6 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
     <script src="assets/vendor/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
     <script src="assets/js/custom.min.js" type="text/javascript"></script>
     <script src="assets/js/deznav-init.js" type="text/javascript"></script>
-
-
     <script>
         function initProgressBars() {
             document.querySelectorAll('.progress-fill').forEach(bar => {
@@ -595,39 +497,6 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
             });
         }
     </script>
-
-    <script>
-        function toggleMenu() {
-            const menu = document.querySelector('.menu-user');
-            if (menu.style.display === 'block') {
-                menu.style.display = 'none';
-
-            } else {
-                menu.style.display = 'block';
-
-            }
-        }
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const tipoDocumento = document.getElementById("tipoDocumentoSelect");
-            const camposCondicionais = document.querySelectorAll(".campo-condicional");
-
-            tipoDocumento.addEventListener("change", function() {
-                if (tipoDocumento.value === "Mini Pauta") {
-                    camposCondicionais.forEach(campo => campo.classList.add("visivel"));
-                } else {
-                    camposCondicionais.forEach(campo => campo.classList.remove("visivel"));
-                }
-            });
-
-            // Garante que os campos começam ocultos
-            camposCondicionais.forEach(campo => campo.classList.remove("visivel"));
-        });
-    </script>
-
-
-
 </body>
 
 </html>

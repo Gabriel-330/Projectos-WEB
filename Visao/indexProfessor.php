@@ -28,7 +28,7 @@ $usuarioId = $_SESSION['idUtilizador'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Home - Professor</title>
 
     <!-- Icones do site-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -251,7 +251,7 @@ $usuarioId = $_SESSION['idUtilizador'];
         <div class="container-fluid">
             <div class="form-head d-flex align-items-center mb-sm-4 mb-3">
                 <div class="me-auto">
-                    <h2 class="text-black font-w600">Área Professor</h2>
+                    <h2 class="text-black font-w600">Dashboard Professor</h2>
                     <p class="mb-0">SGWA - Sistema de Gestão Web de Alunos</p>
                 </div>
             </div>

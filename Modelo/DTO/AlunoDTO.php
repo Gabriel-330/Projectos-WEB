@@ -17,6 +17,7 @@ class AlunoDTO
     private $nomeCurso;
     private $nomeUtilizador;
     private $nomeTurma;
+    private $classeMatricula;
 
 
     //Id Aluno
@@ -28,6 +29,17 @@ class AlunoDTO
     public function setIdAluno($idAluno)
     {
         $this->idAluno = $idAluno;
+    }
+
+     //Classe Matricula
+    public function getClasseMatricula()
+    {
+        return $this->classeMatricula;
+    }
+
+    public function setClasseMatricula($ClasseMatricula)
+    {
+        $this->classeMatricula = $ClasseMatricula;
     }
 
     //Nome do Aluno

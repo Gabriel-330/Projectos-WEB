@@ -48,8 +48,7 @@ $usuarioId = $_SESSION['idUtilizador'];
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet" type="text/css" />
     <link href="assets/css/style.css" rel="stylesheet" type="text/css" />
 
-        <style>
-   
+    <style>
         .menu-user ul li.active a {
             background-color: #0b5ed7;
             /* cor de fundo ao clicar */
@@ -252,6 +251,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                     <li><a href="turmaBase.php" title="Cadastro de Turmas"><i class="fa-solid fa-users"></i><span>Turmas</span></a></li>
                     <li><a href="disciplinaBase.php" title="Cadastro de Disciplinas"><i class="fa-solid fa-book-open"></i><span>Disciplinas</span></a></li>
                     <li><a href="matriculaBase.php" title="Matrícula"><i class="fa-solid fa-file-signature"></i><span>Matrículas</span></a></li>
+                    <li><a href="documentoBase.php" title="Aceitar Documentos"><i class="fa-regular fa-folder-open"></i><span class="text-white">Documentos</span></a></li>
                 </ul>
             </div>
         </nav>
@@ -510,7 +510,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                                     <label class="mb-1"><strong>Contacto <b style="font-size: 14px;color: red;">*</b></strong></label>
                                     <div class="form-group">
                                         <input type="tel"
-                                            class="form-control input-rounded"
+                                            class="form-control input-rounded telefone"
                                             name="contactoProfessor"
                                             id="contactoProfessorEditar"
                                             inputmode="numeric"
@@ -616,13 +616,14 @@ $usuarioId = $_SESSION['idUtilizador'];
                     const Professor = data;
                     $('#idProfessorEditar').val(Professor.idProfessor);
                     $('#nomeProfessorEditar').val(Professor.nomeProfessor);
-                    $('#generoProfessorEditar').val(Professor.generoProduto);
+                    $('#generoProfessorEditar').val(Professor.generoProfessor);
                     $('#emailProfessorEditar').val(Professor.emailProfessor);
                     $('#dataNascProfessorEditar').val(Professor.dataNascProfessor);
                     $('#dataContProfessorEditar').val(Professor.dataContProfessor);
                     $('#tipoContProfessorEditar').val(Professor.tipoContProfessor);
                     $('#moradaProfessorEditar').val(Professor.moradaProfessor);
-                    $('#nIdentificacaoEditar').val(Professor.nIdentificacao);
+                    $('#nIdentificacaoEditar').val(Professor.nIdentificacaoProfessor);
+                    $('#contactoProfessorEditar').val(Professor.contactoProfessor);
 
 
                 } catch (e) {
@@ -656,35 +657,34 @@ $usuarioId = $_SESSION['idUtilizador'];
 
     <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/js/intlTelInput.min.js"></script>
     <script>
-        const input = document.querySelector("#contactoProfessor");
+        // Lista de IDs que vais aplicar o intlTelInput
+        const inputIds = ["#contactoProfessor", "#contactoProfessorEditar"];
 
-        const iti = window.intlTelInput(input, {
-            // Mostra apenas Angola
-            onlyCountries: ["ao"],
+        inputIds.forEach((selector) => {
+            const input = document.querySelector(selector);
 
-            // Usa o código internacional (+244)
-            nationalMode: false,
+            const iti = window.intlTelInput(input, {
+                onlyCountries: ["ao"],
+                nationalMode: false,
+                allowDropdown: false,
+                utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/js/utils.js"
+            });
 
-            // Remove a possibilidade de abrir o seletor de país
-            allowDropdown: false,
+            // Ao focar, preenche com o código do país se estiver vazio
+            input.addEventListener("focus", function() {
+                if (input.value.trim() === "") {
+                    const dialCode = iti.getSelectedCountryData().dialCode;
+                    input.value = `+${dialCode} `;
+                }
+            });
 
-            // Carrega utilitários da biblioteca
-            utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/js/utils.js"
-        });
-
-        // Define o valor com +244 quando focar, se estiver vazio
-        input.addEventListener("focus", function() {
-            if (input.value.trim() === "") {
-                const dialCode = iti.getSelectedCountryData().dialCode;
-                input.value = `+${dialCode} `;
-            }
-        });
-
-        // Garante que o campo só aceite dígitos e o símbolo +
-        input.addEventListener("input", function() {
-            this.value = this.value.replace(/[^\d+]/g, '');
+            // Permite apenas números e o símbolo +
+            input.addEventListener("input", function() {
+                this.value = this.value.replace(/[^\d+]/g, '');
+            });
         });
     </script>
+
 
     <div class="footer">
         <div class="copyright">

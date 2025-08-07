@@ -3,8 +3,6 @@ session_start();
 require_once("../Modelo/DAO/NotificacoesDAO.php");
 require_once("../Modelo/DTO/NotificacoesDTO.php");
 require_once("../Modelo/DAO/ProfessorDAO.php");
-require_once("../Modelo/DTO/ProfessorDTO.php");
-
 // Verifica se o utilizador está autenticado
 if (!isset($_SESSION['idUtilizador']) || !isset($_SESSION['acesso'])) {
     header("Location: index.php"); // Redireciona para login se não estiver autenticado
@@ -546,7 +544,6 @@ $usuarioId = $_SESSION['idUtilizador'];
                                             <option value="NPP">NPP</option>
                                             <option value="NPT">NPT</option>
                                             <option value="NE">NE</option>
-                                            <option value="PG">PG</option>
                                         </select>
                                     </div>
                                 </div>
@@ -895,7 +892,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                     valorCorrespondente = "Avaliação Continua";
                 } else if (tipoSelecionado === "NPP") {
                     valorCorrespondente = "Prova do Professor";
-                } else if (tipoSelecionado === "NPT" || tipoSelecionado === "PG") {
+                } else if (tipoSelecionado === "NPT") {
                     valorCorrespondente = "Prova Trimestral";
                 } else if (tipoSelecionado === "NE") {
                     valorCorrespondente = "Exame";

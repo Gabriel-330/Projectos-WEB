@@ -253,6 +253,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                     <li><a href="turmaBase.php" title="Cadastro de Turmas"><i class="fa-solid fa-users"></i><span>Turmas</span></a></li>
                     <li><a href="disciplinaBase.php" title="Cadastro de Disciplinas"><i class="fa-solid fa-book-open"></i><span>Disciplinas</span></a></li>
                     <li><a href="matriculaBase.php" title="Matrícula"><i class="fa-solid fa-file-signature"></i><span>Matrículas</span></a></li>
+                    <li><a href="documentoBase.php" title="Aceitar Documentos"><i class="fa-regular fa-folder-open"></i><span class="text-white">Documentos</span></a></li>
                 </ul>
 
             </div>
@@ -277,6 +278,13 @@ $usuarioId = $_SESSION['idUtilizador'];
 
             <?php
             require_once("../Modelo/DAO/AlunoDAO.php");
+            require_once("../Modelo/DAO/MatriculaDAO.php");
+            require_once("../Modelo/DTO/MatriculaDTO.php");
+            require_once("../Modelo/DAO/AlunoDAO.php");
+
+            $matriculaDAO = new MatriculaDAO();
+            $alunoDAO = new AlunoDAO();
+
 
             $dao = new AlunoDAO();
             $palavra = $_GET['palavra'] ?? '';
@@ -304,10 +312,6 @@ $usuarioId = $_SESSION['idUtilizador'];
                 </div>
             </form>
 
-
-
-
-
             <!-- row -->
 
             <div class="row">
@@ -329,6 +333,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                                             <th><strong>GÊNERO</strong></th>
                                             <th><strong>CURSO</strong></th>
                                             <th><strong>TURMA</strong></th>
+                                            <th><strong>ClASSE</strong></th>
                                             <th><strong>RESPONSÁVEL</strong></th>
                                             <th><strong>CONTACTO RESPONSÁVEL</strong></th>
                                             <th><strong>ANO DE MATRÍCULA</strong></th>
@@ -340,6 +345,12 @@ $usuarioId = $_SESSION['idUtilizador'];
                                     <tbody>
                                         <?php $cont = 1;
                                         foreach ($alunos as $aluno): ?>
+                                            <?php
+                                            $idAluno = $aluno->getIdAluno();
+                                            $matriculas = $matriculaDAO->listarPorAluno($idAluno);
+                                            foreach($matriculas as $matricula){
+                                                                                     
+                                            ?>
                                             <tr>
                                                 <td><strong><?= $cont++; ?></strong></td>
                                                 <td><?= htmlspecialchars($aluno->getNomeAluno()); ?></td>
@@ -348,12 +359,13 @@ $usuarioId = $_SESSION['idUtilizador'];
                                                 <td><?= htmlspecialchars($aluno->getGeneroAluno()); ?></td>
                                                 <td><?= htmlspecialchars($aluno->getNomeCurso()); ?></td>
                                                 <td><?= htmlspecialchars($aluno->getNomeTurma()); ?></td>
+                                                <td><?= htmlspecialchars($matricula->getClasseMatricula()) ?>ª</td>
                                                 <td><?= htmlspecialchars($aluno->getResponsavelAluno()); ?></td>
                                                 <td><?= htmlspecialchars($aluno->getContactoResponsavelAluno()); ?></td>
                                                 <td><?= htmlspecialchars($aluno->getAnoIngressoAluno()); ?></td>
                                                 <td><?= htmlspecialchars($aluno->getNomeUtilizador()); ?></td>
                                                 <td><?= htmlspecialchars($aluno->getnIdentificacao()); ?></td>
-
+   <?php }?>
 
                                                 <td>
                                                     <div class="dropdown">
@@ -555,74 +567,66 @@ $usuarioId = $_SESSION['idUtilizador'];
                 </div>
             </div>
         </div>
-
         <div class="modal fade" id="modalAlunoEditar">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Editar Aluno</h5>
+                        <h5 class="modal-title">Actualizar Aluno</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-
                     <div class="modal-body">
                         <form action="../Controle/crudAluno.php" method="POST" enctype="multipart/form-data">
-                            <input type="hidden" name="idAluno" id="idAlunoEditar" required>
+                            <input type="hidden" class="form-control input-rounded" name="dataMatricula" id="dataMatriculaEditar" required>
 
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="mb-1"><strong>Nome do Aluno <b style="font-size: 14px;color: red;">*</b></strong></label>
-                                        <input type="text" class="form-control input-rounded" id="nomeAlunoEditar" name="nomeAluno" required>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-md-6">
-                                        <label class="mb-1"><strong>Nº de Identificação (BI) <b style="font-size: 14px;color: red;">*</b></strong></label>
-                                        <input type="text" class="form-control input-rounded" pattern="([0-9]{9}[A-Z]{2}[0-9]{3})"
-                                            title="Nº do Bilhente Inválido! O BI tem esse formato (ex: 123456789LA400)" id="nIdentificacaoEditar" name="nIdentificacao" required>
-                                    </div>
-                                </div>
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Nome do Aluno <b style="font-size: 14px;color: red;">*</b></strong></label>
+                                <input type="text" class="form-control input-rounded" name="nomeAluno" id="nomeAlunoEditar" required>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="mb-1"><strong>Foto do Aluno <b style="font-size: 14px;color: red;">*</b></strong></label>
-                                        <input type="file" class="form-control input-rounded" id="fotoAlunoEditar" name="fotoAluno" accept="image/*">
+                                        <label class="mb-1">
+                                            <strong>Nº de Identificação (BI) <b style="font-size: 14px;color: red;">*</b></strong>
+                                        </label>
+                                        <input type="text"
+                                            class="form-control input-rounded"
+                                            id="nIdentificacaoEditar"
+                                            name="nIdentificacao"
+                                            pattern="([0-9]{9}[A-Z]{2}[0-9]{3})"
+                                            title="Nº do Bilhente Inválido! O BI tem esse formato (ex: 123456789LA400)"
+                                            required>
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="mb-1"><strong>Gênero <b style="font-size: 14px;color: red;">*</b></strong></label>
-                                        <select class="form-control input-rounded" id="generoAlunoEditar" name="generoAluno" required>
+                                        <select class="form-control input-rounded" name="generoAluno" id="generoAlunoEditar" required>
                                             <option value="">Selecione o gênero</option>
                                             <option value="Masculino">Masculino</option>
                                             <option value="Femenino">Femenino</option>
-
                                         </select>
                                     </div>
                                 </div>
                             </div>
 
+
+
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="mb-1"><strong>Morada <b style="font-size: 14px;color: red;">*</b></strong></label>
-                                        <input type="text" class="form-control input-rounded" id="moradaAlunoEditar" name="moradaAluno" required>
+                                        <input type="text" class="form-control input-rounded" name="moradaAluno" id="moradaAlunoEditar" required>
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="mb-1"><strong>Data de Nascimento <b style="font-size: 14px;color: red;">*</b></strong></label>
-                                        <input type="date" class="form-control input-rounded" id="dataNascimentoAlunoEditar" name="dataNascAluno" required>
+                                        <input type="date" class="form-control input-rounded" name="dataNascAluno" id="dataNascimentoAlunoEditar" required>
                                     </div>
                                 </div>
-                            </div>
-
-                            <div class="row">
-
                             </div>
 
                             <?php
@@ -632,76 +636,116 @@ $usuarioId = $_SESSION['idUtilizador'];
                             $cursos = $dao->Mostrar();
                             ?>
 
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>Curso <b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <select class="form-control input-rounded" name="tipoCursoEditar" id="idCursoEditar" required>
+                                            <option value="">Selecione o curso</option>
+                                            <?php foreach ($cursos as $curso): ?>
+                                                <option value="<?= htmlspecialchars($curso->getIdCurso()) ?>">
+                                                    <?= htmlspecialchars($curso->getNomeCurso()) ?>
+                                                </option>
 
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="mb-1"><strong>Curso <b style="font-size: 14px;color: red;">*</b></strong></label>
-                                    <select class="form-control input-rounded" id="idCursoEditar" name="tipoCurso" required>
-                                        <option value="">Selecione o curso</option>
-                                        <?php foreach ($cursos as $curso): ?>
-                                            <option value="<?= htmlspecialchars($curso->getIdCurso()) ?>">
-                                                <?= htmlspecialchars($curso->getNomeCurso()) ?>
-                                            </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
 
-                                        <?php endforeach; ?>
-                                    </select>
                                 </div>
 
-                            </div>
+                                <?php
+                                require_once("../Modelo/DAO/TurmaDAO.php");
 
+                                $dao = new TurmaDAO();
+                                $turmas = $dao->listarTodos();
+                                ?>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>Turma <b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <select class="form-control input-rounded" name="tipoTurma" id="idTurmaEditar" required>
+                                            <option value="">Selecione o turma</option>
+                                            <?php foreach ($turmas as $turma): ?>
+                                                <option value="<?= htmlspecialchars($turma->getIdTurma()) ?>">
+                                                    <?= htmlspecialchars($turma->getNomeTurma()) ?>
+                                                </option>
 
-                            <?php
-                            require_once("../Modelo/DAO/TurmaDAO.php");
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
 
-                            $dao = new TurmaDAO();
-                            $turmas = $dao->listarTodos();
-                            ?>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="mb-1"><strong>Turma <b style="font-size: 14px;color: red;">*</b></strong></label>
-                                    <select class="form-control input-rounded" name="tipoTurma" id="idTurmaEditar" required>
-                                        <option value="">Selecione o turma</option>
-                                        <?php foreach ($turmas as $turma): ?>
-                                            <option value="<?= htmlspecialchars($turma->getIdTurma()) ?>">
-                                                <?= htmlspecialchars($turma->getNomeTurma()) ?>
-                                            </option>
-
-                                        <?php endforeach; ?>
-                                    </select>
                                 </div>
 
+
+
+                                <?php foreach ($matriculas as $matricula): ?>
+                                    <?php $classeSelecionada = $matricula->getClasseMatricula(); ?>
+
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label class="mb-1">
+                                                <strong>Classe<b style="font-size: 14px;color: red;">*</b></strong>
+                                            </label>
+                                            <select class="form-control input-rounded" name="classeMatricula" required>
+                                                <option value="">Selecione a classe</option>
+                                                <option value="10" <?= $classeSelecionada == '10' ? 'selected' : '' ?>>10ª</option>
+                                                <option value="11" <?= $classeSelecionada == '11' ? 'selected' : '' ?>>11ª</option>
+                                                <option value="12" <?= $classeSelecionada == '12' ? 'selected' : '' ?>>12ª</option>
+                                                <option value="13" <?= $classeSelecionada == '13' ? 'selected' : '' ?>>13ª</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
                             </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>Período<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <select class="form-control input-rounded" name="periodoMatricula" id="periodoMatriculaEditar" required>
+                                            <option value="">Selecione o período</option>
+                                            <option value="Manhã">Manhã</option>
+                                            <option value="Tarde">Tarde</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>Foto do Aluno <b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <input type="file" class="form-control input-rounded" name="fotoAluno" id="fotoAlunoEditar" accept="image/*" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>Responsável <b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <input type="text" class="form-control input-rounded" name="responsavelAluno" id="responsavelAlunoEditar" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="mb-1"><strong>Contacto do responsável <b style="font-size: 14px;color: red;">*</b></strong></label>
+                                    <div class="form-group">
+                                        <input type="tel"
+                                            class="form-control input-rounded telefone"
+                                            id="contactoResponsavelAlunoEditar"
+                                            name="contactoResponsavelAluno"
+                                            inputmode="numeric"
+                                            pattern="\+244\d{9}"
+                                            title="O número deve começar com +244 e ter 9 dígitos (ex: +244923456789)"
+                                            required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-primary btn-rounded" name="actualizarAluno">Salvar Alterações</button>
+                                <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
+                            </div>
+                        </form>
                     </div>
 
-
-                    <div class="form-group">
-                        <label class="mb-1"><strong>Responsável <b style="font-size: 14px;color: red;">*</b></strong></label>
-                        <input type="text" class="form-control input-rounded" id="responsavelAlunoEditar" name="responsavelAluno" required>
-                    </div>
-
-                    <label class="mb-1"><strong>Contacto do responsável <b style="font-size: 14px;color: red;">*</b></strong></label>
-                    <div class="form-group">
-
-                        <input type="tel"
-                            class="form-control input-rounded telefone"
-                            id="contactoResponsavelAlunoEditar"
-                            name="contactoResponsavelAluno"
-
-                            inputmode="numeric"
-                            pattern="\+244\d{9}"
-                            title="O número deve começar com +244 e ter 9 dígitos (ex: +244923456789)"
-                            required>
-
-
-                    </div>
-
-                    <div class="text-center mt-4">
-                        <button type="submit" class="btn btn-primary btn-rounded" name="actualizarAluno">Salvar Alterações</button>
-                        <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
-                    </div>
-                    </form>
                 </div>
-
             </div>
         </div>
     </div>
@@ -746,27 +790,34 @@ $usuarioId = $_SESSION['idUtilizador'];
                 id: id
             }, function(data) {
                 try {
-                    const Aluno = data;
-                    $('#idAlunoEditar').val(Aluno.idAluno);
-                    $('#nomeAlunoEditar').val(Aluno.nomeAluno);
-                    $('#generoAlunoEditar').val(Aluno.generoAluno);
-                    $('#dataNascimentoAlunoEditar').val(Aluno.dataNascimentoAluno);
-                    $('#moradaAlunoEditar').val(Aluno.moradaAluno);
-                    $('#responsavelAlunoEditar').val(Aluno.responsavelAluno);
-                    $('#contactoResponsavelAlunoEditar').val(Aluno.contactoResponsavelAluno);
-                    $('#nIdentificacaoEditar').val(Aluno.nIdentificacao);
-                    $('#idCursoEditar').val(Aluno.idCurso);
-                    $('#idTurmaEditar').val(Aluno.idTurma);
+                    const aluno = data;
 
+                    $('#idAlunoEditar').val(aluno.idAluno);
+                    $('#nomeAlunoEditar').val(aluno.nomeAluno);
+                    $('#nIdentificacaoEditar').val(aluno.nIdentificacao);
+                    $('#moradaAlunoEditar').val(aluno.moradaAluno);
+                    $('#dataNascimentoAlunoEditar').val(aluno.dataNascimentoAluno);
+                    $('#generoAlunoEditar').val(aluno.generoAluno);
+                    $('#fotoAlunoPreview').attr('src', aluno.fotoAluno); // Para preview
+                    $('#responsavelAlunoEditar').val(aluno.responsavelAluno);
+                    $('#contactoResponsavelAlunoEditar').val(aluno.contactoResponsavelAluno);
+                    $('#anoIngressoAlunoEditar').val(aluno.anoIngressoAluno);
+                    $('#idUtilizadorEditar').val(aluno.idUtilizador);
+                    $('#idCursoEditar').val(aluno.idCurso);
+                    $('#idTurmaEditar').val(aluno.idTurma);
+                    $('#nomeCursoEditar').val(aluno.nomeCurso);
+                    $('#nomeUtilizadorEditar').val(aluno.nomeUtilizador);
+                    $('#nomeTurmaEditar').val(aluno.nomeTurma);
 
                 } catch (e) {
-                    console.log('Erro ao interpretar o JSON retornado:', data);
+                    console.error('Erro ao interpretar o JSON retornado:', e);
                 }
             }).fail(function(xhr) {
-                console.log('Erro na requisição AJAX:', xhr.responseText);
+                console.error('Erro na requisição AJAX:', xhr.responseText);
             });
         });
     </script>
+
 
     <script>
         $(document).on('click', '.btn-apagar-aluno', function() {

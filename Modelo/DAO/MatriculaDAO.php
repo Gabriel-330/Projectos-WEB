@@ -113,7 +113,7 @@ class MatriculaDAO
 
             return $resultado;
         } catch (Exception $e) {
-            error_log("Erro ao listar matrículas: " . $e->getMessage());
+            die("Erro ao listar matrículas: " . $e->getMessage());
             return [];
         }
     }

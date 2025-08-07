@@ -152,7 +152,7 @@ class AlunoDAO
             $sql = "SELECT a.*, c.nomeCurso, u.nomeUtilizador, t.nomeTurma
                 FROM aluno a
                 INNER JOIN curso c ON a.idCurso = c.idCurso
-                INNER JOIN turma t ON a.idTurma = c.idTurma 
+                INNER JOIN turma t ON a.idTurma = t.idTurma 
                 INNER JOIN utilizador u on a.idUtilizador = u.idUtilizador WHERE idAluno = :id";
             $stmt = $this->conexao->prepare($sql);
             $stmt->bindValue(":id", $id);
@@ -166,7 +166,7 @@ class AlunoDAO
         }
     }
 
- 
+
     public function retornarDadosPorUtilizador($id)
     {
         try {
@@ -305,6 +305,21 @@ class AlunoDAO
         }
     }
 
+    public function buscarPorUtilizador($id)
+    {
+        try {
+            $sql = "SELECT idAluno FROM aluno WHERE idUtilizador = :id";
+            $stmt = $this->conexao->prepare($sql);
+            $stmt->bindValue(':id', $id);
+            $stmt->execute();
+
+            $linha = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $linha ? $linha['idAluno'] : null;
+        } catch (PDOException $e) {
+            die("Erro ao buscar ID do Aluno por utilizador: " . $e->getMessage());
+            return null;
+        }
+    }
 
     private function mapearParaDTO($linha)
     {

@@ -1,27 +1,33 @@
 <?php
-require_once("../Modelo/DAO/MatriculaDAO.php");
-header('Content-Type: application/json');
+require_once '../Modelo/DAO/MatriculaDAO.php';
+require_once '../Modelo/DTO/MatriculaDTO.php';
 
-if (!isset($_GET['id'])) {
-    http_response_code(400);
-    echo json_encode(['erro' => 'ID não especificado']);
-    exit;
-}
+if (isset($_GET['id']) && is_numeric($_GET['id'])) {
+    $id = $_GET['id'];
 
-$id = intval($_GET['id']);
-$dao = new MatriculaDAO();
-$Matricula = $dao->buscarMatriculaPorId($id); // Ajusta o nome do método se for diferente
+    $matriculaDAO = new MatriculaDAO();
+    $matricula = $matriculaDAO->buscarMatriculaPorId($id); // Certifique-se que este método existe no DAO
 
-if ($Matricula) {
-    echo json_encode([
-        'idMatricula'           => $Matricula->getIdMatricula(),
-        'idAluno'           => $Matricula->getIdAluno(),
-        'idTurma'   => $Matricula->getIdTurma(),
-        'dataMatricula'         => $Matricula->getDataMatricula(),
-        'estadoMatricula'         => $Matricula->getEstadoMatricula(),
-        'idCurso'       => $Matricula->getIdCurso()
-    ]);
+    if ($matricula instanceof MatriculaDTO) {
+        $dados = [
+            'idMatricula' => $matricula->getIdMatricula(),
+            'idAluno' => $matricula->getIdAluno(),
+            'idTurma' => $matricula->getIdTurma(),
+            'idCurso' => $matricula->getIdCurso(),
+            'dataMatricula' => $matricula->getDataMatricula(),
+            'estadoMatricula' => $matricula->getEstadoMatricula(),
+            'nomeAluno' => $matricula->getNomeAluno(),
+            'nomeTurma' => $matricula->getNomeTurma(),
+            'nomeCurso' => $matricula->getNomeCurso(),
+            'classeMatricula' => $matricula->getClasseMatricula(),
+            'periodoMatricula' => $matricula->getPeriodoMatricula()
+        ];
+
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($dados);
+    } else {
+        echo json_encode(['erro' => 'Matrícula não encontrada']);
+    }
 } else {
-    http_response_code(404);
-    echo json_encode(['erro' => 'Matricula não encontrado']);
+    echo json_encode(['erro' => 'ID inválido']);
 }
