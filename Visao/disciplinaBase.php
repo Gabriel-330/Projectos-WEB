@@ -233,6 +233,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                 </div>
             </nav>
         </div>
+ <div id="overlay" style="display:none; position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.5); z-index: 998;" onclick="toggleMenu()"></div>
 
         <nav class="menu-user">
             <div class="menu-content">
@@ -251,11 +252,13 @@ $usuarioId = $_SESSION['idUtilizador'];
                 </ul>
             </div>
         </nav>
+             <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+     
     </div>
 
 
 
-    <div class="content-body" style="margin-top: -30px;">
+    <div class="content-body">
         <!-- row -->
         <div class="container-fluid">
             <div class="page-titles">
@@ -446,11 +449,6 @@ $usuarioId = $_SESSION['idUtilizador'];
                                 <input type="text" class="form-control input-rounded" name="nomeDisciplina" id="nomeDisciplinaEditar" required>
                             </div>
 
-                            <div class="form-group">
-                                <label class="mb-1"><strong>Nome da disciplina <b style="font-size: 14px;color: red;">*</b></strong></label>
-                                <input type="text" class="form-control input-rounded" name="nomeDisciplina" required>
-                            </div>
-
                             <div class="form-group campo-condicional">
                                 <label class="mb-1">
                                     <strong>Classe <b style="font-size: 14px;color: red;">*</b></strong>
@@ -639,6 +637,56 @@ $usuarioId = $_SESSION['idUtilizador'];
                     bar.style.width = width;
                 }, 100);
             });
+        }
+
+        $(function() {
+            $('#datetimepicker1').datetimepicker({
+                inline: true,
+            });
+        });
+
+        $('.modal').on('hidden.bs.modal', function() {
+            $('.modal-backdrop').remove();
+            $('body').removeClass('modal-open');
+        });
+    </script>
+
+      <style>
+        .menu-user,
+        #overlay {
+            transition: opacity 0.3s ease;
+            opacity: 0;
+            display: none;
+        }
+    </style>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.querySelector('.menu-user');
+            const overlay = document.getElementById('overlay');
+
+            if (menu.style.display === 'block') {
+                // Esconder com efeito fade out
+                menu.style.opacity = '0';
+                overlay.style.opacity = '0';
+
+                setTimeout(() => {
+                    menu.style.display = 'none';
+                    overlay.style.display = 'none';
+                }, 300); // tempo da transição em ms
+            } else {
+                // Mostrar e começar transparente
+                menu.style.display = 'block';
+                overlay.style.display = 'block';
+
+                // Forçar leitura para ativar transição (reflow)
+                menu.offsetHeight;
+                overlay.offsetHeight;
+
+                // Fade in
+                menu.style.opacity = '1';
+                overlay.style.opacity = '1';
+            }
         }
     </script>
 </body>

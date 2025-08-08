@@ -56,6 +56,27 @@ nav.menu-user {
     align-items: center;
 }
 
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* escurece a tela */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+    z-index: 900;
+    /* abaixo do menu, acima do conteúdo */
+}
+
+.overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+
 /* Scroll personalizado (opcional) */
 .menu-user .menu-content::-webkit-scrollbar {
     width: 8px;

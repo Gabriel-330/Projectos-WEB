@@ -232,6 +232,7 @@ $usuarioId = $_SESSION['idUtilizador'];
             </nav>
         </div>
 
+        <div id="overlay" style="display:none; position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.5); z-index: 998;" onclick="toggleMenu()"></div>
 
         <nav class="menu-user">
             <div class="menu-content">
@@ -246,15 +247,13 @@ $usuarioId = $_SESSION['idUtilizador'];
                     <li><a href="turmaBase.php" title="Cadastro de Turmas"><i class="fa-solid fa-users"></i><span>Turmas</span></a></li>
                     <li><a href="disciplinaBase.php" title="Cadastro de Disciplinas"><i class="fa-solid fa-book-open"></i><span>Disciplinas</span></a></li>
                     <li><a href="matriculaBase.php" title="Matrícula"><i class="fa-solid fa-file-signature"></i><span>Matrículas</span></a></li>
-                    <li><a href="documentoBase.php" title="Aceitar Documentos"><i class="fa-regular fa-folder-open"></i><span class="text-white">Documentos</span></a></li>
+                    <li><a href="documentoBase.php" title="Aceitar Documentos"><i class="fa-regular fa-folder-open"></i><span>Documentos</span></a></li>
                 </ul>
             </div>
         </nav>
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
     </div>
-
-
-
-
 
     <div class="content-body">
         <!-- row -->
@@ -490,11 +489,44 @@ $usuarioId = $_SESSION['idUtilizador'];
                     }
                 });
             </script>
+            <style>
+                .menu-user,
+                #overlay {
+                    transition: opacity 0.3s ease;
+                    opacity: 0;
+                    display: none;
+                }
+            </style>
 
+            <script>
+                function toggleMenu() {
+                    const menu = document.querySelector('.menu-user');
+                    const overlay = document.getElementById('overlay');
 
+                    if (menu.style.display === 'block') {
+                        // Esconder com efeito fade out
+                        menu.style.opacity = '0';
+                        overlay.style.opacity = '0';
 
+                        setTimeout(() => {
+                            menu.style.display = 'none';
+                            overlay.style.display = 'none';
+                        }, 300); // tempo da transição em ms
+                    } else {
+                        // Mostrar e começar transparente
+                        menu.style.display = 'block';
+                        overlay.style.display = 'block';
 
+                        // Forçar leitura para ativar transição (reflow)
+                        menu.offsetHeight;
+                        overlay.offsetHeight;
 
+                        // Fade in
+                        menu.style.opacity = '1';
+                        overlay.style.opacity = '1';
+                    }
+                }
+            </script>
 
 </body>
 

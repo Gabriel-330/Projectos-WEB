@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (!$nome || !$classe || !$curso || !$professor) {
                 $_SESSION['success'] = "Todos os campos são obrigatórios.";
                 $_SESSION['icon'] = 'warning';
-                header("Location: ../Visao/criarDisciplina.php");
+                header("Location: ../Visao/disciplinaBase.php");
                 exit();
             }
 
@@ -33,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($disciplinaDAO->existeNome($nome, $classe, $curso)) {
                 $_SESSION['success'] = "Já existe uma disciplina '$nome' na classe '$classe' para este curso.";
                 $_SESSION['icon'] = 'warning';
-                header("Location: ../Visao/criarDisciplina.php");
+                header("Location: ../Visao/disciplinaBase.php");
                 exit();
             }
 

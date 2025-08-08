@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if (empty($idTurma) || empty($idCurso) || empty($idAluno) || empty($estadoMatricula) || empty($periodoMatricula) || empty($classeMatricula) || empty($dataMatricula)) {
             $_SESSION['error'] = "Todos os campos devem ser preenchidos.";
             $_SESSION['icon'] = "error";
-            header("Location: ../Visao/criarMatricula.php");
+            header("Location: ../Visao/matriculaBase.php");
             exit();
         }
 
@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if ($matriculaDAO->existeMatricula($idAluno, $idCurso)) {
             $_SESSION['error'] = "Já existe uma matrícula para esse aluno no curso selecionado.";
             $_SESSION['icon'] = "error";
-            header("Location: ../Visao/criarMatricula.php");
+            header("Location: ../Visao/matriculaBase.php");
             exit();
         }
 
@@ -62,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         } else {
             $_SESSION['error'] = "Erro ao cadastrar matrícula.";
             $_SESSION['icon'] = "error";
-            header("Location: ../Visao/criarMatricula.php");
+            header("Location: ../Visao/matriculaBase.php");
             exit();
         }
     }
