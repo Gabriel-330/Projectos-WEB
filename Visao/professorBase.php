@@ -304,7 +304,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h4 class="card-title">Lista de professores</h4>
-                            <a href="#" class="btn btn-success btn-rounded" data-bs-toggle="modal" data-bs-target="#modalProfessorCadastrar">+ Adicionar professor</a>
+                            <a href="#" class="btn btn-success btn-rounded" data-bs-toggle="modal" data-bs-target="#modalProfessorCadastrar">+ Adicionar Professor</a>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -463,7 +463,7 @@ $usuarioId = $_SESSION['idUtilizador'];
 
                             <div class="text-center mt-4">
                                 <button type="submit" class="btn btn-primary btn-rounded" name="cadastrarProfessor">Cadastrar</button>
-                                <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
+                                <a href="#" class="btn btn-light btn-rounded ml-2" data-bs-dismiss="modal">Cancelar</a>
                             </div>
                         </form>
                     </div>
@@ -569,7 +569,7 @@ $usuarioId = $_SESSION['idUtilizador'];
 
                             <div class="text-center mt-4">
                                 <button type="submit" class="btn btn-primary btn-rounded" name="actualizarProfessor">Salvar Alterações</button>
-                                <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
+                                <a href="#" class="btn btn-light btn-rounded ml-2" data-bs-dismiss="modal">Cancelar</a>
                             </div>
                         </form>
                     </div>
@@ -593,7 +593,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                        <a href="#" class="btn btn-light btn-rounded ml-2" data-bs-dismiss="modal">Cancelar</a>
                         <button type="submit" form="formProfessorExcluir" class="btn btn-danger" name="apagarProfessor">Confirmar Exclusão</button>
                     </div>
                 </div>

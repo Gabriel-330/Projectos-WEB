@@ -165,15 +165,15 @@ class ProfessorDAO
     }
 
 
-    public function apagar(ProfessorDTO $professor)
+    public function apagar($id)
     {
         try {
             $sql = "DELETE FROM professor WHERE idProfessor = :id";
             $stmt = $this->conexao->prepare($sql);
-            $stmt->bindValue(":id", $professor->getIdProfessor());
+            $stmt->bindValue(":id", $id);
             return $stmt->execute();
         } catch (PDOException $e) {
-            die("Erro ao apagar professor: " . $e->getMessage());
+            error_log("Erro ao apagar professor: " . $e->getMessage());
             return false;
         }
     }

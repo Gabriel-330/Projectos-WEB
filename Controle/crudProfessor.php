@@ -186,7 +186,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     elseif (isset($_POST["apagarProfessor"])) {
         try {
             $idProfessor = $_POST["idProfessor"];
-            $nomeProfessor = $_POST["nomeProfessor"]; // pode ser enviado via hidden
 
             // Buscar ID do utilizador correspondente ao professor
             $professor = $ProfessorDAO->buscarPorId($idProfessor);
@@ -203,7 +202,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             // Apagar professor
             if (!$ProfessorDAO->apagar($idProfessor)) {
-                throw new Exception("Erro ao apagar professor.");
+                throw new Exception("Erro ao apagar professor. Existem dados associados!");
             }
 
             // Apagar utilizador correspondente
@@ -227,9 +226,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $_SESSION['icon'] = 'success';
             header("Location: ../Visao/professorBase.php");
             exit();
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             $conn->rollBack();
-            $_SESSION['success'] = "Erro ao remover professor.";
+            $_SESSION['success'] = $e->getMessage();
             $_SESSION['icon'] = 'error';
             header("Location: ../Visao/professorBase.php");
             exit();

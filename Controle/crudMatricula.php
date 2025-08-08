@@ -29,6 +29,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             exit();
         }
 
+        $matriculaDAO = new MatriculaDAO();
+
+        // Verifica se já existe matrícula para o mesmo aluno e curso
+        if ($matriculaDAO->existeMatricula($idAluno, $idCurso)) {
+            $_SESSION['error'] = "Já existe uma matrícula para esse aluno no curso selecionado.";
+            $_SESSION['icon'] = "error";
+            header("Location: ../Visao/criarMatricula.php");
+            exit();
+        }
+
         $matriculaDTO = new MatriculaDTO();
         $matriculaDTO->setIdTurma($idTurma);
         $matriculaDTO->setIdCurso($idCurso);
@@ -37,8 +47,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $matriculaDTO->setEstadoMatricula($estadoMatricula);
         $matriculaDTO->setClasseMatricula($classeMatricula);
         $matriculaDTO->setPeriodoMatricula($periodoMatricula);
-
-        $matriculaDAO = new MatriculaDAO();
 
         if ($matriculaDAO->criarMatricula($matriculaDTO)) {
             $notificacaoDTO->setTipoNotificacoes("Cadastro de matrícula");

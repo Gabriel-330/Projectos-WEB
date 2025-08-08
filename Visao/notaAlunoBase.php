@@ -285,7 +285,7 @@ $idAluno = $alunoDAO->retornarDadosPorUtilizador($id);
             <div class="row">
                 <div class="col-lg-12">
                     <div class="card">
-                       <div class="card-body">
+                        <div class="card-body">
                             <div class="table-responsive">
                                 <?php
                                 // Agrupar notas por trimestre normalizado
@@ -393,21 +393,6 @@ $idAluno = $alunoDAO->retornarDadosPorUtilizador($id);
                                                                 <td><?= htmlspecialchars($nota->getTipoAvaliacaoNota()); ?></td>
                                                                 <td><?= htmlspecialchars($nota->getTipoNota()); ?></td>
                                                                 <td><?= htmlspecialchars($nota->getTrimestreNota()); ?></td>
-                                                                <td>
-                                                                    <div class="dropdown">
-                                                                        <button type="button" class="btn btn-primary light sharp" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                            <svg width="20px" height="20px" viewBox="0 0 24 24">
-                                                                                <circle fill="#000" cx="5" cy="12" r="2"></circle>
-                                                                                <circle fill="#000" cx="12" cy="12" r="2"></circle>
-                                                                                <circle fill="#000" cx="19" cy="12" r="2"></circle>
-                                                                            </svg>
-                                                                        </button>
-                                                                        <div class="dropdown-menu">
-                                                                            <a class="dropdown-item btn-apagar-nota" data-bs-toggle="modal" data-bs-target="#modalNotaApagar" href="#" data-id="<?= $nota->getIdNota() ?>">Apagar</a>
-                                                                            <a class="dropdown-item btn-editar-nota" data-bs-toggle="modal" data-bs-target="#modalNotaEditar" href="#" data-id="<?= $nota->getIdNota() ?>">Editar</a>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
                                                             </tr>
                                                         <?php endforeach; ?>
                                                     </tbody>

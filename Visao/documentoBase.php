@@ -463,6 +463,7 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
 
                             <div class="text-center mt-4">
                                 <button type="submit" class="btn btn-primary btn-rounded w-50" name="solicitarDocumento">Solicitar</button>
+                                <a href="#" class="btn btn-light btn-rounded ml-2" data-bs-dismiss="modal">Cancelar</a>
 
                             </div>
                     </div>

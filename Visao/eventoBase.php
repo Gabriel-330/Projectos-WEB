@@ -372,8 +372,8 @@ $usuarioId = $_SESSION['idUtilizador'];
                                                                     </li>
                                                                     <li>
                                                                         <i class="las la-clock text-primary me-1"></i>
-                                                                        <strong>Início: </strong> <?= htmlspecialchars($evento->getHoraInicioEvento()) ?>
-                                                                        <span class="ms-2"><strong>Fim:</strong> <?= htmlspecialchars($evento->getHoraFimEvento()) ?></span>
+                                                                        <strong>Início: </strong> <?= htmlspecialchars($evento->getHoraFimEvento()) ?>
+                                                                        <span class="ms-2"><strong>Fim:</strong> <?= htmlspecialchars($evento->getHoraInicioEvento()) ?></span>
                                                                     </li>
                                                                     <li>
                                                                         <i class="las la-map-marker text-primary me-1"></i>
@@ -497,7 +497,7 @@ $usuarioId = $_SESSION['idUtilizador'];
 
                                 <div class="text-center mt-4">
                                     <button type="submit" class="btn btn-primary btn-rounded" name="cadastrarEvento">Cadastrar</button>
-                                    <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
+                                    <a href="#" class="btn btn-light btn-rounded ml-2" data-bs-dismiss="modal">Cancelar</a>
                                 </div>
                             </div>
 

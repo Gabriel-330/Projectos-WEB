@@ -386,8 +386,8 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                                                                     </li>
                                                                     <li>
                                                                         <i class="las la-clock text-primary me-1"></i>
-                                                                        <strong>Início: </strong> <?= htmlspecialchars($evento->getHoraInicioEvento()) ?>
-                                                                        <span class="ms-2"><strong>Fim:</strong> <?= htmlspecialchars($evento->getHoraFimEvento()) ?></span>
+                                                                        <strong>Início: </strong> <?= htmlspecialchars($evento->getHoraFimEvento()) ?>
+                                                                        <span class="ms-2"><strong>Fim:</strong> <?= htmlspecialchars($evento->getHoraInicioEvento()) ?></span>
                                                                     </li>
                                                                     <li>
                                                                         <i class="las la-map-marker text-primary me-1"></i>

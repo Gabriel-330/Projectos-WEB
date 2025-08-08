@@ -204,7 +204,7 @@ class MatriculaDAO
             $stmt->bindValue(":id", $id);
             return $stmt->execute();
         } catch (Exception $e) {
-            echo "Erro ao apagar matrícula: " . $e->getMessage();
+            error_log("Erro ao apagar matrícula: " . $e->getMessage());
             return false;
         }
     }
@@ -258,6 +258,15 @@ class MatriculaDAO
             echo "Erro ao buscar matrícula por aluno: " . $e->getMessage();
             return false;
         }
+    }
+    public function existeMatricula($idAluno, $idCurso)
+    {
+        $sql = "SELECT COUNT(*) FROM matriculas WHERE idAluno = ? AND idCurso = ?";
+        $stmt = $this->conexao->prepare($sql);
+        $stmt->execute([$idAluno, $idCurso]);
+        $count = $stmt->fetchColumn();
+
+        return $count > 0;
     }
 
 

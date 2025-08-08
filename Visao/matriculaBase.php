@@ -480,7 +480,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                             </div>
                             <div class="text-center mt-4">
                                 <button type="submit" class="btn btn-primary btn-rounded" name="cadastrarMatricula">Cadastrar</button>
-                                <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
+                                <a href="#" class="btn btn-light btn-rounded ml-2" data-bs-dismiss="modal">Cancelar</a>
                             </div>
                         </form>
                     </div>
@@ -603,7 +603,8 @@ $usuarioId = $_SESSION['idUtilizador'];
                             </div>
                             <div class="text-center mt-4">
                                 <button type="submit" class="btn btn-primary btn-rounded" name="actualizarMatricula">Salvar Alterações</button>
-                                <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
+                                <a href="#" class="btn btn-light btn-rounded ml-2" data-bs-dismiss="modal">Cancelar</a>
+
                             </div>
                         </form>
                     </div>
@@ -626,7 +627,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                        <a href="#" class="btn btn-light btn-rounded ml-2" data-bs-dismiss="modal">Cancelar</a>
                         <button type="submit" form="formMatriculaExcluir" class="btn btn-danger" name="apagarMatricula">Confirmar Exclusão</button>
                     </div>
                 </div>

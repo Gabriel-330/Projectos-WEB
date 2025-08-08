@@ -308,7 +308,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                         <!-- Cabeçalho com botão -->
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h4 class="card-title">Notas por Trimestre</h4>
-                            <a href="../Controle/crudNota.php" class="btn btn-primary btn-rounded" data-bs-toggle="modal" data-bs-target="#modalNotaCadastrar">+ Adicionar Nota</a>
+                            <a href="../Controle/crudNota.php" class="btn btn-success btn-rounded" data-bs-toggle="modal" data-bs-target="#modalNotaCadastrar">+ Adicionar Nota</a>
                         </div>
 
                         <div class="card-body">
@@ -599,7 +599,7 @@ $usuarioId = $_SESSION['idUtilizador'];
 
                             <div class="text-center mt-4 campo-condicional">
                                 <button type="submit" class="btn btn-primary btn-rounded" name="cadastrarNota">Cadastrar</button>
-                                <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
+                                <a href="#" class="btn btn-light btn-rounded ml-2" data-bs-dismiss="modal">Cancelar</a>
                             </div>
                         </form>
                     </div>
@@ -737,7 +737,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                             </div>
                             <div class="text-center mt-4">
                                 <button type="submit" class="btn btn-primary btn-rounded" name="actualizarNota">Salvar Alterações</button>
-                                <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
+                                <a href="#" class="btn btn-light btn-rounded ml-2" data-bs-dismiss="modal">Cancelar</a>
                             </div>
                         </form>
                     </div>
@@ -759,7 +759,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                        <a href="#" class="btn btn-light btn-rounded ml-2" data-bs-dismiss="modal">Cancelar</a>
                         <button type="submit" form="formNotaExcluir" class="btn btn-danger" name="apagarNota">Confirmar Exclusão</button>
                     </div>
                 </div>

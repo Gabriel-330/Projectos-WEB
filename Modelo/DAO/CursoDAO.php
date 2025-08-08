@@ -134,10 +134,46 @@ class CursoDAO
 
             return $stmt->execute();
         } catch (PDOException $e) {
-            echo "Erro ao apagar curso: " . $e->getMessage();
+            error_log("Erro ao apagar curso: " . $e->getMessage());
             return false;
         }
     }
+    // Verifica se já existe curso com o mesmo nome, excluindo o próprio ID
+    public function existeNomeOutro($nomeCurso, $idCurso)
+    {
+        try {
+            $sql = "SELECT COUNT(*) as total 
+                  FROM curso 
+                 WHERE nomeCurso = ? 
+                   AND idCurso <> ?";
+            $stmt = $this->conexao->prepare($sql);
+            $stmt->bindValue(1, $nomeCurso);
+            $stmt->bindValue(2, $idCurso, PDO::PARAM_INT);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return ($result['total'] > 0);
+        } catch (PDOException $e) {
+            error_log("Erro ao verificar duplicidade de curso (excluindo ID): " . $e->getMessage());
+            return false;
+        }
+    }
+
+    // Verifica se já existe curso com o mesmo nome
+    public function existeNome($nomeCurso)
+    {
+        try {
+            $sql = "SELECT COUNT(*) as total FROM curso WHERE nomeCurso = ?";
+            $stmt = $this->conexao->prepare($sql);
+            $stmt->bindValue(1, $nomeCurso);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return ($result['total'] > 0);
+        } catch (PDOException $e) {
+            error_log("Erro ao verificar duplicidade de curso: " . $e->getMessage());
+            return false;
+        }
+    }
+
 
     public function ListarCurso($linha)
     {

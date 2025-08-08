@@ -263,9 +263,9 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                     <div class="card">
                         <div class="card-header">
                             <h4 class="card-title">Busca de Documentos</h4>
-                            <a href="#" class="btn btn-primary btn-rounded float-right" data-bs-toggle="modal" data-bs-target="#modalDocumentoSolicitar">
+                            <a href="#" class="btn btn-success btn-rounded float-right" data-bs-toggle="modal" data-bs-target="#modalDocumentoSolicitar">
                                 <i class="fa fa-upload mr-2"></i>
-                                Solicitar documento
+                                Solicitar Documento
                             </a>
                         </div>
                         <div class="card-body">
@@ -462,6 +462,7 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
 
                             <div class="text-center mt-4">
                                 <button type="submit" class="btn btn-primary btn-rounded w-50" name="solicitarDocumentoAluno">Solicitar</button>
+                                <a href="#" class="btn btn-light btn-rounded ml-2" data-bs-dismiss="modal">Cancelar</a>
 
                             </div>
                     </div>

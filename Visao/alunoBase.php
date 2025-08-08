@@ -339,30 +339,39 @@ $usuarioId = $_SESSION['idUtilizador'];
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php $cont = 1;
-                                        foreach ($alunos as $aluno): ?>
-                                            <?php
+                                        <?php
+                                        $cont = 1;
+                                        foreach ($alunos as $aluno):
                                             $idAluno = $aluno->getIdAluno();
                                             $matriculas = $matriculaDAO->listarPorAluno($idAluno);
-                                            foreach ($matriculas as $matricula) {
 
-                                            ?>
-                                                <tr>
-                                                    <td><strong><?= $cont++; ?></strong></td>
-                                                    <td><?= htmlspecialchars($aluno->getNomeAluno()); ?></td>
-                                                    <td><?= htmlspecialchars($aluno->getnIdentificacao()); ?></td>
-                                                    <td><?= htmlspecialchars($aluno->getMoradaAluno()); ?></td>
-                                                    <td><?= htmlspecialchars($aluno->getDataNascimentoAluno()); ?></td>
-                                                    <td><?= htmlspecialchars($aluno->getGeneroAluno()); ?></td>
-                                                    <td><?= htmlspecialchars($aluno->getNomeCurso()); ?></td>
-                                                    <td><?= htmlspecialchars($aluno->getNomeTurma()); ?></td>
-                                                    <td><?= htmlspecialchars($matricula->getClasseMatricula()) ?>ª</td>
-                                                    <td><?= htmlspecialchars($matricula->getPeriodoMatricula()) ?></td>
-                                                    <td><?= htmlspecialchars($aluno->getResponsavelAluno()); ?></td>
-                                                    <td><?= htmlspecialchars($aluno->getContactoResponsavelAluno()); ?></td>
-                                                    <td><?= htmlspecialchars($aluno->getAnoIngressoAluno()); ?></td>
+                                            // Pega a primeira matrícula, se existir
+                                            $matricula = !empty($matriculas) ? $matriculas[0] : null;
+                                        ?>
+                                            <tr>
+                                                <td><strong><?= $cont++; ?></strong></td>
+                                                <td><?= htmlspecialchars($aluno->getNomeAluno()); ?></td>
+                                                <td><?= htmlspecialchars($aluno->getnIdentificacao()); ?></td>
+                                                <td><?= htmlspecialchars($aluno->getMoradaAluno()); ?></td>
+                                                <td><?= htmlspecialchars($aluno->getDataNascimentoAluno()); ?></td>
+                                                <td><?= htmlspecialchars($aluno->getGeneroAluno()); ?></td>
+                                                <td><?= htmlspecialchars($aluno->getNomeCurso()); ?></td>
+                                                <td><?= htmlspecialchars($aluno->getNomeTurma()); ?></td>
 
-                                                <?php } ?>
+                                                <td>
+                                                    <?= $matricula
+                                                        ? htmlspecialchars($matricula->getClasseMatricula()) . 'ª'
+                                                        : '-' ?>
+                                                </td>
+                                                <td>
+                                                    <?= $matricula
+                                                        ? htmlspecialchars($matricula->getPeriodoMatricula())
+                                                        : '-' ?>
+                                                </td>
+
+                                                <td><?= htmlspecialchars($aluno->getResponsavelAluno()); ?></td>
+                                                <td><?= htmlspecialchars($aluno->getContactoResponsavelAluno()); ?></td>
+                                                <td><?= htmlspecialchars($aluno->getAnoIngressoAluno()); ?></td>
 
                                                 <td>
                                                     <div class="dropdown">
@@ -382,9 +391,10 @@ $usuarioId = $_SESSION['idUtilizador'];
                                                         </div>
                                                     </div>
                                                 </td>
-                                                </tr>
-                                            <?php endforeach; ?>
+                                            </tr>
+                                        <?php endforeach; ?>
                                     </tbody>
+
                                 </table>
                             </div>
                         </div>
@@ -556,7 +566,7 @@ $usuarioId = $_SESSION['idUtilizador'];
 
                             <div class="text-center mt-4">
                                 <button type="submit" class="btn btn-primary btn-rounded" name="cadastrarAluno">Cadastrar</button>
-                                <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
+                                <a href="#" class="btn btn-light btn-rounded ml-2" data-bs-dismiss="modal">Cancelar</a>
                             </div>
                         </form>
                     </div>
@@ -575,7 +585,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                     </div>
                     <div class="modal-body">
                         <form action="../Controle/crudAluno.php" method="POST" enctype="multipart/form-data">
-                            <?php if (!empty($matriculas)): ?>
+                            <?php if (!$matriculas[null]): ?>
                                 <?php foreach ($matriculas as $matricula): ?>
                                     <input type="hidden" class="form-control input-rounded"
                                         name="estadoMatricula"
@@ -694,7 +704,7 @@ $usuarioId = $_SESSION['idUtilizador'];
 
 
 
-                                <?php if (!empty($matriculas)): ?>
+                                <?php if (!$matriculas[null]): ?>
                                     <?php foreach ($matriculas as $matricula): ?>
                                         <?php $classeSelecionada = $matricula->getClasseMatricula(); ?>
                                         <div class="col-md-3">
@@ -733,7 +743,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                             </div>
 
                             <div class="row">
-                                <?php if (!empty($matriculas)): ?>
+                                <?php if (!$matriculas[null]): ?>
                                     <?php foreach ($matriculas as $matricula): ?>
                                         <?php $periodoSelecionado = $matricula->getPeriodoMatricula(); ?>
                                         <div class="col-md-6">
@@ -823,7 +833,7 @@ $usuarioId = $_SESSION['idUtilizador'];
 
                             <div class="text-center mt-4">
                                 <button type="submit" class="btn btn-primary btn-rounded" name="actualizarAluno">Salvar Alterações</button>
-                                <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
+                                <a href="#" class="btn btn-light btn-rounded ml-2" data-bs-dismiss="modal">Cancelar</a>
                             </div>
                         </form>
                     </div>
@@ -847,7 +857,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                    <a href="#" class="btn btn-light btn-rounded ml-2" data-bs-dismiss="modal">Cancelar</a>
                     <button type="submit" form="formAlunoExcluir" class="btn btn-danger" name="apagarAluno">Confirmar Exclusão</button>
                 </div>
             </div>

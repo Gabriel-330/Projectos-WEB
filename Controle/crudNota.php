@@ -43,9 +43,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $tipoNota = trim($_POST['tipoNota'] ?? '');
         $trimestre = trim($_POST['trimestreNota'] ?? '');
 
-        $comentario = ($valorNota < 10) ? "Insuficiente" : (($valorNota == 10) ? "Satisfatório" : "Bom");
+        if ($idAluno && $idDisciplina && $valorNota && $dataAvaliacao && $tipoAvaliacao && $tipoNota && $trimestre) {
 
-        if ($idAluno && $idDisciplina && $valorNota && $dataAvaliacao && $tipoAvaliacao) {
+            if ($notaDAO->existeNota($idAluno, $idDisciplina, $idCurso, $tipoAvaliacao, $tipoNota, $trimestre)) {
+                $_SESSION['success'] = "Já existe uma nota do mesmo tipo para este aluno nesta disciplina, curso, avaliação e trimestre.";
+                $_SESSION['icon'] = "warning";
+                header("Location: ../Visao/notaProfessorBase.php");
+                exit();
+            }
+
             $notaDTO = new NotaDTO();
             $notaDTO->setIdAluno($idAluno);
             $notaDTO->setIdProfessor($idProfessor);
@@ -91,8 +97,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $tipoAvaliacao = trim($_POST['tipoAvaliacaoNota'] ?? '');
         $tipoNota = trim($_POST['tipoNota'] ?? '');
         $trimestre = trim($_POST['trimestreNota'] ?? '');
-
-        $comentario = ($valorNota < 10) ? "Insuficiente" : (($valorNota == 10) ? "Satisfatório" : "Bom");
 
         if ($idNota && $idAluno && $idDisciplina && $dataAvaliacao && $tipoAvaliacao) {
             $notaDTO = new NotaDTO();

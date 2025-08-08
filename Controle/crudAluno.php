@@ -167,7 +167,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     // === ACTUALIZAR ALUNO ===
-    // === ACTUALIZAR ALUNO ===
     elseif (isset($_POST["actualizarAluno"])) {
         try {
             $conn->beginTransaction();
@@ -293,7 +292,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             $conn->beginTransaction();
 
-            if (!$AlunoDAO->apagar($idAluno)) throw new Exception("Erro ao apagar aluno.");
+            if (!$AlunoDAO->apagar($idAluno)) throw new Exception("Erro ao apagar aluno. Existem dados asoociados!");
             if (!$dao->apagar($idUtilizador)) throw new Exception("Erro ao apagar utilizador.");
 
             $notificacaoDTO->setTipoNotificacoes("Remoção de aluno");

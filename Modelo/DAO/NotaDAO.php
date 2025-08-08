@@ -136,7 +136,7 @@ class NotaDAO
         }
     }
 
-      public function listarPorCurso($curso)
+    public function listarPorCurso($curso)
     {
         try {
             $sql = "SELECT nota.*, disciplina.nomeDisciplina, curso.nomeCurso, aluno.nomeAluno, aluno.dataNascimentoAluno, aluno.responsavelAluno
@@ -160,7 +160,7 @@ class NotaDAO
 
             return $resultado;
         } catch (Exception $ex) {
-            die ("Erro ao listar notas do aluno: " . $ex->getMessage());
+            die("Erro ao listar notas do aluno: " . $ex->getMessage());
             return false;
         }
     }
@@ -277,6 +277,16 @@ class NotaDAO
             $resultado[] = $this->mapearNota($linha);
         }
         return $resultado;
+    }
+
+    public function existeNota($idAluno, $idDisciplina, $idCurso, $tipoAvaliacao, $tipoNota, $trimestre)
+    {
+        $sql = "SELECT COUNT(*) FROM nota WHERE idAluno = ? AND idDisciplina = ? AND idCurso = ? AND tipoAvaliacaoNota = ? AND tipoNota = ? AND trimestreNota = ?";
+        $stmt = $this->conexao->prepare($sql);
+        $stmt->execute([$idAluno, $idDisciplina, $idCurso, $tipoAvaliacao, $tipoNota, $trimestre]);
+        $count = $stmt->fetchColumn();
+
+        return $count > 0;
     }
 
     private function mapearNota($linha)

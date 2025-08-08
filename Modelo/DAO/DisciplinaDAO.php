@@ -46,7 +46,7 @@ class DisciplinaDAO
 
             return $stmt->execute();
         } catch (PDOException $e) {
-            die ("Erro ao atualizar disciplina: " . $e->getMessage());
+            die("Erro ao atualizar disciplina: " . $e->getMessage());
             return false;
         }
     }
@@ -163,7 +163,51 @@ class DisciplinaDAO
         }
     }
 
+    // Verifica se existe disciplina com mesmo nome, classe e curso (excluindo a própria disciplina pelo ID)
+    public function existeNomeOutro($nome, $classe, $idCurso, $idDisciplina)
+    {
+        try {
+            $sql = "SELECT COUNT(*) as total 
+                  FROM disciplina 
+                 WHERE nomeDisciplina = ? 
+                   AND classeDisciplina = ? 
+                   AND idCurso = ? 
+                   AND idDisciplina <> ?";
+            $stmt = $this->conexao->prepare($sql);
+            $stmt->bindValue(1, $nome);
+            $stmt->bindValue(2, $classe);
+            $stmt->bindValue(3, $idCurso);
+            $stmt->bindValue(4, $idDisciplina);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return ($result['total'] > 0);
+        } catch (PDOException $e) {
+            error_log("Erro ao verificar duplicidade de disciplina: " . $e->getMessage());
+            return false;
+        }
+    }
 
+    // Verifica se já existe disciplina com mesmo nome, classe e curso
+    public function existeNome($nome, $classe, $idCurso)
+    {
+        try {
+            $sql = "SELECT COUNT(*) as total 
+                  FROM disciplina 
+                 WHERE nomeDisciplina = ? 
+                   AND classeDisciplina = ? 
+                   AND idCurso = ?";
+            $stmt = $this->conexao->prepare($sql);
+            $stmt->bindValue(1, $nome);
+            $stmt->bindValue(2, $classe);
+            $stmt->bindValue(3, $idCurso);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return ($result['total'] > 0);
+        } catch (PDOException $e) {
+            error_log("Erro ao verificar duplicidade de disciplina: " . $e->getMessage());
+            return false;
+        }
+    }
 
 
     public function listarTodosCursoClasse($curso, $classe)
