@@ -30,7 +30,7 @@ $usuarioId = $_SESSION['idUtilizador'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Painel Evento</title>
 
     <!-- Icones do site-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -49,8 +49,7 @@ $usuarioId = $_SESSION['idUtilizador'];
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet" type="text/css" />
     <link href="assets/css/style.css" rel="stylesheet" type="text/css" />
 
-        <style>
- 
+    <style>
         .menu-user ul li.active a {
             background-color: #0b5ed7;
             /* cor de fundo ao clicar */
@@ -246,7 +245,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                     <li><a href="turmaBase.php" title="Turmas"><i class="fa-solid fa-users"></i><span>Turmas</span></a></li>
                     <li><a href="disciplinaBase.php" title="Disciplinas"><i class="fa-solid fa-book-open"></i><span>Disciplinas</span></a></li>
                     <li><a href="matriculaBase.php" title="Matrícula"><i class="fa-solid fa-file-signature"></i><span>Matrícula</span></a></li>
-                    <li><a href="documentoBase.php" title="Aceitar Documentos"><i class="fa-regular fa-folder-open"></i><span class="text-white">Documentos</span></a></li>
+                    <li><a href="documentoBase.php" title="Aceitar Documentos"><i class="fa-regular fa-folder-open"></i><span>Documentos</span></a></li>
 
                 </ul>
             </div>
@@ -296,8 +295,8 @@ $usuarioId = $_SESSION['idUtilizador'];
                             <i class="fa fa-search me-1"></i> Buscar
                         </button>
 
-                        <a href="criarEvento.php" data-bs-toggle="modal" data-bs-target="#modalEventoCadastrar" class="btn btn-success btn-rounded">
-                            + Adicionar evento
+                        <a href="#" id="btnVerificarCurso" data-bs-toggle="modal" data-bs-target="#modalEventoCadastrar" class="btn btn-success btn-rounded">
+                            + Adicionar Evento
                         </a>
                     </div>
                 </div>
@@ -396,9 +395,9 @@ $usuarioId = $_SESSION['idUtilizador'];
                                                                     <i class="fa fa-ellipsis-h"></i>
                                                                 </button>
                                                                 <div class="dropdown-menu dropdown-menu-right">
-                                                                    <a class="dropdown-item" href="#"><i class="fa fa-eye me-2"></i>Ver detalhes</a>
-                                                                    <a class="dropdown-item" href="#"><i class="fa fa-bell me-2"></i>Definir lembrete</a>
-                                                                    <a class="dropdown-item" href="#"><i class="fa fa-share-alt me-2"></i>Partilhar</a>
+
+                                                                    <a class="dropdown-item btn-apagar-evento" data-bs-toggle="modal" data-bs-target="#modalEventoApagar" data-id="<?= $evento->getIdEvento() ?>">Apagar</a>
+                                                                    <a class="dropdown-item btn-editar-evento" data-bs-toggle="modal" data-bs-target="#modalEventoEditar" data-id="<?= $evento->getIdEvento() ?>">Editar</a>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -413,52 +412,44 @@ $usuarioId = $_SESSION['idUtilizador'];
                     </div>
                 </div>
             </div>
-
         </div>
-    </div>
-    <div class="footer">
-        <div class="copyright">
-            <p>Copyright © Sistema de Gestão Web de Gestão de Alunos by <a href="#" target="_blank">SGWA</a> 2025</p>
-        </div>
-    </div>
 
-    <div class="modal fade" id="modalEventoCadastrar">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Cadastrar Evento</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="../Controle/crudEvento.php" method="POST" enctype="multipart/form-data">
-                        <div class="form-group">
-                            <label class="mb-1"><strong>Título do Evento<b style="font-size: 14px;color: red;">*</b></strong></label>
-                            <input type="text" class="form-control input-rounded" name="tituloEvento" required>
-                        </div>
+        <div class="modal fade" id="modalEventoCadastrar">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Cadastrar Evento</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="../Controle/crudEvento.php" method="POST" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Título do Evento<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                <input type="text" class="form-control input-rounded" name="tituloEvento" required>
+                            </div>
 
-                        <div class="form-group">
-                            <label class="mb-1"><strong>Tipo de Evento<b style="font-size: 14px;color: red;">*</b></strong></label>
-                            <select class="form-control input-rounded" name="tipoEvento" required>
-                                <option value="">Selecione o tipo de evento</option>
-                                <option value="Prova">Prova</option>
-                                <option value="Actividade">Actividade</option>
-                                <option value="Apresentação">Apresentação</option>
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Tipo de Evento<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                <select class="form-control input-rounded" name="tipoEvento" required>
+                                    <option value="">Selecione o tipo de evento</option>
+                                    <option value="Prova">Prova</option>
+                                    <option value="Actividade">Actividade</option>
+                                    <option value="Apresentação">Apresentação</option>
 
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="mb-1"><strong>Local Evento<b style="font-size: 14px;color: red;">*</b></strong></label>
-                            <input type="text" class="form-control input-rounded" name="localEvento" required>
-                        </div>
-                        <?php
-                        require_once("../Modelo/DAO/CursoDAO.php");
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Local Evento<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                <input type="text" class="form-control input-rounded" name="localEvento" required>
+                            </div>
+                            <?php
+                            require_once("../Modelo/DAO/CursoDAO.php");
 
-                        $dao = new CursoDAO();
-                        $cursos = $dao->Mostrar();
-                        ?>
+                            $dao = new CursoDAO();
+                            $cursos = $dao->Mostrar();
+                            ?>
 
 
-                        <div class="col-md-6">
                             <div class="form-group">
                                 <label class="mb-1"><strong>Curso <b style="font-size: 14px;color: red;">*</b></strong></label>
                                 <select class="form-control input-rounded" name="cursoEvento" required>
@@ -470,52 +461,263 @@ $usuarioId = $_SESSION['idUtilizador'];
 
                                     <?php endforeach; ?>
                                 </select>
+
+
+                            </div>
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Responsável<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                <input type="text" class="form-control input-rounded" name="responsavelEvento" required>
                             </div>
 
-                        </div>
-                        <div class="form-group">
-                            <label class="mb-1"><strong>Responsável<b style="font-size: 14px;color: red;">*</b></strong></label>
-                            <input type="text" class="form-control input-rounded" name="responsavelEvento" required>
-                        </div>
+
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Data do Evento<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                <input type="date" class="form-control input-rounded" name="dataEvento" required>
+                            </div>
 
 
-                        <div class="form-group">
-                            <label class="mb-1"><strong>Data do Evento<b style="font-size: 14px;color: red;">*</b></strong></label>
-                            <input type="date" class="form-control input-rounded" name="dataEvento" required>
-                        </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="col-md-6"><strong>Hora Fim<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <input type="time" class="form-control input-rounded" name="horaFimEvento" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="col-md-6">
+                                            <strong>Hora Início <b style="font-size: 14px; color: red;">*</b></strong>
+                                        </label>
+                                        <input type="time" class="form-control input-rounded" name="horaInicioEvento" required>
+                                    </div>
 
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="col-md-6"><strong>Hora Fim<b style="font-size: 14px;color: red;">*</b></strong></label>
-                                    <input type="time" class="form-control input-rounded" name="horaFimEvento" required>
+
+                                </div>
+
+                                <div class="text-center mt-4">
+                                    <button type="submit" class="btn btn-primary btn-rounded" name="cadastrarEvento">Cadastrar</button>
+                                    <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="col-md-6">
-                                        <strong>Hora Início <b style="font-size: 14px; color: red;">*</b></strong>
-                                    </label>
-                                    <input type="time" class="form-control input-rounded" name="horaInicioEvento" required>
-                                </div>
 
+                        </form>
+                    </div>
 
-
-                            </div>
-
-                            <div class="text-center mt-4">
-                                <button type="submit" class="btn btn-primary btn-rounded" name="cadastrarEvento">Cadastrar</button>
-                                <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
-                            </div>
-                        </div>
-
-                    </form>
                 </div>
+            </div>
+        </div>
 
+        <div class="modal fade" id="modalEventoEditar">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Evento</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="../Controle/crudEvento.php" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="idEvento" id="idEventoEditar">
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Título do Evento<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                <input type="text" class="form-control input-rounded" name="tituloEvento" id="tituloEventoEditar" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Tipo de Evento<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                <select class="form-control input-rounded" name="tipoEvento" id="tipoEventoEditar" required>
+                                    <option value="">Selecione o tipo de evento</option>
+                                    <option value="Prova">Prova</option>
+                                    <option value="Actividade">Actividade</option>
+                                    <option value="Apresentação">Apresentação</option>
+
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Local Evento<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                <input type="text" class="form-control input-rounded" name="localEvento" id="localEventoEditar" required>
+                            </div>
+                            <?php
+                            require_once("../Modelo/DAO/CursoDAO.php");
+
+                            $dao = new CursoDAO();
+                            $cursos = $dao->Mostrar();
+                            ?>
+
+
+
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Curso <b style="font-size: 14px;color: red;">*</b></strong></label>
+                                <select class="form-control input-rounded" name="cursoEvento" id="idCursoEditar" required>
+                                    <option value="">Selecione o curso</option>
+                                    <?php foreach ($cursos as $curso): ?>
+                                        <option value="<?= htmlspecialchars($curso->getIdCurso()) ?>">
+                                            <?= htmlspecialchars($curso->getNomeCurso()) ?>
+                                        </option>
+
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Responsável<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                <input type="text" class="form-control input-rounded" name="responsavelEvento" id="responsavelEventoEditar" required>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Data do Evento<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                <input type="date" class="form-control input-rounded" name="dataEvento" id="dataEventoEditar" required>
+                            </div>
+
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="col-md-6"><strong>Hora Fim<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <input type="time" class="form-control input-rounded" name="horaFimEvento" id="horaFimEventoEditar" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="col-md-6">
+                                            <strong>Hora Início <b style="font-size: 14px; color: red;">*</b></strong>
+                                        </label>
+                                        <input type="time" class="form-control input-rounded" name="horaInicioEvento" id="horaInicioEventoEditar" required>
+                                    </div>
+                                </div>
+
+                                <div class="text-center mt-4">
+                                    <button type="submit" class="btn btn-primary btn-rounded" name="actualizarEvento">Salvar Alterções</button>
+                                    <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalEventoApagar">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirmar Exclusão</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Tem certeza que deseja excluir este Evento? Esta ação não pode ser desfeita.</p>
+                        <form id="formEventoExcluir" method="POST" action="../Controle/crudEvento.php">
+                            <input type="hidden" name="idEvento" id="idEventoApagar" required>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" form="formEventoExcluir" class="btn btn-danger" name="apagarEvento">Confirmar Exclusão</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+
+
+
+
+    <div class="footer">
+        <div class="copyright">
+            <p>Copyright © Sistema de Gestão Web de Gestão de Alunos by <a href="#" target="_blank">SGWA</a> 2025</p>
+        </div>
+    </div>
+    <script src="assets/js/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).on('click', '.btn-editar-evento', function() {
+            const id = $(this).data('id');
+
+            $.get('../Controle/retornarEvento.php', {
+                id: id
+            }, function(data) {
+                try {
+                    const evento = data;
+
+                    $('#idEventoEditar').val(evento.idEvento);
+                    $('#tituloEventoEditar').val(evento.tituloEvento);
+                    $('#dataEventoEditar').val(evento.dataEvento);
+                    $('#horaInicioEventoEditar').val(evento.horaInicioEvento);
+                    $('#horaFimEventoEditar').val(evento.horaFimEvento);
+                    $('#localEventoEditar').val(evento.localEvento);
+                    $('#responsavelEventoEditar').val(evento.responsavelEvento);
+                    $('#tipoEventoEditar').val(evento.tipoEvento);
+                    $('#idCursoEditar').val(evento.idCurso);
+                    $('#idUtilizadorEditar').val(evento.idUtilizador);
+
+                } catch (e) {
+                    console.error('Erro ao processar JSON:', data);
+                }
+            }).fail(function(xhr) {
+                console.error('Erro na requisição AJAX:', xhr.responseText);
+            });
+        });
+    </script>
+
+    <script>
+        $(document).on('click', '.btn-apagar-evento', function() {
+            const id = $(this).data('id');
+
+            $.get('../Controle/retornarEvento.php', {
+                id: id
+            }, function(data) {
+                try {
+                    const evento = data;
+
+                    $('#idEventoApagar').val(evento.idEvento);
+
+
+                } catch (e) {
+                    console.error('Erro ao processar JSON:', data);
+                }
+            }).fail(function(xhr) {
+                console.error('Erro na requisição AJAX:', xhr.responseText);
+            });
+        });
+    </script>
+
+    <script>
+        document.getElementById('btnVerificarCurso').addEventListener('click', function() {
+            fetch('../Controle/verificarCursoNoEvento.php', {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        const modal = new bootstrap.Modal(document.getElementById('modalEventoCadastrar'));
+                        modal.show();
+                    } else if (data.status === 'erro') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro',
+                            text: data.message
+                        });
+                    } else if (data.status === 'redirect') {
+                        window.location.href = data.redirect;
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro na verificação:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: 'Erro ao verificar incidentes.'
+                    });
+                });
+        });
+    </script>
+
+
 
     <script src="assets/vendor/global/global.min.js" type="text/javascript"></script>
     <script src="assets/vendor/bootstrap-select/dist/js/bootstrap-select.min.js" type="text/javascript"></script>
@@ -541,6 +743,11 @@ $usuarioId = $_SESSION['idUtilizador'];
             $('#datetimepicker1').datetimepicker({
                 inline: true,
             });
+        });
+
+        $('.modal').on('hidden.bs.modal', function() {
+            $('.modal-backdrop').remove();
+            $('body').removeClass('modal-open');
         });
     </script>
 </body>

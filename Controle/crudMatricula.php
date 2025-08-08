@@ -66,6 +66,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $idAluno        = $_POST['alunoMatricula'] ?? '';
         $idCurso        = $_POST['cursoMatricula'] ?? '';
         $dataMatricula  = $_POST['dataMatricula'] ?? '';
+        $periodoMatricula = trim($_POST["periodoMatricula"] ?? '');
+        $classeMatricula  = trim($_POST["classeMatricula"] ?? '');
         $estado         = $_POST['estadoMatricula'] ?? '';
 
         if (empty($idMatricula) || empty($idTurma) || empty($idAluno) || empty($idCurso) || empty($dataMatricula) || empty($estado)) {
@@ -81,6 +83,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $matriculaDTO->setIdCurso($idCurso);
         $matriculaDTO->setDataMatricula($dataMatricula);
         $matriculaDTO->setEstadoMatricula($estado);
+        $matriculaDTO->setPeriodoMatricula($periodoMatricula);
+        $matriculaDTO->setClasseMatricula($classeMatricula);
         $matriculaDTO->setIdTurma($idTurma);
 
         $matriculaDAO = new MatriculaDAO();

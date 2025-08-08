@@ -54,7 +54,7 @@ class NotaDAO
     public function actualizar(NotaDTO $notaDTO)
     {
         try {
-            $sql = "UPDATE nota SET idAluno = :idAluno, idDisciplina = :idDisciplina, idCurso = :idCurso, idProfessor = :idProfessor, valorNota = :valorNota, dataValorNota = :dataValorNota, tipoAvaliacaoNota = :tipoAvaliacaoNota, tipoNota = :tipoNota, trimestreNota = :trimestreNota WHERE idNota = :idNota";
+            $sql = "UPDATE nota SET idAluno = :idAluno, idDisciplina = :idDisciplina, idCurso = :idCurso, idProfessor = :idProfessor, valorNota = :valorNota, dataAvaliacaoNota = :dataValorNota, tipoAvaliacaoNota = :tipoAvaliacaoNota, tipoNota = :tipoNota, trimestreNota = :trimestreNota WHERE idNota = :idNota";
             $stmt = $this->conexao->prepare($sql);
 
             $stmt->bindValue(":idAluno", $notaDTO->getIdAluno());
@@ -70,7 +70,7 @@ class NotaDAO
 
             return $stmt->execute();
         } catch (Exception $e) {
-            echo "Erro ao atualizar nota: " . $e->getMessage();
+            die("Erro ao atualizar nota: " . $e->getMessage());
             return false;
         }
     }

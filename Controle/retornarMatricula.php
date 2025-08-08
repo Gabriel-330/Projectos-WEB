@@ -1,33 +1,29 @@
 <?php
-require_once '../Modelo/DAO/MatriculaDAO.php';
-require_once '../Modelo/DTO/MatriculaDTO.php';
+require_once("../Modelo/DAO/MatriculaDAO.php");
+header('Content-Type: application/json');
 
-if (isset($_GET['id']) && is_numeric($_GET['id'])) {
-    $id = $_GET['id'];
+if (!isset($_GET['id'])) {
+    http_response_code(400);
+    echo json_encode(['erro' => 'ID não especificado']);
+    exit;
+}
 
-    $matriculaDAO = new MatriculaDAO();
-    $matricula = $matriculaDAO->buscarMatriculaPorId($id); // Certifique-se que este método existe no DAO
+$id = intval($_GET['id']);
+$dao = new MatriculaDAO();
+$matricula = $dao->buscarMatriculaPorId($id);
 
-    if ($matricula instanceof MatriculaDTO) {
-        $dados = [
-            'idMatricula' => $matricula->getIdMatricula(),
-            'idAluno' => $matricula->getIdAluno(),
-            'idTurma' => $matricula->getIdTurma(),
-            'idCurso' => $matricula->getIdCurso(),
-            'dataMatricula' => $matricula->getDataMatricula(),
-            'estadoMatricula' => $matricula->getEstadoMatricula(),
-            'nomeAluno' => $matricula->getNomeAluno(),
-            'nomeTurma' => $matricula->getNomeTurma(),
-            'nomeCurso' => $matricula->getNomeCurso(),
-            'classeMatricula' => $matricula->getClasseMatricula(),
-            'periodoMatricula' => $matricula->getPeriodoMatricula()
-        ];
-
-        header('Content-Type: application/json; charset=utf-8');
-        echo json_encode($dados);
-    } else {
-        echo json_encode(['erro' => 'Matrícula não encontrada']);
-    }
+if ($matricula) {
+    echo json_encode([
+        'idMatricula'        => $matricula->getIdMatricula(),
+        'idAluno'            => $matricula->getIdAluno(),
+        'idTurma'            => $matricula->getIdTurma(),
+        'idCurso'            => $matricula->getIdCurso(),
+        'dataMatricula'      => $matricula->getDataMatricula(),
+        'estadoMatricula'    => $matricula->getEstadoMatricula(),
+        'classeMatricula'    => $matricula->getClasseMatricula(),
+        'periodoMatricula'   => $matricula->getPeriodoMatricula()
+    ]);
 } else {
-    echo json_encode(['erro' => 'ID inválido']);
+    http_response_code(404);
+    echo json_encode(['erro' => 'Matrícula não encontrada']);
 }

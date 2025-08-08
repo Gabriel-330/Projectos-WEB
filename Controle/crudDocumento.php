@@ -1,141 +1,164 @@
 <?php
 session_start();
+
 require_once("../Modelo/DAO/conn.php");
 require_once("../Modelo/DAO/DocumentoDAO.php");
 require_once("../Modelo/DTO/DocumentoDTO.php");
 require_once("../Modelo/DAO/NotificacoesDAO.php");
-require_once("../Modelo/DTO/NotificacoesDTO.php");
-require_once("../Modelo/DAO/CursoDAO.php");
-require_once("../Modelo/DAO/TurmaDAO.php");
 require_once("../Modelo/DAO/ProfessorDAO.php");
-require_once("../Modelo/DAO/DisciplinaDAO.php");
+require_once("../Modelo/DAO/AlunoDAO.php");
+require_once("../Modelo/DTO/NotificacoesDTO.php");
 
 $notificacaoDTO = new NotificacoesDTO();
 $notificacaoDAO = new NotificacoesDAO();
-$documentoDAO = new DocumentoDAO();
-$documentoDTO = new DocumentoDTO();
+$professorDAO = new ProfessorDAO();
+$alunoDAO = new AlunoDAO();
 
-// Função utilitária para criar notificações
-function criarNotificacao($tipo, $mensagem, $notificacaoDTO, $notificacaoDAO)
-{
-    $notificacaoDTO->setTipoNotificacoes($tipo);
-    $notificacaoDTO->setMensagemNotificacoes($mensagem);
-    $notificacaoDTO->setlidaNotificacoes(0);
-    $notificacaoDTO->setIdUtilizador($_SESSION['idUtilizador']);
-    $notificacaoDAO->criarNotificacao($notificacaoDTO);
-}
+$idProfessor = $professorDAO->buscarPorUtilizador($_SESSION["idUtilizador"]);
+$idAluno = $alunoDAO->buscarPorUtilizador($_SESSION["idUtilizador"]);
 
-// Função utilitária para redirecionar com mensagem
-function redirecionar($mensagem, $tipo, $local)
-{
-    $_SESSION[$tipo === 'success' ? 'success' : 'error'] = $mensagem;
-    $_SESSION['icon'] = $tipo;
-    header("location: $local");
-    exit();
-}
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // === SOLICITAR DOCUMENTO PROFESSOR ===
+    if (isset($_POST["solicitarDocumentoProfessor"])) {
+    
+          // === SOLICITAR DOCUMENTO ALUNO ===
+    }elseif (isset($_POST["solicitarDocumentoAluno"])) {
 
-    // === CADASTRAR DOCUMENTO ===
-    if (isset($_POST["criarDocumento"])) {
-        $idAluno = filter_input(INPUT_POST, 'idAluno', FILTER_VALIDATE_INT);
-        $tipoDocumento = trim(filter_input(INPUT_POST, 'tipoDocumento', FILTER_SANITIZE_STRING));
-        //$numeroDocumento = trim(filter_input(INPUT_POST, 'numeroDocumento', FILTER_SANITIZE_STRING)); // Comentado propositalmente
+        $tipo         = trim($_POST["tipoDocumento"] ?? '');
+        $estado       = trim($_POST["estadoDocumento"] ?? '');
+        $dataEmissao = date("Y-m-d H:i:s"); // Formato completo com hora
+ 
 
-        if ($idAluno && $tipoDocumento) {
-            $documentoDTO->setAluno_IdAluno($idAluno);
-            $documentoDTO->setTipoDocumento($tipoDocumento);
-            //$documentoDTO->setNumeroDocumento($numeroDocumento);
+        if (
+             empty($tipo) || empty($estado)
+        ) {
 
-            if ($documentoDAO->cadastrar($documentoDTO)) {
-                criarNotificacao("Cadastro de documento", "Foi solicitado um documento: $tipoDocumento", $notificacaoDTO, $notificacaoDAO);
-                redirecionar("Documento cadastrado com sucesso!", "success", "../Visao/documentoBase.php");
-            } else {
-                redirecionar("Erro ao cadastrar documento.", "error", "../Visao/documentoBase.php");
-            }
-        } else {
-            redirecionar("Preencha todos os campos obrigatórios.", "warning", "../Visao/documentoBase.php");
+            $_SESSION['success'] = "Todos os campos são obrigatórios.";
+            $_SESSION['icon'] = "error";
+            header("Location: ../Visao/documentoAlunoBase.php");
+            exit();
         }
-    }
 
-    // === ATUALIZAR DOCUMENTO ===
-    if (isset($_POST["atualizarDocumento"])) {
-        $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
-        $idAluno = filter_input(INPUT_POST, 'idAluno', FILTER_VALIDATE_INT);
-        $tipoDocumento = trim(filter_input(INPUT_POST, 'tipoDocumento', FILTER_SANITIZE_STRING));
-        //$numeroDocumento = trim(filter_input(INPUT_POST, 'numeroDocumento', FILTER_SANITIZE_STRING));
+        $docDTO = new DocumentoDTO();
+        $docDTO->setIdAluno($idAluno);
+        $docDTO->setIdProfessor($idProfessor);
+        $docDTO->setTipoDocumento($tipo);
+        $docDTO->setEstadoDocumento($estado);
+        $docDTO->setDataEmissaoDocumento($dataEmissao);
 
-        if ($id && $idAluno && $tipoDocumento) {
-            $documentoDTO->setIdDocumento($id);
-            $documentoDTO->setAluno_IdAluno($idAluno);
-            $documentoDTO->setTipoDocumento($tipoDocumento);
-            //$documentoDTO->setNumeroDocumento($numeroDocumento);
 
-            if ($documentoDAO->actualizar($documentoDTO)) {
-                criarNotificacao("Actualização de documento", "Documento atualizado: $tipoDocumento", $notificacaoDTO, $notificacaoDAO);
-                redirecionar("Documento atualizado com sucesso!", "success", "../Visao/documentoBase.php");
-            } else {
-                redirecionar("Erro ao atualizar documento.", "error", "../Visao/documentoBase.php");
-            }
+        $docDAO = new DocumentoDAO();
+
+        if ($docDAO->cadastrar($docDTO)) {
+            $notificacaoDTO->setTipoNotificacoes("Cadastro de documento");
+            $notificacaoDTO->setMensagemNotificacoes("Foi cadastrado um novo documento.");
+            $notificacaoDTO->setLidaNotificacoes(0);
+            $notificacaoDTO->setIdUtilizador($_SESSION['idUtilizador']);
+            $notificacaoDAO->criarNotificacao($notificacaoDTO);
+
+            $_SESSION['success'] = "Documento solicitado com sucesso!";
+            $_SESSION['icon'] = "success";
+            header("Location: ../Visao/documentoAlunoBase.php");
+            exit();
         } else {
-            redirecionar("Preencha todos os campos obrigatórios.", "warning", "../Visao/documentoBase.php");
+            $_SESSION['error'] = "Erro ao soliciatar documento.";
+            $_SESSION['icon'] = "error";
+            header("Location: ../Visao/documentoAlunoBase.php");
+            exit();
         }
-    }
 
-    // === DELETAR DOCUMENTO ===
-    if (isset($_POST["deletarDocumento"])) {
-        $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
+        // === APAGAR DOCUMENTO ===
+    } elseif (isset($_POST["apagarDocumento"])) {
 
-        if ($id) {
-            if ($documentoDAO->apagar($id)) {
-                criarNotificacao("Eliminação de documento", "Os dados de um documento foram eliminados.", $notificacaoDTO, $notificacaoDAO);
-                redirecionar("Documento deletado com sucesso!", "success", "../Visao/documentoBase.php");
-            } else {
-                redirecionar("Erro ao deletar documento.", "error", "../Visao/documentoBase.php");
-            }
-        } else {
-            redirecionar("Documento inválido para eliminar.", "warning", "../Visao/documentoBase.php");
+        $id = $_POST["idDocumento"] ?? null;
+
+        if (empty($id)) {
+            $_SESSION['error'] = "ID de documento inválido.";
+            $_SESSION['icon'] = "error";
+            header("Location: ../Visao/documentoProfessorBase.php");
+            exit();
         }
-    }
 
+        $docDTO = new DocumentoDTO();
+        $docDTO->setIdDocumento($id);
 
-    if (isset($_POST['solicitarDocumento'])) {
+        $docDAO = new DocumentoDAO();
 
-        $professorDAO = new ProfessorDAO();
-        $cursoDAO = new CursoDAO();
-        $turmaDAO = new TurmaDAO();
-        $disciplinaDAO = new DisciplinaDAO();
-        $dao = new DocumentoDAO();
-        $doc = new DocumentoDTO();
+        if ($docDAO->apagar($docDTO)) {
+            $notificacaoDTO->setTipoNotificacoes("Eliminação de documento");
+            $notificacaoDTO->setMensagemNotificacoes("Um documento foi eliminado.");
+            $notificacaoDTO->setLidaNotificacoes(0);
+            $notificacaoDTO->setIdUtilizador($_SESSION['idUtilizador']);
+            $notificacaoDAO->criarNotificacao($notificacaoDTO);
 
-        $disciplinaDTO = $disciplinaDAO->buscarPorId($_POST['idDisciplina']);
-        $cursoDTO = $cursoDAO->MostrarPorID($_POST['idCurso']);
-        $turmaDTO = $turmaDAO->buscarPorId($_POST['idTurma']);
-
-        if ($cursoDTO && $turmaDTO && $disciplinaDTO) {
-            $curso = $cursoDTO->getNomeCurso();
-            $turma = $turmaDTO->getNomeTurma();
-            $disciplina = $disciplinaDTO->getNomeDisciplina();
+            $_SESSION['success'] = "Documento apagado com sucesso!";
+            $_SESSION['icon'] = "success";
         } else {
-            $curso = null;
-            $turma = null;
-            $disciplina = null;
+            $_SESSION['error'] = "Erro ao apagar documento.";
+            $_SESSION['icon'] = "error";
         }
-        $id = $professorDAO->buscarPorUtilizador($_SESSION['idUtilizador']);
-        $doc->setClasseDocumento($_POST['classe']);
-        $doc->setPeriodoDocumento($_POST['periodo']);
-        $doc->setCursoDocumento($curso);
-        $doc->setTurmaDocumento($turma);
-        $doc->setDisciplinaDocumento($disciplina);
-        $doc->setTipoDocumento($_POST["tipoDocumento"]);
-        $doc->setEstadoDocumento($_POST["estadoDocumento"]);
-        $doc->setProfessor_IdProfessor($id);
 
-        if ($dao->cadastrar($doc)) {
-            criarNotificacao("Cadastro de documento", "Foi solicitado um documento: $tipoDocumento", $notificacaoDTO, $notificacaoDAO);
-            redirecionar("Documento cadastrado com sucesso!", "success", "../Visao/documentoProfessorBase.php");
+        header("Location: ../Visao/documentoProfessorBase.php");
+        exit();
+
+        // === ATUALIZAR DOCUMENTO ===
+    } elseif (isset($_POST["actualizarDocumento"])) {
+
+        $id          = trim($_POST["idDocumento"] ?? '');
+        $idAluno     = trim($_POST["idAluno"] ?? '');
+        $idProfessor = trim($_POST["idProfessor"] ?? '');
+        $tipo        = trim($_POST["tipoDocumento"] ?? '');
+        $estado      = trim($_POST["estadoDocumento"] ?? '');
+        $dataEmissao = trim($_POST["dataEmissaoDocumento"] ?? '');
+        $curso       = trim($_POST["cursoDocumento"] ?? '');
+        $turma       = trim($_POST["turmaDocumento"] ?? '');
+        $classe      = trim($_POST["classeDocumento"] ?? '');
+        $periodo     = trim($_POST["periodoDocumento"] ?? '');
+        $disciplina  = trim($_POST["disciplinaDocumento"] ?? '');
+
+        if (
+            empty($id) || empty($idAluno) || empty($idProfessor) || empty($tipo) || empty($estado) || empty($dataEmissao) ||
+            empty($curso) || empty($turma) || empty($classe) || empty($periodo) || empty($disciplina)
+        ) {
+
+            $_SESSION['error'] = "Todos os campos devem ser preenchidos.";
+            $_SESSION['icon'] = "error";
+            header("Location: ../Visao/documentoProfessorBase.php");
+            exit();
+        }
+
+        $docDTO = new DocumentoDTO();
+        $docDTO->setIdDocumento($id);
+        $docDTO->setIdAluno($idAluno);
+        $docDTO->setIdProfessor($idProfessor);
+        $docDTO->setTipoDocumento($tipo);
+        $docDTO->setEstadoDocumento($estado);
+        $docDTO->setDataEmissaoDocumento($dataEmissao);
+        $docDTO->setCursoDocumento($curso);
+        $docDTO->setTurmaDocumento($turma);
+        $docDTO->setClasseDocumento($classe);
+        $docDTO->setPeriodoDocumento($periodo);
+        $docDTO->setDisciplinaDocumento($disciplina);
+
+        $docDAO = new DocumentoDAO();
+
+        if ($docDAO->actualizar($docDTO)) {
+            $notificacaoDTO->setTipoNotificacoes("Atualização de documento");
+            $notificacaoDTO->setMensagemNotificacoes("Um documento foi atualizado.");
+            $notificacaoDTO->setLidaNotificacoes(0);
+            $notificacaoDTO->setIdUtilizador($_SESSION['idUtilizador']);
+            $notificacaoDAO->criarNotificacao($notificacaoDTO);
+
+            $_SESSION['success'] = "Documento atualizado com sucesso!";
+            $_SESSION['icon'] = "success";
+            header("Location: ../Visao/documentoProfessorBase.php");
+            exit();
         } else {
-            redirecionar("Erro ao cadastrar documento.", "error", "../Visao/documentoProfessorBase.php");
+            $_SESSION['error'] = "Erro ao atualizar documento.";
+            $_SESSION['icon'] = "error";
+            header("Location: ../Visao/documentoProfessorBase.php");
+            exit();
         }
     }
 }

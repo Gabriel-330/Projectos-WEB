@@ -167,10 +167,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     // === ACTUALIZAR ALUNO ===
+    // === ACTUALIZAR ALUNO ===
     elseif (isset($_POST["actualizarAluno"])) {
         try {
+            $conn->beginTransaction();
+
             $id = $_SESSION['idUtilizador'];
-            $idTurma = $_POST['tipoTurma'];
             $idAluno = trim($_POST['idAluno']);
             $nome = trim($_POST['nomeAluno']);
             $genero = trim($_POST['generoAluno']);
@@ -179,15 +181,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $dataNasc = trim($_POST['dataNascAluno']);
             $morada = trim($_POST['moradaAluno']);
             $idCurso = trim($_POST['tipoCurso']);
+            $idTurma = $_POST['tipoTurma'];
+            $classeMatricula = $_POST['classeMatricula'];
+            $estadoMatricula = $_POST['estadoMatricula'];
+            $periodoMatricula = trim($_POST['periodoMatricula']);
+            $dataMatricula = trim($_POST['dataMatricula']);
             $anoIngresso = date("Y");
             $nIdentificacao = trim($_POST['nIdentificacao']);
 
-            $fotoAtual = $AlunoDAO->buscarFotoPorId($idAluno);
-            $fotoAlunoBD = $fotoAtual;
+            // Imagem antiga (vinda do hidden)
+            $fotoAlunoBD = $_POST['fotoAlunoAntiga'];
 
-            if (isset($_FILES['fotoAluno']) && $_FILES['fotoAluno']['error'] === UPLOAD_ERR_OK) {
-                $tmp = $_FILES['fotoAluno']['tmp_name'];
-                $ext = strtolower(pathinfo($_FILES['fotoAluno']['name'], PATHINFO_EXTENSION));
+            // Se foi enviada nova imagem
+            if (isset($_FILES['fotoAlunoNova']) && $_FILES['fotoAlunoNova']['error'] === UPLOAD_ERR_OK) {
+                $tmp = $_FILES['fotoAlunoNova']['tmp_name'];
+                $ext = strtolower(pathinfo($_FILES['fotoAlunoNova']['name'], PATHINFO_EXTENSION));
                 $permitidos = ['jpg', 'jpeg', 'png', 'gif'];
 
                 if (!in_array($ext, $permitidos)) {
@@ -197,14 +205,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     exit();
                 }
 
+                // Novo nome e destino
                 $novoNome = uniqid('aluno_') . ".$ext";
                 $destino = "../alunos/fotos/";
                 if (!is_dir($destino)) mkdir($destino, 0755, true);
+
                 if (move_uploaded_file($tmp, $destino . $novoNome)) {
                     $fotoAlunoBD = "alunos/fotos/" . $novoNome;
                 }
             }
 
+            // Preencher DTO do aluno
             $AlunoDTO->setIdAluno($idAluno);
             $AlunoDTO->setIdUtilizador($id);
             $AlunoDTO->setNomeAluno($nome);
@@ -219,27 +230,57 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $AlunoDTO->setFotoAluno($fotoAlunoBD);
             $AlunoDTO->setnIdentificacao($nIdentificacao);
 
-            if ($AlunoDAO->actualizar($AlunoDTO)) {
-                $texto = $genero === "Masculino" ? "aluno" : "aluna";
-                $notificacaoDTO->setTipoNotificacoes("Actualização de aluno");
-                $notificacaoDTO->setMensagemNotificacoes("Os dados do(a) $texto $nome foram actualizados");
-                $notificacaoDTO->setlidaNotificacoes(0);
-                $notificacaoDTO->setIdUtilizador($_SESSION['idUtilizador']);
-                $notificacaoDAO->criarNotificacao($notificacaoDTO);
-                $_SESSION['success'] = 'Aluno atualizado com sucesso!';
-                $_SESSION['icon'] = "success";
-                header('location: ../Visao/alunoBase.php');
-                exit();
-            } else {
+            // Atualizar aluno
+            if (!$AlunoDAO->actualizar($AlunoDTO)) {
                 throw new Exception("Erro ao atualizar aluno.");
             }
+
+            // Verificar se matrícula já existe
+            $matriculaExistente = $matriculaDAO->buscarPorIdAluno($idAluno);
+
+            // Preencher DTO de matrícula
+            $matriculaDTO->setIdTurma($idTurma);
+            $matriculaDTO->setIdCurso($idCurso);
+            $matriculaDTO->setIdAluno($idAluno);
+            $matriculaDTO->setDataMatricula($dataMatricula);
+            $matriculaDTO->setEstadoMatricula($estadoMatricula);
+            $matriculaDTO->setClasseMatricula($classeMatricula);
+            $matriculaDTO->setPeriodoMatricula($periodoMatricula);
+
+            if ($matriculaExistente) {
+                $matriculaDTO->setIdMatricula($matriculaExistente->getIdMatricula());
+                if (!$matriculaDAO->actualizarMatricula($matriculaDTO)) {
+                    throw new Exception("Erro ao atualizar matrícula.");
+                }
+            } else {
+                if (!$matriculaDAO->criarMatricula($matriculaDTO)) {
+                    throw new Exception("Erro ao cadastrar matrícula.");
+                }
+            }
+
+            // Notificação
+            $texto = $genero === "Masculino" ? "aluno" : "aluna";
+            $notificacaoDTO->setTipoNotificacoes("Actualização de aluno");
+            $notificacaoDTO->setMensagemNotificacoes("Os dados do(a) $texto $nome foram actualizados");
+            $notificacaoDTO->setlidaNotificacoes(0);
+            $notificacaoDTO->setIdUtilizador($_SESSION['idUtilizador']);
+            $notificacaoDAO->criarNotificacao($notificacaoDTO);
+
+            $conn->commit();
+
+            $_SESSION['success'] = 'Aluno atualizado com sucesso!';
+            $_SESSION['icon'] = "success";
+            header('location: ../Visao/alunoBase.php');
+            exit();
         } catch (Exception $e) {
+            $conn->rollBack();
             $_SESSION['success'] = $e->getMessage();
             $_SESSION['icon'] = "error";
             header('location: ../Visao/alunoBase.php');
             exit();
         }
     }
+
 
     // === APAGAR ALUNO ===
     elseif (isset($_POST["apagarAluno"])) {

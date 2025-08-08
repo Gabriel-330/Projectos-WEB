@@ -230,8 +230,9 @@ $usuarioId = $_SESSION['idUtilizador'];
                             </a>
                             <div class="dropdown-menu dropdown-menu-end">
                                 <a href="editarPerfil.html" class="dropdown-item ai-icon">
-                                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M22.75 15.8385V13.0463C22.7471 10.8855 21.9385 8.80353 20.4821 7.20735C19.0258 5.61116 17.0264 4.61555 14.875 4.41516V2.625C14.875 2.39294 14.7828 2.17038 14.6187 2.00628C14.4546 1.84219 14.2321 1.75 14 1.75C13.7679 1.75 13.5454 1.84219 13.3813 2.00628C13.2172 2.17038 13.125 2.39294 13.125 2.625V4.41534C10.9736 4.61572 8.97429 5.61131 7.51794 7.20746C6.06159 8.80361 5.25291 10.8855 5.25 13.0463V15.8383C4.26257 16.0412 3.37529 16.5784 2.73774 17.3593C2.10019 18.1401 1.75134 19.1169 1.75 20.125C1.75076 20.821 2.02757 21.4882 2.51969 21.9803C3.01181 22.4724 3.67904 22.7492 4.375 22.75H9.71346C9.91521 23.738 10.452 24.6259 11.2331 25.2636C12.0142 25.9013 12.9916 26.2497 14 26.2497C15.0084 26.2497 15.9858 25.9013 16.7669 25.2636C17.548 24.6259 18.0848 23.738 18.2865 22.75H23.625C24.321 22.7492 24.9882 22.4724 25.4803 21.9803C25.9724 21.4882 26.2492 20.821 26.25 20.125C26.2486 19.117 25.8998 18.1402 25.2622 17.3594C24.6247 16.5786 23.7374 16.0414 22.75 15.8385Z" fill="#007bff" />
+                                    <svg id="icon-user1" xmlns="http://www.w3.org/2000/svg" class="text-primary" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
                                     </svg>
                                     <span class="ms-2">Perfil </span>
                                 </a>
@@ -307,7 +308,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                         <!-- Cabeçalho com botão -->
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h4 class="card-title">Notas por Trimestre</h4>
-                            <a href="../Controle/crudNota.php" class="btn btn-primary btn-rounded" data-bs-toggle="modal" data-bs-target="#modalNotaCadastrar">+ Adicionar nota</a>
+                            <a href="../Controle/crudNota.php" class="btn btn-primary btn-rounded" data-bs-toggle="modal" data-bs-target="#modalNotaCadastrar">+ Adicionar Nota</a>
                         </div>
 
                         <div class="card-body">
@@ -602,14 +603,9 @@ $usuarioId = $_SESSION['idUtilizador'];
                             </div>
                         </form>
                     </div>
-
                 </div>
             </div>
         </div>
-
-
-
-
 
         <div class="modal fade" id="modalNotaEditar">
             <div class="modal-dialog modal-lg">
@@ -621,6 +617,8 @@ $usuarioId = $_SESSION['idUtilizador'];
                     <div class="modal-body">
                         <form action="../Controle/crudNota.php" method="POST">
                             <input type="hidden" name="idNota" id="idNotaEditar" required>
+                            <input type="hidden" name="idProfessor" id="idProfessorEditar" required>
+                          
 
                             <?php
                             require_once("../Modelo/DAO/AlunoDAO.php");
@@ -650,70 +648,102 @@ $usuarioId = $_SESSION['idUtilizador'];
                                     <?php endforeach; ?>
                                 </select>
                             </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>Nome do Aluno<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <select class="form-control input-rounded" id="idAlunoEditar" name="idAluno" required>
+                                            <option value="">Selecione o aluno</option>
+                                            <?php foreach ($alunos as $aluno): ?>
+                                                <option value="<?= htmlspecialchars($aluno->getIdAluno()) ?>">
+                                                    <?= htmlspecialchars($aluno->getNomeAluno()) ?>
+                                                </option>
 
-                            <div class="form-group">
-                                <label class="mb-1"><strong>Nome do Aluno<b style="font-size: 14px;color: red;">*</b></strong></label>
-                                <select class="form-control input-rounded" id="idAlunoEditar" name="idAluno" required>
-                                    <option value="">Selecione o aluno</option>
-                                    <?php foreach ($alunos as $aluno): ?>
-                                        <option value="<?= htmlspecialchars($aluno->getIdAluno()) ?>">
-                                            <?= htmlspecialchars($aluno->getNomeAluno()) ?>
-                                        </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
 
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="mb-1"><strong>Nome do Curso <b style="font-size: 14px;color: red">*</b></strong></label>
-                                <select class="form-control input-rounded" id="idCursoEditar" name="idCurso" required>
-                                    <option value="">Selecione o curso</option>
-                                    <?php
-                                    foreach ($cursos as $curso): ?>
-                                        <option value=""><?= htmlspecialchars($curso->getIdCurso()) ?>
-                                            <?= htmlspecialchars($curso->getNomeCurso()) ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
+                                        <label><strong>Curso</strong></label>
+                                        <select id="idCursoEditar" name="idCurso" class="form-control input-rounded">
+                                            <option value="">Selecione o curso</option>
+                                            <?php foreach ($cursos as $curso): ?>
+                                                <option value="<?= $curso->getIdCurso() ?>"><?= htmlspecialchars($curso->getNomeCurso()) ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
 
-
-
-                            <div class="form-group">
-                                <label class="mb-1"><strong>Valor<b style="font-size: 14px;color: red;">*</b></strong></label>
-                                <input type="text" class="form-control input-rounded" id="ValorNotaEditar" name="valorNota" required>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="form-group">
-                                <label class="mb-1"><strong>Data da Avaliação<b style="font-size: 14px;color: red;">*</b></strong></label>
-                                <input type="datetime-local" class="form-control input-rounded" id="dataAvaliacaoNotaEditar" name="dataAvaliacaoNota" required>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>Valor<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <input type="text" class="form-control input-rounded" id="valorNotaEditar" name="valorNota" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>Data da Avaliação<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <input type="datetime-local" class="form-control input-rounded" id="dataAvaliacaoNotaEditar" name="dataAvaliacaoNota" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group ">
+                                        <label class="mb-1">
+                                            <strong>Tipo de Avaliação <b style="font-size: 14px;color: red;">*</b></strong>
+                                        </label>
+                                        <select class="form-control input-rounded" name="tipoAvaliacaoNota" id="tipoAvaliacaoNotaEditar" required>
+                                            <option value="">Selecione o tipo de Avaliação</option>
+                                            <option value="Avaliação Continua">Avaliação Continua</option>
+                                            <option value="Prova do Professor">Prova do Professor</option>
+                                            <option value="Prova Trimestral">Prova Trimestral</option>
+                                            <option value="Exame">Exame</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
 
-
-
-                            <div class="form-group">
-                                <label class="mb-1"><strong>Tipo de avaliação<b style="font-size: 14px;color: red;">*</b></strong></label>
-                                <select class="form-control input-rounded" id="tipoAvaliacaoNotaEditar" name="tipoAvaliacaoNota" required>
-                                    <option value="">Selecione o tipo de avaliação</option>
-                                    <option value="Avaliação Continua">Avaliação Continua</option>
-                                    <option value="Prova do professor">Prova do professor</option>
-                                    <option value="Prova trimestral">Prova trimestral</option>
-                                    <option value="Exame">Exame</option>
-
-                                </select>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="mb-1">
+                                            <strong>Tipo de Nota <b style="font-size: 14px;color: red;">*</b></strong>
+                                        </label>
+                                        <select class="form-control input-rounded" name="tipoNota" id="tipoNotaEditar" required>
+                                            <option value="">Selecione o tipo de Nota</option>
+                                            <option value="MAC">MAC</option>
+                                            <option value="NPP">NPP</option>
+                                            <option value="NPT">NPT</option>
+                                            <option value="NE">NE</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group ">
+                                        <label class="mb-1"><strong>Trimestre<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <select class="form-control input-rounded" name="trimestreNota" id="trimestreNotaEditar" required>
+                                            <option value="">Selecione o Trimestre</option>
+                                            <option value="1º Trimestre">1º Trimestre</option>
+                                            <option value="2º Trimestre">2º Trimestre</option>
+                                            <option value="3º Trimestre">3º Trimestre</option>
+                                            <option value="-">-</option>
+                                        </select>
+                                    </div>~
+                                </div>
                             </div>
-
-
                             <div class="text-center mt-4">
                                 <button type="submit" class="btn btn-primary btn-rounded" name="actualizarNota">Salvar Alterações</button>
                                 <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
                             </div>
                         </form>
                     </div>
-
                 </div>
             </div>
         </div>
-
 
         <div class="modal fade" id="modalNotaApagar">
             <div class="modal-dialog">
@@ -750,23 +780,33 @@ $usuarioId = $_SESSION['idUtilizador'];
                 id: id
             }, function(data) {
                 try {
-                    const Nota = data;
-                    $('#idNotaEditar').val(Nota.idNota);
-                    $('#idDisciplinaEditar').val(Nota.idDisciplina);
-                    $('#idAlunoEditar').val(Nota.idAluno);
-                    $('#idCursoEditar').val(Nota.idCurso);
-                    $('#ValorNotaEditar').val(Nota.valorNota);
-                    $('#tipoAvaliacaoNotaEditar').val(Nota.tipoAvaliacacaoNota);
-                    $('#dataAvaliacaoNotaEditar').val(Nota.dataAvaliacaoNota);
+                    const nota = data;
+
+                    $('#idNotaEditar').val(nota.idNota);
+                    $('#idAlunoEditar').val(nota.idAluno);
+                    $('#idDisciplinaEditar').val(nota.idDisciplina);
+                    $('#idCursoEditar').val(nota.idCurso);
+                    $('#idProfessorEditar').val(nota.idProfessor);
+                    $('#valorNotaEditar').val(nota.valorNota);
+                    $('#dataAvaliacaoNotaEditar').val(nota.dataValorNota);
+                    $('#tipoAvaliacaoNotaEditar').val(nota.tipoAvaliacaoNota);
+                    $('#trimestreNotaEditar').val(nota.trimestreNota);
+                    $('#tipoNotaEditar').val(nota.tipoNota);
+                    $('#nomeDisciplinaEditar').val(nota.nomeDisciplina);
+                    $('#nomeCursoEditar').val(nota.nomeCurso);
+                    $('#nomeAlunoEditar').val(nota.nomeAluno);
+                    $('#dataNascimentoAlunoEditar').val(nota.dataNascimentoAluno);
+                    $('#responsavelAlunoEditar').val(nota.responsavelAluno);
 
                 } catch (e) {
-                    console.log('Erro ao interpretar o JSON retornado:', data);
+                    console.error('Erro ao processar JSON:', data);
                 }
             }).fail(function(xhr) {
-                console.log('Erro na requisição AJAX:', xhr.responseText);
+                console.error('Erro na requisição AJAX:', xhr.responseText);
             });
         });
     </script>
+
 
     <script>
         $(document).on('click', '.btn-apagar-nota', function() {

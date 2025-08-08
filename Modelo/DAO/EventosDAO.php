@@ -55,22 +55,24 @@ class EventosDAO
     public function actualizar(EventosDTO $eventosDTO)
     {
         try {
-            $sql = "UPDATE evento SET tituloEvento = :tituloEvento, dataEvento = :dataEvento, horaInicio = :horaInicio, horaFim = :horaFim, localEvento = :localEvento, responsavelEvento = :responsavelEvento, tipoEvento = :tipoEvento, curso_id = :curso_id WHERE idEvento
+            $sql = "UPDATE evento SET tituloEvento = :tituloEvento, dataEvento = :dataEvento, horaInicio = :horaInicio, horaFim = :horaFim, localEvento = :localEvento, responsavelEvento = :responsavelEvento, tipoEvento = :tipoEvento, idCurso = :curso_id, idUtilizador = :utilizador WHERE idEvento
              = :id";
             $stmt = $this->conexao->prepare($sql);
 
             $stmt->bindValue(":tituloEvento", $eventosDTO->getTituloEvento());
             $stmt->bindValue(":dataEvento", $eventosDTO->getDataEvento());
-            $stmt->bindValue(":horarioInicio", $eventosDTO->getHoraInicioEvento());
-            $stmt->bindValue(":horarioFim", $eventosDTO->getHoraFimEvento());
+            $stmt->bindValue(":horaInicio", $eventosDTO->getHoraInicioEvento());
+            $stmt->bindValue(":horaFim", $eventosDTO->getHoraFimEvento());
             $stmt->bindValue(":localEvento", $eventosDTO->getLocalEvento());
             $stmt->bindValue(":responsavelEvento", $eventosDTO->getResponsavelEvento());
+            $stmt->bindValue(":tipoEvento", $eventosDTO->getTipoEvento());
             $stmt->bindValue(":curso_id", $eventosDTO->getIdCurso());
+            $stmt->bindValue(":utilizador", $eventosDTO->getIdUtilizador());
             $stmt->bindValue(":id", $eventosDTO->getIdEvento());
 
             return $stmt->execute();
         } catch (Exception $e) {
-            echo "Erro ao atualizar os dados: " . $e->getMessage();
+            die("Erro ao atualizar os dados: " . $e->getMessage());
             return false;
         }
     }
@@ -133,7 +135,7 @@ class EventosDAO
     public function buscarPorId($id)
     {
         try {
-            $sql = "SELECT * FROM evento WHERE id = :id";
+            $sql = "SELECT * FROM evento WHERE idEvento = :id";
             $stmt = $this->conexao->prepare($sql);
             $stmt->bindValue(':id', $id);
             $stmt->execute();
@@ -147,15 +149,15 @@ class EventosDAO
     }
 
 
-    public function apagar(UtilizadorDTO $utilizador)
+    public function apagar($id)
     {
         try {
-            $sql = "DELETE FROM utilizador WHERE id = :id";
+            $sql = "DELETE FROM evento WHERE idEvento = :id";
             $stmt = $this->conexao->prepare($sql);
-            $stmt->bindValue(":id", $utilizador->getId());
+            $stmt->bindValue(":id", $id);
             return $stmt->execute();
         } catch (Exception $e) {
-            echo "Erro ao apagar utilizador: " . $e->getMessage();
+            die("Erro ao apagar Evento: " . $e->getMessage());
             return false;
         }
     }
@@ -165,7 +167,7 @@ class EventosDAO
     private function listarEvento($linha)
     {
         $dto = new EventosDTO();
-        $dto->setId($linha['idEvento']);
+        $dto->setIdEvento($linha['idEvento']);
         $dto->setTituloEvento($linha['tituloEvento']);
         $dto->setDataEvento($linha['dataEvento']);
         $dto->setHoraInicioEvento($linha['horaInicio']);

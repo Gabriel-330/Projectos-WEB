@@ -237,7 +237,7 @@ $usuarioId = $_SESSION['idUtilizador'];
             <div class="menu-content">
                 <i class="fa-solid fa-user-graduate user-photo"></i>
                 <ul>
-                    <li><a href="#" title="Home" id="linkAdicionarAluno"><i class="fa-solid fa-chalkboard"></i><span class="text-white">Dashboard</span></a></li>
+                    <li class="active"><a href="#" title="Home" id="linkAdicionarAluno"><i class="fa-solid fa-chalkboard"></i><span class="text-white">Dashboard</span></a></li>
                     <li><a href="alunoBase.php" title="Cadastrar Aluno"><i class="fa-regular fa fa-user"></i><span>Aluno</span></a></li>
                     <li><a href="professorBase.php" title="Cadastrar Professor"><i class="fa-solid fa-chalkboard-user"></i><span>Professores</span></a></li>
                     <li><a href="eventoBase.php" title="Cadastro de Evento"><i class="fa-regular fa-calendar"></i><span>Eventos</span></a></li>

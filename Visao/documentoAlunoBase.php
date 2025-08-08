@@ -206,8 +206,9 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                             </a>
                             <div class="dropdown-menu dropdown-menu-end">
                                 <a href="editarPerfil.html" class="dropdown-item ai-icon">
-                                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M22.75 15.8385V13.0463C22.7471 10.8855 21.9385 8.80353 20.4821 7.20735C19.0258 5.61116 17.0264 4.61555 14.875 4.41516V2.625C14.875 2.39294 14.7828 2.17038 14.6187 2.00628C14.4546 1.84219 14.2321 1.75 14 1.75C13.7679 1.75 13.5454 1.84219 13.3813 2.00628C13.2172 2.17038 13.125 2.39294 13.125 2.625V4.41534C10.9736 4.61572 8.97429 5.61131 7.51794 7.20746C6.06159 8.80361 5.25291 10.8855 5.25 13.0463V15.8383C4.26257 16.0412 3.37529 16.5784 2.73774 17.3593C2.10019 18.1401 1.75134 19.1169 1.75 20.125C1.75076 20.821 2.02757 21.4882 2.51969 21.9803C3.01181 22.4724 3.67904 22.7492 4.375 22.75H9.71346C9.91521 23.738 10.452 24.6259 11.2331 25.2636C12.0142 25.9013 12.9916 26.2497 14 26.2497C15.0084 26.2497 15.9858 25.9013 16.7669 25.2636C17.548 24.6259 18.0848 23.738 18.2865 22.75H23.625C24.321 22.7492 24.9882 22.4724 25.4803 21.9803C25.9724 21.4882 26.2492 20.821 26.25 20.125C26.2486 19.117 25.8998 18.1402 25.2622 17.3594C24.6247 16.5786 23.7374 16.0414 22.75 15.8385Z" fill="#007bff" />
+                                    <svg id="icon-user1" xmlns="http://www.w3.org/2000/svg" class="text-primary" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
                                     </svg>
                                     <span class="ms-2">Perfil </span>
                                 </a>
@@ -336,14 +337,14 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                                 <?php
 
                                 require_once("../Modelo/DAO/DocumentoDAO.php");
-                                require_once("../Modelo/DAO/ProfessorDAO.php");
+                                require_once("../Modelo/DAO/AlunoDAO.php");
                                 require_once("../Modelo/DTO/DocumentoDTO.php");
 
 
                                 $documentoDAO = new DocumentoDAO();
-                                $professorDAO = new ProfessorDAO();
+                                $AlunoDAO = new AlunoDAO();
 
-                                $id = $professorDAO->buscarPorUtilizador($_SESSION['idUtilizador']);
+                                $id = $AlunoDAO->buscarPorUtilizador($_SESSION['idUtilizador']);
                                 $documentos = $documentoDAO->buscarPorAluno($id);
 
                                 ?>
@@ -460,7 +461,7 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                             </div>
 
                             <div class="text-center mt-4">
-                                <button type="submit" class="btn btn-primary btn-rounded w-50" name="solicitarDocumento">Solicitar</button>
+                                <button type="submit" class="btn btn-primary btn-rounded w-50" name="solicitarDocumentoAluno">Solicitar</button>
 
                             </div>
                     </div>

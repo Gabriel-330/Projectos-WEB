@@ -31,7 +31,7 @@ $usuarioId = $_SESSION['idUtilizador'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Painel Disciplina</title>
 
     <!-- Icones do site-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -247,7 +247,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                     <li><a href="turmaBase.php" title="Cadastro de Turmas"><i class="fa-solid fa-users"></i><span>Turmas</span></a></li>
                     <li class="active"><a href="#" title="Cadastro de Disciplinas"><i class="fa-solid fa-book-open"></i><span class="text-white">Disciplinas</span></a></li>
                     <li><a href="matriculaBase.php" title="Matrícula"><i class="fa-solid fa-file-signature"></i><span>Matrículas</span></a></li>
-                    <li><a href="documentoBase.php" title="Aceitar Documentos"><i class="fa-regular fa-folder-open"></i><span class="text-white">Documentos</span></a></li>
+                    <li><a href="documentoBase.php" title="Aceitar Documentos"><i class="fa-regular fa-folder-open"></i><span>Documentos</span></a></li>
                 </ul>
             </div>
         </nav>
@@ -301,7 +301,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h4 class="card-title">Lista de Disciplina</h4>
-                            <a href="#" class="btn btn-success btn-rounded" data-bs-toggle="modal" data-bs-target="#modalDisciplinaCadastrar">+ Adicionar disciplina</a>
+                            <a href="#" id="btnVerificarProfessorCurso" class="btn btn-success btn-rounded" data-bs-toggle="modal" data-bs-target="#modalDisciplinaCadastrar">+ Adicionar Disciplina</a>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -369,10 +369,18 @@ $usuarioId = $_SESSION['idUtilizador'];
                                 <input type="text" class="form-control input-rounded" name="nomeDisciplina" required>
                             </div>
 
-                            <div class="form-group">
-                                <label class="mb-1"><strong>classe <b style="font-size: 14px;color: red;">*</b></strong></label>
-                                <input type="text" class="form-control input-rounded" name="classeDisciplina" required>
+                            <div class="form-group campo-condicional">
+                                <label class="mb-1">
+                                    <strong>Classe <b style="font-size: 14px;color: red;">*</b></strong>
+                                </label>
+                                <select class="form-control input-rounded" name="classeDisciplina" required>
+                                    <option value="">Selecione a classe</option>
+                                    <option value="10">10ª</option>
+                                    <option value="11">11ª</option>
+                                    <option value="12">12ª</option>
+                                </select>
                             </div>
+
 
                             <?php
                             require_once("../Modelo/DAO/CursoDAO.php");
@@ -410,9 +418,6 @@ $usuarioId = $_SESSION['idUtilizador'];
                                 </select>
                             </div>
 
-
-
-
                             <div class="text-center mt-4">
                                 <button type="submit" class="btn btn-primary btn-rounded" name="cadastrarDisciplina">Cadastrar</button>
                                 <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
@@ -423,145 +428,190 @@ $usuarioId = $_SESSION['idUtilizador'];
                 </div>
             </div>
 
-            <div class="modal fade" id="modalDisciplinaEditar">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Editar Disciplina</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <form action="../Controle/crudDisciplina.php" method="POST">
-                                <input type="hidden" name="idDisciplina" id="idDisciplinaEditar" required>
+        </div>
 
-                                <div class="form-group">
-                                    <label class="mb-1"><strong>Nome da disciplina <b style="font-size: 14px;color: red;">*</b></strong></label>
-                                    <input type="text" class="form-control input-rounded" id="nomeDisciplinaEditar" name="nomeDisciplina" required>
-                                </div>
-
-                                <?php
-                                require_once("../Modelo/DAO/CursoDAO.php");
-                                require_once("../Modelo/DAO/ProfessorDAO.php");
-                                $daoProfessor = new ProfessorDAO();
-                                $professores = $daoProfessor->listarTodos();
-                                $dao = new CursoDAO();
-                                $cursos = $dao->Mostrar();
-                                ?>
-
-                                <div class="form-group">
-                                    <label class="mb-1"><strong>Curso <b style="font-size: 14px;color: red;">*</b></strong></label>
-                                    <select class="form-control input-rounded" id="cursoDisciplinaEditar" name="cursoDisciplina" required>
-                                        <option value="">Selecione o curso</option>
-                                        <?php foreach ($cursos as $curso): ?>
-                                            <option value="<?= htmlspecialchars($curso->getIdCurso()) ?>">
-                                                <?= htmlspecialchars($curso->getNomeCurso()) ?>
-                                            </option>
-
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="mb-1"><strong>Professor<b style="font-size: 14px;color: red;">*</b></strong></label>
-                                    <select class="form-control input-rounded" id="professorDisciplinaEditar" name="professorDisciplina" required>
-                                        <option value="">Selecione o Professor</option>
-                                        <?php foreach ($professores as $professor): ?>
-                                            <option value="<?= htmlspecialchars($professor->getIdProfessor()) ?>">
-                                                <?= htmlspecialchars($professor->getNomeProfessor()) ?>
-                                            </option>
-
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-
-
-
-
-                                <div class="text-center mt-4">
-                                    <button type="submit" class="btn btn-primary btn-rounded" name="actualizarDisciplina">Salvar Alterações</button>
-                                    <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
-                                </div>
-                            </form>
-                        </div>
-
+        <div class="modal fade" id="modalDisciplinaEditar">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Disciplina</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                </div>
+                    <div class="modal-body">
+                        <form action="../Controle/crudDisciplina.php" method="POST">
+                            <input type="hidden" name="idDisciplina" id="idDisciplinaEditar">
+
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Nome da disciplina <b style="font-size: 14px;color: red;">*</b></strong></label>
+                                <input type="text" class="form-control input-rounded" name="nomeDisciplina" id="nomeDisciplinaEditar" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Nome da disciplina <b style="font-size: 14px;color: red;">*</b></strong></label>
+                                <input type="text" class="form-control input-rounded" name="nomeDisciplina" required>
+                            </div>
+
+                            <div class="form-group campo-condicional">
+                                <label class="mb-1">
+                                    <strong>Classe <b style="font-size: 14px;color: red;">*</b></strong>
+                                </label>
+                                <select class="form-control input-rounded" name="classeDisciplina" id="classeDisciplinaEditar" required>
+                                    <option value="">Selecione a classe</option>
+                                    <option value="10">10ª</option>
+                                    <option value="11">11ª</option>
+                                    <option value="12">12ª</option>
+                                </select>
+                            </div>
+
+                            <?php
+                            require_once("../Modelo/DAO/CursoDAO.php");
+                            require_once("../Modelo/DAO/ProfessorDAO.php");
+                            $daoProfessor = new ProfessorDAO();
+                            $professores = $daoProfessor->listarTodos();
+                            $dao = new CursoDAO();
+                            $cursos = $dao->Mostrar();
+                            ?>
+
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Curso <b style="font-size: 14px;color: red;">*</b></strong></label>
+                                <select class="form-control input-rounded" name="cursoDisciplina" id="idCursoEditar" required>
+                                    <option value="">Selecione o curso</option>
+                                    <?php foreach ($cursos as $curso): ?>
+                                        <option value="<?= htmlspecialchars($curso->getIdCurso()) ?>">
+                                            <?= htmlspecialchars($curso->getNomeCurso()) ?>
+                                        </option>
+
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
 
 
-                <div class="modal fade" id="modalDisciplinaApagar">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Confirmar Exclusão</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Professor<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                <select class="form-control input-rounded" name="professorDisciplina" id="idProfessorEditar" required>
+                                    <option value="">Selecione o professor da disciplina</option>
+                                    <?php foreach ($professores as $professor): ?>
+                                        <option value="<?= htmlspecialchars($professor->getIdProfessor()) ?>">
+                                            <?= htmlspecialchars($professor->getNomeProfessor()) ?>
+                                        </option>
+
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
-                            <div class="modal-body">
-                                <p>Tem certeza que deseja excluir os dados desta Disciplina? Esta ação não pode ser desfeita.</p>
-                                <form id="formDisciplinaExcluir" method="POST" action="../Controle/crudDisciplina.php">
-                                    <input type="hidden" name="idDisciplina" id="idDisciplinaApagar" required>
-                                </form>
+
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-primary btn-rounded" name="actualizarDisciplina">Salvar Alterações</button>
+                                <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                                <button type="submit" form="formDisciplinaExcluir" class="btn btn-danger" name="apagarDisciplina">Confirmar Exclusão</button>
-                            </div>
-                        </div>
+                        </form>
                     </div>
-                </div>
 
+                </div>
             </div>
-
-
-            <script src="assets/js/jquery-3.6.0.min.js">
-
-            </script>
-
-            <script>
-                $(document).on('click', '.btn-editar-disciplina', function() {
-                    const id = $(this).data('id');
-
-                    $.get('../Controle/retornarDisciplina.php', {
-                        id: id
-                    }, function(data) {
-                        try {
-                            const Disciplina = data;
-                            $('#idDisciplinaEditar').val(Disciplina.idDisciplina);
-                            $('#nomeDisciplinaEditar').val(Disciplina.nomeDisciplina);
-                            $('#cursoDisciplinaEditar').val(Disciplina.idCurso);
-                            $('#professorDisciplinaEditar').val(Disciplina.idProfessor);
-
-
-                        } catch (e) {
-                            console.log('Erro ao interpretar o JSON retornado:', data);
-                        }
-                    }).fail(function(xhr) {
-                        console.log('Erro na requisição AJAX:', xhr.responseText);
-                    });
-                });
-            </script>
-
-            <script>
-                $(document).on('click', '.btn-apagar-disciplina', function() {
-                    const id = $(this).data('id');
-
-                    $.get('../Controle/retornarDisciplina.php', {
-                        id: id
-                    }, function(data) {
-                        try {
-                            const Disciplina = data;
-                            $('#idDisciplinaApagar').val(Disciplina.idDisciplina);
-
-                        } catch (e) {
-                            console.log('Erro ao interpretar o JSON retornado:', data);
-                        }
-                    }).fail(function(xhr) {
-                        console.log('Erro na requisição AJAX:', xhr.responseText);
-                    });
-                });
-            </script>
 
         </div>
 
+        <div class="modal fade" id="modalDisciplinaApagar">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirmar Exclusão</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Tem certeza que deseja excluir os dados desta Disciplina? Esta ação não pode ser desfeita.</p>
+                        <form id="formDisciplinaExcluir" method="POST" action="../Controle/crudDisciplina.php">
+                            <input type="hidden" name="idDisciplina" id="idDisciplinaApagar" required>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" form="formDisciplinaExcluir" class="btn btn-danger" name="apagarDisciplina">Confirmar Exclusão</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/jquery-3.6.0.min.js"> </script>
+
+    <script>
+        $(document).on('click', '.btn-editar-disciplina', function() {
+            const id = $(this).data('id');
+
+            $.get('../Controle/retornarDisciplina.php', {
+                id: id
+            }, function(data) {
+                try {
+                    const disciplina = data;
+
+                    $('#idDisciplinaEditar').val(disciplina.idDisciplina);
+                    $('#nomeDisciplinaEditar').val(disciplina.nomeDisciplina);
+                    $('#classeDisciplinaEditar').val(disciplina.classeDisciplina);
+                    $('#idCursoEditar').val(disciplina.idCurso);
+                    $('#idProfessorEditar').val(disciplina.idProfessor);
+
+
+                } catch (e) {
+                    console.error('Erro ao processar JSON:', data);
+                }
+            }).fail(function(xhr) {
+                console.error('Erro na requisição AJAX:', xhr.responseText);
+            });
+        });
+    </script>
+
+
+    <script>
+        $(document).on('click', '.btn-apagar-disciplina', function() {
+            const id = $(this).data('id');
+
+            $.get('../Controle/retornarDisciplina.php', {
+                id: id
+            }, function(data) {
+                try {
+                    const Disciplina = data;
+                    $('#idDisciplinaApagar').val(Disciplina.idDisciplina);
+
+                } catch (e) {
+                    console.log('Erro ao interpretar o JSON retornado:', data);
+                }
+            }).fail(function(xhr) {
+                console.log('Erro na requisição AJAX:', xhr.responseText);
+            });
+        });
+    </script>
+
+    <script>
+        document.getElementById('btnVerificarProfessorCurso').addEventListener('click', function() {
+            fetch('../Controle/verificarProfessorCurso.php', {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        const modal = new bootstrap.Modal(document.getElementById('modalDisciplinaCadastrar'));
+                        modal.show();
+                    } else if (data.status === 'erro') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro',
+                            text: data.message
+                        });
+                    } else if (data.status === 'redirect') {
+                        window.location.href = data.redirect;
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro na verificação:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: 'Erro ao verificar incidentes.'
+                    });
+                });
+        });
+    </script>
 
     </div>
     <div class="footer">

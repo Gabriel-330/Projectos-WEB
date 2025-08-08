@@ -26,7 +26,7 @@ class EventosDTO {
         return $this->idEvento;
     }
 
-    public function setId($id) {
+    public function setIdEvento($id) {
         $this->idEvento = $id;
     }
 

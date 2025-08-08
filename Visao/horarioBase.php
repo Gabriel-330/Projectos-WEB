@@ -29,7 +29,7 @@ $usuarioId = $_SESSION['idUtilizador'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Painel Horario</title>
 
     <!-- Icones do site-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -48,8 +48,7 @@ $usuarioId = $_SESSION['idUtilizador'];
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet" type="text/css" />
     <link href="assets/css/style.css" rel="stylesheet" type="text/css" />
 
-        <style>
-
+    <style>
         .menu-user ul li.active a {
             background-color: #0b5ed7;
             /* cor de fundo ao clicar */
@@ -130,7 +129,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                                 <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M22.75 15.8385V13.0463C22.7471 10.8855 21.9385 8.80353 20.4821 7.20735C19.0258 5.61116 17.0264 4.61555 14.875 4.41516V2.625C14.875 2.39294 14.7828 2.17038 14.6187 2.00628C14.4546 1.84219 14.2321 1.75 14 1.75C13.7679 1.75 13.5454 1.84219 13.3813 2.00628C13.2172 2.17038 13.125 2.39294 13.125 2.625V4.41534C10.9736 4.61572 8.97429 5.61131 7.51794 7.20746C6.06159 8.80361 5.25291 10.8855 5.25 13.0463V15.8383C4.26257 16.0412 3.37529 16.5784 2.73774 17.3593C2.10019 18.1401 1.75134 19.1169 1.75 20.125C1.75076 20.821 2.02757 21.4882 2.51969 21.9803C3.01181 22.4724 3.67904 22.7492 4.375 22.75H9.71346C9.91521 23.738 10.452 24.6259 11.2331 25.2636C12.0142 25.9013 12.9916 26.2497 14 26.2497C15.0084 26.2497 15.9858 25.9013 16.7669 25.2636C17.548 24.6259 18.0848 23.738 18.2865 22.75H23.625C24.321 22.7492 24.9882 22.4724 25.4803 21.9803C25.9724 21.4882 26.2492 20.821 26.25 20.125C26.2486 19.117 25.8998 18.1402 25.2622 17.3594C24.6247 16.5786 23.7374 16.0414 22.75 15.8385Z" fill="#007bff" />
                                 </svg>
-                                <span class="badge light text-white bg-primary"> <?=$n_Notificacoes?></span>
+                                <span class="badge light text-white bg-primary"> <?= $n_Notificacoes ?></span>
                             </a>
                             <div class="dropdown-menu dropdown-menu-end p-0">
                                 <div id="DZ_W_Notification1" class="widget-media dz-scroll p-3" style="max-height: 380px; overflow-y: auto;">
@@ -246,7 +245,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                     <li><a href="turmaBase.php" title="Cadastro de Turmas"><i class="fa-solid fa-users"></i><span>Turma</span></a></li>
                     <li><a href="disciplinaBase.php" title="Cadastro de Disciplinas"><i class="fa-solid fa-book-open"></i><span>Disciplinas</span></a></li>
                     <li><a href="matriculaBase.php" title="Matrícula"><i class="fa-solid fa-file-signature"></i><span>Matrícula</span></a></li>
-                    <li><a href="documentoBase.php" title="Aceitar Documentos"><i class="fa-regular fa-folder-open"></i><span class="text-white">Documentos</span></a></li>
+                    <li><a href="documentoBase.php" title="Aceitar Documentos"><i class="fa-regular fa-folder-open"></i><span>Documentos</span></a></li>
                 </ul>
             </div>
         </nav>
@@ -299,7 +298,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h4 class="card-title">Lista de horário</h4>
-                            <a href="#" class="btn btn-success btn-rounded" data-bs-toggle="modal" data-bs-target="#modalHorarioCadastrar">+ Adicionar horário</a>
+                            <a href="#" id="btnVerificarTurmaDisciplina" class="btn btn-success btn-rounded" data-bs-toggle="modal" data-bs-target="#modalHorarioCadastrar">+ Adicionar Horário</a>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -317,7 +316,8 @@ $usuarioId = $_SESSION['idUtilizador'];
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php $cont = 1; foreach ($horarios as $horario): ?>
+                                        <?php $cont = 1;
+                                        foreach ($horarios as $horario): ?>
                                             <tr>
                                                 <td><strong><?= $cont++; ?></strong></td>
                                                 <td><?= htmlspecialchars($horario->getTurma()); ?></td>
@@ -519,7 +519,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                                 </select>
                             </div>
 
- 
+
                             <div class="form-group">
                                 <label class="mb-1"><strong>Curso <b style="font-size: 14px;color: red;">*</b></strong></label>
                                 <select class="form-control input-rounded" id="cursoHorarioEditar" name="cursoHorario" required>
@@ -581,7 +581,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <p>Tem certeza que deseja excluir os dados deste Horário? Esta ação não pode ser desfeita.</p>
+                        <p>Tem certeza que deseja excluir este Horário? Esta ação não pode ser desfeita.</p>
                         <form id="formHorarioExcluir" method="POST" action="../Controle/crudHorario.php">
                             <input type="text" name="idHorario" id="idHorarioApagar" required>
                         </form>
@@ -598,9 +598,7 @@ $usuarioId = $_SESSION['idUtilizador'];
 
     </div>
 
-    <script src="assets/js/jquery-3.6.0.min.js">
-
-    </script>
+    <script src="assets/js/jquery-3.6.0.min.js"> </script>
 
     <script>
         $(document).on('click', '.btn-editar-horario', function() {
@@ -648,7 +646,36 @@ $usuarioId = $_SESSION['idUtilizador'];
             });
         });
     </script>
-
+    <script>
+        document.getElementById('btnVerificarTurmaDisciplina').addEventListener('click', function() {
+            fetch('../Controle/verificarTurmaDisciplina.php', {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        const modal = new bootstrap.Modal(document.getElementById('modalHorarioCadastrar'));
+                        modal.show();
+                    } else if (data.status === 'erro') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro',
+                            text: data.message
+                        });
+                    } else if (data.status === 'redirect') {
+                        window.location.href = data.redirect;
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro na verificação:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: 'Erro ao verificar incidentes.'
+                    });
+                });
+        });
+    </script>
 
     <div class="footer">
         <div class="copyright">

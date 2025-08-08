@@ -29,7 +29,7 @@ $usuarioId = $_SESSION['idUtilizador'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Painel Turma</title>
 
     <!-- Icones do site-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -48,9 +48,7 @@ $usuarioId = $_SESSION['idUtilizador'];
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet" type="text/css" />
     <link href="assets/css/style.css" rel="stylesheet" type="text/css" />
 
-        <style>
-   
-
+    <style>
         .menu-user ul li.active a {
             background-color: #0b5ed7;
             /* cor de fundo ao clicar */
@@ -247,7 +245,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                     <li class="active"><a href="#" title="Cadastro de Turmas"><i class="fa-solid fa-users"></i><span class="text-white">Turmas</span></a></li>
                     <li><a href="disciplinaBase.php" title="Cadastro de Disciplinas"><i class="fa-solid fa-book-open"></i><span>Disciplinas</span></a></li>
                     <li><a href="matriculaBase.php" title="Matrícula"><i class="fa-solid fa-file-signature"></i><span>Matrículas</span></a></li>
-                    <li><a href="documentoBase.php" title="Aceitar Documentos"><i class="fa-regular fa-folder-open"></i><span class="text-white">Documentos</span></a></li>
+                    <li><a href="documentoBase.php" title="Aceitar Documentos"><i class="fa-regular fa-folder-open"></i><span>Documentos</span></a></li>
                 </ul>
             </div>
         </nav>
@@ -299,7 +297,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h4 class="card-title">Lista de Turmas</h4>
-                            <a href="criarTurma.php" class="btn btn-success btn-rounded" data-bs-toggle="modal" data-bs-target="#modalTurmaCadastrar">+ Adicionar turma</a>
+                            <a href="#" id="btnVerificarCurso" class="btn btn-success btn-rounded" data-bs-toggle="modal" data-bs-target="#modalTurmaCadastrar">+ Adicionar Turma</a>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -338,9 +336,17 @@ $usuarioId = $_SESSION['idUtilizador'];
                                                             </svg>
                                                         </button>
                                                         <div class="dropdown-menu">
-                                                            <a class="dropdown-item" href="detalhesCurso.php?id=<?= $turma->getIdTurma(); ?>">Apagar</a>
-                                                            <a class="dropdown-item" href="editarCurso.php?id=<?= $turma->getIdTurma(); ?>">Editar</a>
+                                                            <a class="dropdown-item btn-apagar-turma"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#modalTurmaApagar"
+                                                                data-id="<?= $turma->getIdTurma() ?>">Apagar</a>
+
+                                                            <a class="dropdown-item btn-editar-turma"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#modalTurmaEditar"
+                                                                data-id="<?= $turma->getIdTurma() ?>">Editar</a>
                                                         </div>
+
                                                     </div>
                                                 </td>
                                             </tr>
@@ -353,6 +359,166 @@ $usuarioId = $_SESSION['idUtilizador'];
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="modalTurmaCadastrar">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Cadastrar Turma</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="../Controle/crudTurma.php" method="POST">
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Nome da Turma <b style="font-size: 14px;color: red;">*</b></strong></label>
+                                <input type="text" class="form-control input-rounded" name="nomeTurma" required>
+                            </div>
+
+                            <?php
+                            require_once("../Modelo/DAO/CursoDAO.php");
+                            require_once("../Modelo/DAO/ProfessorDAO.php");
+
+                            $daoCurso = new CursoDAO();
+                            $cursos = $daoCurso->Mostrar();
+
+                            $daoProfessor = new ProfessorDAO();
+                            $professores = $daoProfessor->listarTodos();
+                            ?>
+
+
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Curso <b style="font-size: 14px;color: red;">*</b></strong></label>
+                                <select class="form-control input-rounded" name="cursoTurma" required>
+                                    <option value="">Selecione o curso</option>
+                                    <?php foreach ($cursos as $curso): ?>
+                                        <option value="<?= htmlspecialchars($curso->getIdCurso()) ?>">
+                                            <?= htmlspecialchars($curso->getNomeCurso()) ?>
+                                        </option>
+
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Nº da Sala <b style="font-size: 14px;color: red;">*</b></strong></label>
+                                <input type="text" class="form-control input-rounded" name="nSalaTurma" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Director de Turma</label>
+                                <select class="form-control input-rounded" name="directorTurma" required>
+                                    <option value="">Selecione o director de turma</option>
+                                    <?php foreach ($professores as $professor): ?>
+                                        <option value="<?= htmlspecialchars($professor->getIdProfessor()) ?>">
+                                            <?= htmlspecialchars($professor->getNomeProfessor()) ?>
+                                        </option>
+
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-primary btn-rounded" name="cadastrarTurma">Cadastrar</button>
+                                <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalTurmaEditar">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Turma</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="../Controle/crudTurma.php" method="POST">
+                            <input type="hidden" name="idTurma" id="idTurmaEditar">
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Nome da Turma <b style="font-size: 14px;color: red;">*</b></strong></label>
+                                <input type="text" class="form-control input-rounded" name="nomeTurma" id="nomeTurmaEditar" required>
+                            </div>
+
+                            <?php
+                            require_once("../Modelo/DAO/CursoDAO.php");
+                            require_once("../Modelo/DAO/ProfessorDAO.php");
+
+                            $daoCurso = new CursoDAO();
+                            $cursos = $daoCurso->Mostrar();
+
+                            $daoProfessor = new ProfessorDAO();
+                            $professores = $daoProfessor->listarTodos();
+                            ?>
+
+
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Curso <b style="font-size: 14px;color: red;">*</b></strong></label>
+                                <select class="form-control input-rounded" name="cursoTurma" id="cursoTurmaEditar" required>
+                                    <option value="">Selecione o curso</option>
+                                    <?php foreach ($cursos as $curso): ?>
+                                        <option value="<?= htmlspecialchars($curso->getIdCurso()) ?>">
+                                            <?= htmlspecialchars($curso->getNomeCurso()) ?>
+                                        </option>
+
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Nº da Sala <b style="font-size: 14px;color: red;">*</b></strong></label>
+                                <input type="text" class="form-control input-rounded" name="nSalaTurma" id="nSalaTurmaEditar" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="mb-1"><strong>Director de Turma</label>
+                                <select class="form-control input-rounded" name="directorTurma" id="directorTurmaEditar" required>
+                                    <option value="">Selecione o director de turma</option>
+                                    <?php foreach ($professores as $professor): ?>
+                                        <option value="<?= htmlspecialchars($professor->getIdProfessor()) ?>">
+                                            <?= htmlspecialchars($professor->getNomeProfessor()) ?>
+                                        </option>
+
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-primary btn-rounded" name="actualizarTurma">Salvar Alterações</button>
+                                <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalTurmaApagar">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirmar Exclusão</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p style="font-weight: normal;">Tem certeza que deseja excluir esta Turma? Esta ação não pode ser desfeita.</p>
+                        <form id="formTurmaExcluir" method="POST" action="../Controle/crudTurma.php">
+                            <input type="hidden" name="idTurma" id="idTurmaApagar" required>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" form="formTurmaExcluir" class="btn btn-danger" name="apagarTurma">Confirmar Exclusão</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="footer">
         <div class="copyright">
@@ -360,75 +526,85 @@ $usuarioId = $_SESSION['idUtilizador'];
         </div>
     </div>
 
-    <div class="modal fade" id="modalTurmaCadastrar">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Cadastrar Turma</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="../Controle/crudTurma.php" method="POST">
-                        <div class="form-group">
-                            <label class="mb-1"><strong>Nome da Turma <b style="font-size: 14px;color: red;">*</b></strong></label>
-                            <input type="text" class="form-control input-rounded" name="nomeTurma" required>
-                        </div>
 
-                        <?php
-                        require_once("../Modelo/DAO/CursoDAO.php");
-                        require_once("../Modelo/DAO/ProfessorDAO.php");
+    <script src="assets/js/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).on('click', '.btn-editar-turma', function() {
+            const id = $(this).data('id');
 
-                        $daoCurso = new CursoDAO();
-                        $cursos = $daoCurso->Mostrar();
+            $.get('../Controle/retornarTurma.php', {
+                id: id
+            }, function(data) {
+                try {
+                    const turma = data;
 
-                        $daoProfessor = new ProfessorDAO();
-                        $professores = $daoProfessor->listarTodos();
-                        ?>
+                    $('#idTurmaEditar').val(turma.idTurma);
+                    $('#nomeTurmaEditar').val(turma.nomeTurma);
+                    $('#nSalaTurmaEditar').val(turma.salaTurma);
+                    $('#cursoTurmaEditar').val(turma.idCurso);
+                    $('#nomeCursoEditar').val(turma.nomeCurso);
+                    $('#directorTurmaEditar').val(turma.idProfessor);
+                    $('#idAlunoEditar').val(turma.idAluno);
 
+                } catch (e) {
+                    console.error('Erro ao fazer parse do JSON:', data);
+                }
+            }).fail(function(xhr) {
+                console.error('Erro na requisição AJAX:', xhr.responseText);
+            });
+        });
+    </script>
+    <script>
+        $(document).on('click', '.btn-apagar-turma', function() {
+            const id = $(this).data('id');
 
-                        <div class="form-group">
-                            <label class="mb-1"><strong>Curso <b style="font-size: 14px;color: red;">*</b></strong></label>
-                            <select class="form-control input-rounded" name="cursoTurma" required>
-                                <option value="">Selecione o curso</option>
-                                <?php foreach ($cursos as $curso): ?>
-                                    <option value="<?= htmlspecialchars($curso->getIdCurso()) ?>">
-                                        <?= htmlspecialchars($curso->getNomeCurso()) ?>
-                                    </option>
+            $.get('../Controle/retornarTurma.php', {
+                id: id
+            }, function(data) {
+                try {
+                    const turma = data;
 
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-
-
-                        <div class="form-group">
-                            <label class="mb-1"><strong>Nº da Sala <b style="font-size: 14px;color: red;">*</b></strong></label>
-                            <input type="text" class="form-control input-rounded" name="nSalaTurma" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="mb-1"><strong>Director de Turma</label>
-                            <select class="form-control input-rounded" name="directorTurma" required>
-                                <option value="">Selecione o director de turma</option>
-                                <?php foreach ($professores as $professor): ?>
-                                    <option value="<?= htmlspecialchars($professor->getIdProfessor()) ?>">
-                                        <?= htmlspecialchars($professor->getNomeProfessor()) ?>
-                                    </option>
-
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
+                    $('#idTurmaApagar').val(turma.idTurma);
 
 
-                        <div class="text-center mt-4">
-                            <button type="submit" class="btn btn-primary btn-rounded" name="cadastrarTurma">Cadastrar</button>
-                            <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
-                        </div>
-                    </form>
-                </div>
-
-            </div>
-        </div>
-    </div>
+                } catch (e) {
+                    console.error('Erro ao fazer parse do JSON:', data);
+                }
+            }).fail(function(xhr) {
+                console.error('Erro na requisição AJAX:', xhr.responseText);
+            });
+        });
+    </script>
+    <script>
+        document.getElementById('btnVerificarCurso').addEventListener('click', function() {
+            fetch('../Controle/verificarCursoNaTurma.php', {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        const modal = new bootstrap.Modal(document.getElementById('modalTurmaCadastrar'));
+                        modal.show();
+                    } else if (data.status === 'erro') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro',
+                            text: data.message
+                        });
+                    } else if (data.status === 'redirect') {
+                        window.location.href = data.redirect;
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro na verificação:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: 'Erro ao verificar incidentes.'
+                    });
+                });
+        });
+    </script>
 
     <script src="assets/vendor/global/global.min.js" type="text/javascript"></script>
     <script src="assets/vendor/bootstrap-select/dist/js/bootstrap-select.min.js" type="text/javascript"></script>

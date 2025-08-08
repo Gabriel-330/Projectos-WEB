@@ -41,13 +41,33 @@ nav.menu-user {
     align-items: center;
     transition: width 0.3s ease;
     z-index: 999;
+    overflow: hidden;
+    /* Esconde scroll no nav */
 }
 
+/* Área que rola */
 .menu-user .menu-content {
     width: 100%;
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 5px;
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+/* Scroll personalizado (opcional) */
+.menu-user .menu-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.menu-user .menu-content::-webkit-scrollbar-thumb {
+    background-color: #555;
+    border-radius: 4px;
+}
+
+.menu-user .menu-content::-webkit-scrollbar-track {
+    background-color: #f0f0f0;
 }
 
 .user-photo {

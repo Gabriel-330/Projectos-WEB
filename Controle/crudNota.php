@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // === ATUALIZAR NOTA ===
-    if (isset($_POST['actualizar'])) {
+    if (isset($_POST['actualizarNota'])) {
         $idNota = intval($_POST['idNota'] ?? 0);
         $idProfessor = intval($_POST['idProfessor'] ?? 0);
         $idAluno = intval($_POST['idAluno'] ?? 0);

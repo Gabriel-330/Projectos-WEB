@@ -30,7 +30,7 @@ $usuarioId = $_SESSION['idUtilizador'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Painel Matricula</title>
 
     <!-- Icones do site-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -245,7 +245,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                     <li><a href="turmaBase.php" title="Cadastro de Turmas"><i class="fa-solid fa-users"></i><span>Turmas</span></a></li>
                     <li><a href="disciplinaBase.php" title="Cadastro de Disciplinas"><i class="fa-solid fa-book-open"></i><span>Disciplinas</span></a></li>
                     <li class="active"><a href="#" title="Matrícula"><i class="fa-solid fa-file-signature"></i><span class="text-white">Matrículas</span></a></li>
-                    <li><a href="documentoBase.php" title="Aceitar Documentos"><i class="fa-regular fa-folder-open"></i><span class="text-white">Documentos</span></a></li>
+                    <li><a href="documentoBase.php" title="Aceitar Documentos"><i class="fa-regular fa-folder-open"></i><span>Documentos</span></a></li>
                 </ul>
             </div>
         </nav>
@@ -297,7 +297,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h4 class="card-title">Lista de Matriculas</h4>
-                            <a href="#" class="btn btn-success btn-rounded d-none" data-bs-toggle="modal" data-bs-target="#modalMatriculaCadastrar">+ Adicionar matricula</a>
+                            <a href="#" class="btn btn-success btn-rounded d-none" data-bs-toggle="modal" data-bs-target="#modalMatriculaCadastrar">+ Adicionar Matricula</a>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -390,9 +390,6 @@ $usuarioId = $_SESSION['idUtilizador'];
                             $daoAluno = new AlunoDAO();
                             $alunos = $daoAluno->listarTodos();
                             ?>
-
-
-
 
                             <div class="form-group">
                                 <label class="mb-1"><strong>Turma<b style="font-size: 14px;color: red;">*</b></strong></label>
@@ -517,12 +514,9 @@ $usuarioId = $_SESSION['idUtilizador'];
                             $alunos = $daoAluno->listarTodos();
                             ?>
 
-
-
-
                             <div class="form-group">
                                 <label class="mb-1"><strong>Turma<b style="font-size: 14px;color: red;">*</b></strong></label>
-                                <select class="form-control input-rounded" id="turmaMatriculaEditar" name="turmaMatricula" required>
+                                <select class="form-control input-rounded" name="turmaMatricula" id="idTurmaEditar" required>
                                     <option value="">Selecione a turma</option>
                                     <?php foreach ($turmas as $turma): ?>
                                         <option value="<?= htmlspecialchars($turma->getIdTurma()) ?>">
@@ -532,64 +526,81 @@ $usuarioId = $_SESSION['idUtilizador'];
                                     <?php endforeach; ?>
                                 </select>
                             </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>Curso <b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <select class="form-control input-rounded" name="cursoMatricula" id="idCursoEditar" required>
+                                            <option value="">Selecione o curso</option>
+                                            <?php foreach ($cursos as $curso): ?>
+                                                <option value="<?= htmlspecialchars($curso->getIdCurso()) ?>">
+                                                    <?= htmlspecialchars($curso->getNomeCurso()) ?>
+                                                </option>
 
-                            <div class="form-group">
-                                <label class="mb-1"><strong>Curso <b style="font-size: 14px;color: red;">*</b></strong></label>
-                                <select class="form-control input-rounded" id="cursoMatriculaEditar" name="cursoMatricula" required>
-                                    <option value="">Selecione o curso</option>
-                                    <?php foreach ($cursos as $curso): ?>
-                                        <option value="<?= htmlspecialchars($curso->getIdCurso()) ?>">
-                                            <?= htmlspecialchars($curso->getNomeCurso()) ?>
-                                        </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>Aluno<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <select class="form-control input-rounded" name="alunoMatricula" id="idAlunoEditar" required>
+                                            <option value="">Selecione o aluno</option>
+                                            <?php foreach ($alunos as $aluno): ?>
+                                                <option value="<?= htmlspecialchars($aluno->getIdAluno()) ?>">
+                                                    <?= htmlspecialchars($aluno->getNomeAluno()) ?>
+                                                </option>
 
-                                    <?php endforeach; ?>
-                                </select>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
-
-                            <div class="form-group">
-                                <label class="mb-1"><strong>Aluno<b style="font-size: 14px;color: red;">*</b></strong></label>
-                                <select class="form-control input-rounded" id="alunoMatriculaEditar" name="alunoMatricula" required>
-                                    <option value="">Selecione o aluno</option>
-                                    <?php foreach ($alunos as $aluno): ?>
-                                        <option value="<?= htmlspecialchars($aluno->getIdAluno()) ?>">
-                                            <?= htmlspecialchars($aluno->getNomeAluno()) ?>
-                                        </option>
-
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="mb-1"><strong>Período<b style="font-size: 14px;color: red;">*</b></strong></label>
-                                        <input type="text" class="form-control input-rounded" name="periodoMatricula" required>
+                                        <select class="form-control input-rounded" name="periodoMatricula" id="periodoMatriculaEditar" required>
+                                            <option value="">Selecione o período</option>
+                                            <option value="Manhã">Manhã</option>
+                                            <option value="Tarde">Tarde</option>
+                                        </select>
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="mb-1"><strong>Classe<b style="font-size: 14px;color: red;">*</b></strong></label>
-                                        <input type="text" class="form-control input-rounded" name="classeMatricula" required>
+                                        <select class="form-control input-rounded" name="classeMatricula" id="classeMatriculaEditar" required>
+                                            <option value="">Selecione a classe</option>
+                                            <option value="10">10ª</option>
+                                            <option value="11">11ª</option>
+                                            <option value="12">12ª</option>
+                                            <option value="13">13ª</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="form-group">
-                                <label class="mb-1"><strong>Data da Matricula<b style="font-size: 14px;color: red;">*</b></strong></label>
-                                <input type="date" class="form-control input-rounded" id="dataMatriculaEditar" name="dataMatricula" required>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>Estado da Matricula<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <select class="form-control input-rounded" name="estadoMatricula" id="estadoMatriculaEditar" required>
+                                            <option value="">Selecione o estado da matricula</option>
+                                            <option value="Activa">Activa</option>
+                                            <option value="Cancelada">Cancelada</option>
+                                            <option value="Trancada">Trancada</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="mb-1"><strong>Data da Matricula<b style="font-size: 14px;color: red;">*</b></strong></label>
+                                        <input type="date" class="form-control input-rounded" name="dataMatricula" id="dataMatriculaEditar" required>
+                                    </div>
+                                </div>
                             </div>
-
-                            <div class="form-group">
-                                <label class="mb-1"><strong>Estado da Matricula<b style="font-size: 14px;color: red;">*</b></strong></label>
-                                <select class="form-control input-rounded" id="estadoMatriculaEditar" name="estadoMatricula" required>
-                                    <option value="">Selecione o estado da matricula</option>
-                                    <option value="Activa">Activa</option>
-                                    <option value="Cancelada">Cancelada</option>
-                                    <option value="Trancada">Trancada</option>
-                                </select>
-                            </div>
-
                             <div class="text-center mt-4">
                                 <button type="submit" class="btn btn-primary btn-rounded" name="actualizarMatricula">Salvar Alterações</button>
                                 <a href="javascript:void(0)" class="btn btn-light btn-rounded ml-2">Cancelar</a>
@@ -600,8 +611,6 @@ $usuarioId = $_SESSION['idUtilizador'];
                 </div>
             </div>
         </div>
-
-
 
         <div class="modal fade" id="modalMatriculaApagar">
             <div class="modal-dialog">
@@ -623,8 +632,6 @@ $usuarioId = $_SESSION['idUtilizador'];
                 </div>
             </div>
         </div>
-
-
     </div>
 
 
@@ -642,24 +649,26 @@ $usuarioId = $_SESSION['idUtilizador'];
                 id: id
             }, function(data) {
                 try {
-                    const Matricula = data;
-                    $('#idMatriculaEditar').val(Matricula.idMatricula);
-                    $('#turmariculaEditar').val(Matricula.idTurma);
+                    const matricula = data;
 
-                    $('#alunoMatriculaEditar').val(Matricula.idAluno);
-                    $('#dataMatriculaEditar').val(Matricula.dataMatricula);
-                    $('#estadoMatriculaEditar').val(Matricula.estadoMatricula);
-                    $('#cursoMatriculaEditar').val(Matricula.idCurso);
-
+                    $('#idMatriculaEditar').val(matricula.idMatricula);
+                    $('#idAlunoEditar').val(matricula.idAluno);
+                    $('#idTurmaEditar').val(matricula.idTurma);
+                    $('#idCursoEditar').val(matricula.idCurso);
+                    $('#dataMatriculaEditar').val(matricula.dataMatricula);
+                    $('#estadoMatriculaEditar').val(matricula.estadoMatricula);
+                    $('#classeMatriculaEditar').val(matricula.classeMatricula);
+                    $('#periodoMatriculaEditar').val(matricula.periodoMatricula);
 
                 } catch (e) {
-                    console.log('Erro ao interpretar o JSON retornado:', data);
+                    console.error('Erro ao processar JSON:', data);
                 }
             }).fail(function(xhr) {
-                console.log('Erro na requisição AJAX:', xhr.responseText);
+                console.error('Erro na requisição AJAX:', xhr.responseText);
             });
         });
     </script>
+
 
     <script>
         $(document).on('click', '.btn-apagar-matricula', function() {

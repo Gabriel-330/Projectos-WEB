@@ -10,16 +10,18 @@ if (!isset($_GET['id'])) {
 
 $id = intval($_GET['id']);
 $dao = new DisciplinaDAO();
-$Disciplina = $dao->buscarPorId($id); // Ajusta o nome do método se for diferente
+$disciplina = $dao->buscarPorId($id);
 
-if ($Disciplina) {
+if ($disciplina) {
     echo json_encode([
-        'idDisciplina'           => $Disciplina->getIdDisciplina(),
-        'nomeDisciplina'           => $Disciplina->getNomeDisciplina(),
-        'idCurso'   => $Disciplina->getIdCurso(),
-        'idProfessor'         => $Disciplina->getidProfessor()
+        'idDisciplina'    => $disciplina->getIdDisciplina(),
+        'nomeDisciplina'  => $disciplina->getNomeDisciplina(),
+        'classeDisciplina'=> $disciplina->getClasseDisciplina(),
+        'idCurso'         => $disciplina->getIdCurso(),
+        'idProfessor'     => $disciplina->getIdProfessor(),
+ 
     ]);
 } else {
     http_response_code(404);
-    echo json_encode(['erro' => 'Disciplina não encontrado']);
+    echo json_encode(['erro' => 'Disciplina não encontrada']);
 }

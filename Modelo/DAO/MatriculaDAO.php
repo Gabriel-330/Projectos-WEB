@@ -46,7 +46,7 @@ class MatriculaDAO
                         dataMatricula = :dataMatricula, 
                         estadoMatricula = :estadoMatricula, 
                         classeMatricula = :classeMatricula, 
-                        periodoMatricula = :periodoMatricula, 
+                        periodoMatricula = :periodoMatricula 
                     WHERE idMatricula = :id";
 
             $stmt = $this->conexao->prepare($sql);
@@ -161,7 +161,7 @@ class MatriculaDAO
             $stmt->bindParam(":classe", $classe, PDO::PARAM_INT);
             $stmt->bindParam(":periodo", $periodo, PDO::PARAM_INT);
             $stmt->bindParam(":curso", $curso, PDO::PARAM_STR);
-            $stmt->bindParam(":turma", $turma, PDO::PARAM_STR); 
+            $stmt->bindParam(":turma", $turma, PDO::PARAM_STR);
 
             $stmt->execute();
 
@@ -243,6 +243,23 @@ class MatriculaDAO
 
         return $resultado;
     }
+
+    public function buscarPorIdAluno($idAluno)
+    {
+        try {
+            $sql = "SELECT * FROM Matricula WHERE idAluno = :idAluno ORDER BY idMatricula DESC LIMIT 1";
+            $stmt = $this->conexao->prepare($sql);
+            $stmt->bindValue(":idAluno", $idAluno);
+            $stmt->execute();
+
+            $linha = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $this->mapearMatricula($linha);
+        } catch (Exception $e) {
+            echo "Erro ao buscar matrícula por aluno: " . $e->getMessage();
+            return false;
+        }
+    }
+
 
     private function mapearMatricula($linha)
     {

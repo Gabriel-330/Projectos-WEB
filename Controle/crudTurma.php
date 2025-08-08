@@ -51,7 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     // === ATUALIZAR TURMA ===
-    if (isset($_POST['actualizar'])) {
+    if (isset($_POST['actualizarTurma'])) {
         $idTurma = $_POST['idTurma'];
         $nomeTurma = trim($_POST['nomeTurma']);
         $cursoTurma = trim($_POST['cursoTurma']);
@@ -82,7 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     // === APAGAR TURMA ===
-    if (isset($_POST['apagar'])) {
+    if (isset($_POST['apagarTurma'])) {
         $idTurma = $_POST['idTurma'] ?? null;
         if (!empty($idTurma)) {
             $turmaDTO->setIdTurma($idTurma);

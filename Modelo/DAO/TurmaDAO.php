@@ -49,7 +49,7 @@ class TurmaDAO
     public function actualizar(TurmaDTO $turma)
     {
         try {
-            $sql = "UPDATE turma SET nomeTurma = :nome, salaTurma = :sala, idCurso = :idCurso, idProfessor = :idProfessor WHERE id = :id";
+            $sql = "UPDATE turma SET nomeTurma = :nome, salaTurma = :sala, idCurso = :idCurso, idProfessor = :idProfessor WHERE idTurma = :id";
             $stmt = $this->conexao->prepare($sql);
 
             $stmt->bindValue(":nome", $turma->getNomeTurma());
@@ -120,7 +120,10 @@ class TurmaDAO
     public function buscarPorId($id)
     {
         try {
-            $sql = "SELECT * FROM turma WHERE idTurma = :idTurma";
+            $sql = "SELECT t.*, c.nomeCurso, p.nomeProfessor
+                FROM turma t
+                INNER JOIN curso c ON t.idCurso = c.idCurso
+                INNER JOIN professor p ON t.idProfessor = p.idProfessor WHERE idTurma = :idTurma";
             $stmt = $this->conexao->prepare($sql);
             $stmt->bindValue(':idTurma', $id);
             $stmt->execute();
@@ -128,7 +131,7 @@ class TurmaDAO
             $linha = $stmt->fetch(PDO::FETCH_ASSOC);
             return $this->mapearParaDTO($linha);
         } catch (PDOException $e) {
-            echo "Erro ao buscar turma: " . $e->getMessage();
+            die("Erro ao buscar turma: " . $e->getMessage());
             return false;
         }
     }
@@ -136,7 +139,7 @@ class TurmaDAO
     public function apagar(TurmaDTO $turma)
     {
         try {
-            $sql = "DELETE FROM turma WHERE id = :id";
+            $sql = "DELETE FROM turma WHERE idTurma = :id";
             $stmt = $this->conexao->prepare($sql);
             $stmt->bindValue(":id", $turma->getIdTurma());
             return $stmt->execute();
@@ -172,6 +175,8 @@ class TurmaDAO
     {
         $dto = new TurmaDTO();
         $dto->setIdTurma($linha['idTurma']);
+        $dto->setNomeProfessor($linha['nomeProfessor']);
+        $dto->setNomeCurso($linha['nomeCurso']);
         $dto->setNomeTurma($linha['nomeTurma']);
         $dto->setSalaTurma($linha['salaTurma']);
         $dto->setIdCurso($linha['idCurso']);

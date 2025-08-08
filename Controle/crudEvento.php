@@ -71,22 +71,30 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     // === ATUALIZAR EVENTO ===
-    if (isset($_POST["atualizarEvento"])) {
-        $id = $_POST['id'] ?? null;
-        $titulo = trim($_POST['titulo'] ?? '');
-        $dataEvento = trim($_POST['dataEvento'] ?? '');
-
-        if (empty($id) || empty($titulo) || empty($dataEvento)) {
-            $_SESSION['error'] = 'Dados inválidos para atualização.';
-            $_SESSION['icon'] = 'error';
-            header('location: ../Visao/eventoBase.php');
-            exit();
-        }
+    if (isset($_POST["actualizarEvento"])) {
+        $idEvento = $_POST['idEvento'] ?? null;
+        $idUtilizador = $_SESSION['idUtilizador'] ?? null;
+        $titulo = trim($_POST['tituloEvento'] ?? '');
+        $tipo = trim($_POST['tipoEvento'] ?? '');
+        $local = trim($_POST['localEvento'] ?? '');
+        $curso = trim($_POST['cursoEvento'] ?? '');
+        $responsavel = trim($_POST['responsavelEvento'] ?? '');
+        $data = trim($_POST['dataEvento'] ?? '');
+        $horaInicio = trim($_POST['horaInicioEvento'] ?? '');
+        $horaFim = trim($_POST['horaFimEvento'] ?? '');
 
         $eventoDTO = new EventosDTO();
-        $eventoDTO->setId($id);
+        $eventoDTO->setIdEvento($idEvento);
+        $eventoDTO->setIdUtilizador($idUtilizador);
         $eventoDTO->setTituloEvento($titulo);
-        $eventoDTO->setDataEvento($dataEvento);
+        $eventoDTO->setTipoEvento($tipo);
+        $eventoDTO->setLocalEvento($local);
+        $eventoDTO->setIdCurso($curso);
+        $eventoDTO->setResponsavelEvento($responsavel);
+        $eventoDTO->setDataEvento($data);
+        $eventoDTO->setHoraInicioEvento($horaInicio);
+        $eventoDTO->setHoraFimEvento($horaFim);
+
 
         $eventoDAO = new EventosDAO();
 
@@ -97,10 +105,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $notificacaoDTO->setIdUtilizador($_SESSION['idUtilizador']);
             $notificacaoDAO->criarNotificacao($notificacaoDTO);
 
-            $_SESSION['success'] = 'Evento atualizado com sucesso!';
+            $_SESSION['success'] = 'Evento actualizado com sucesso!';
             $_SESSION['icon'] = 'success';
         } else {
-            $_SESSION['error'] = 'Erro ao atualizar evento.';
+            $_SESSION['error'] = 'Erro ao actualizar evento.';
             $_SESSION['icon'] = 'error';
         }
 
@@ -109,15 +117,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     // === DELETAR EVENTO ===
-    if (isset($_POST["deletarEvento"])) {
-        $id = $_POST['id'] ?? null;
-
-        if (empty($id)) {
-            $_SESSION['error'] = 'ID inválido para exclusão.';
-            $_SESSION['icon'] = 'error';
-            header('location: ../Visao/eventoBase.php');
-            exit();
-        }
+    if (isset($_POST["apagarEvento"])) {
+        $id = $_POST['idEvento'] ?? null;
 
         $eventoDAO = new EventosDAO();
 
@@ -128,10 +129,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $notificacaoDTO->setIdUtilizador($_SESSION['idUtilizador']);
             $notificacaoDAO->criarNotificacao($notificacaoDTO);
 
-            $_SESSION['success'] = 'Evento deletado com sucesso!';
+            $_SESSION['success'] = 'Evento apagado com sucesso!';
             $_SESSION['icon'] = 'success';
         } else {
-            $_SESSION['error'] = 'Erro ao deletar evento.';
+            $_SESSION['error'] = 'Erro ao apagar evento.';
             $_SESSION['icon'] = 'error';
         }
 

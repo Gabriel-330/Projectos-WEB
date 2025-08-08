@@ -20,45 +20,47 @@ class DocumentoDAO
     {
         try {
             $sql = "INSERT INTO documento (
+                        idAluno,
+                        idProfessor,
                         tipoDocumento,
                         estadoDocumento,
-                        aluno_idAluno,
-                        classeDocumento,
+                        dataEmissaoDocumento,
                         cursoDocumento,
-                        disciplinaDocumento,
                         turmaDocumento,
+                        classeDocumento,
                         periodoDocumento,
-                        professor_idProfessor
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?,?,?)";
+                        disciplinaDocumento
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             $stmt = $this->conexao->prepare($sql);
             $stmt->execute([
+                $doc->getIdAluno(),
+                $doc->getIdProfessor(),
                 $doc->getTipoDocumento(),
                 $doc->getEstadoDocumento(),
-                $doc->getAluno_IdAluno(),
-                $doc->getClasseDocumento(),
+                $doc->getDataEmissaoDocumento(),
                 $doc->getCursoDocumento(),
-                $doc->getDisciplinaDocumento(),
                 $doc->getTurmaDocumento(),
+                $doc->getClasseDocumento(),
                 $doc->getPeriodoDocumento(),
-                $doc->getProfessor_IdProfessor()
+                $doc->getDisciplinaDocumento()
             ]);
 
             return true;
         } catch (PDOException $e) {
             die("Erro ao cadastrar documento: " . $e->getMessage());
-            return false;
         }
     }
+
     public function mostrarDocumentoPorCPCT()
     {
         try {
-            $sql = "SELECT cursoDocumento,turmaDocumento,classeDocumento,periodoDocumento, disciplinaDocumento FROM documento WHERE professor_;";
+            $sql = "SELECT cursoDocumento, turmaDocumento, classeDocumento, periodoDocumento, disciplinaDocumento 
+                    FROM documento";
             $stmt = $this->conexao->query($sql);
             $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             $resultado = [];
-
             foreach ($registros as $linha) {
                 $dto = new DocumentoDTO();
                 $dto->setCursoDocumento($linha['cursoDocumento']);
@@ -66,14 +68,11 @@ class DocumentoDAO
                 $dto->setClasseDocumento($linha['classeDocumento']);
                 $dto->setPeriodoDocumento($linha['periodoDocumento']);
                 $dto->setDisciplinaDocumento($linha['disciplinaDocumento']);
-
                 $resultado[] = $dto;
             }
-
             return $resultado;
         } catch (PDOException $e) {
             die("Erro ao mostrar os documentos: " . $e->getMessage());
-            return false;
         }
     }
 
@@ -89,7 +88,6 @@ class DocumentoDAO
             return 0;
         }
     }
-
 
     public function listarTodos()
     {
@@ -114,7 +112,7 @@ class DocumentoDAO
         try {
             $sql = "SELECT * FROM documento WHERE idDocumento = :id";
             $stmt = $this->conexao->prepare($sql);
-            $stmt->bindValue(":id", $id);
+            $stmt->bindValue(":id", $id, PDO::PARAM_INT);
             $stmt->execute();
 
             $linha = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -130,11 +128,10 @@ class DocumentoDAO
         try {
             $sql = "SELECT * FROM documento WHERE idProfessor = :id";
             $stmt = $this->conexao->prepare($sql);
-            $stmt->bindValue(":id", $id, PDO::PARAM_INT); // Garantir tipo inteiro
+            $stmt->bindValue(":id", $id, PDO::PARAM_INT);
             $stmt->execute();
 
             $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
             $resultado = [];
             foreach ($registros as $linha) {
                 $resultado[] = $this->mapearParaDTO($linha);
@@ -145,16 +142,16 @@ class DocumentoDAO
             return false;
         }
     }
+
     public function buscarPorAluno($id)
     {
         try {
-            $sql = "SELECT * FROM documento WHERE idaluno = :id";
+            $sql = "SELECT * FROM documento WHERE idAluno = :id";
             $stmt = $this->conexao->prepare($sql);
-            $stmt->bindValue(":id", $id, PDO::PARAM_INT); // Garantir tipo inteiro
+            $stmt->bindValue(":id", $id, PDO::PARAM_INT);
             $stmt->execute();
 
             $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
             $resultado = [];
             foreach ($registros as $linha) {
                 $resultado[] = $this->mapearParaDTO($linha);
@@ -165,34 +162,35 @@ class DocumentoDAO
             return false;
         }
     }
-
 
     public function actualizar(DocumentoDTO $doc)
     {
         try {
             $sql = "UPDATE documento SET
-                        tipoDocumento = ?,
-                        dataEmissaoDocumento = ?,
-                        caminhoArquivoDocumento = ?,
                         idAluno = ?,
-                        idCurso = ?,
-                        idNota = ?,
-                        idDisciplina = ?,
-                        idTurma = ?,
-                        idProfessor = ?
-                    WHERE id = ?";
+                        idProfessor = ?,
+                        tipoDocumento = ?,
+                        estadoDocumento = ?,
+                        dataEmissaoDocumento = ?,
+                        cursoDocumento = ?,
+                        turmaDocumento = ?,
+                        classeDocumento = ?,
+                        periodoDocumento = ?,
+                        disciplinaDocumento = ?
+                    WHERE idDocumento = ?";
             $stmt = $this->conexao->prepare($sql);
             return $stmt->execute([
+                $doc->getIdAluno(),
+                $doc->getIdProfessor(),
                 $doc->getTipoDocumento(),
+                $doc->getEstadoDocumento(),
                 $doc->getDataEmissaoDocumento(),
-                $doc->getCaminhoArquivoDocumento(),
-                $doc->getAluno_IdAluno(),
-                $doc->getIdCurso(),
-                $doc->getIdNota(),
-                $doc->getIdDisciplina(),
-                $doc->getIdTurma(),
-                $doc->getProfessor_IdProfessor(),
-                $doc->getIdDocumento() // supondo que o DTO tem o campo "id"
+                $doc->getCursoDocumento(),
+                $doc->getTurmaDocumento(),
+                $doc->getClasseDocumento(),
+                $doc->getPeriodoDocumento(),
+                $doc->getDisciplinaDocumento(),
+                $doc->getIdDocumento()
             ]);
         } catch (PDOException $e) {
             error_log("Erro ao actualizar documento: " . $e->getMessage());
@@ -203,9 +201,9 @@ class DocumentoDAO
     public function apagar(DocumentoDTO $doc)
     {
         try {
-            $sql = "DELETE FROM documento WHERE id = :id";
+            $sql = "DELETE FROM documento WHERE idDocumento = :id";
             $stmt = $this->conexao->prepare($sql);
-            $stmt->bindValue(":id", $doc->getIdDocumento());
+            $stmt->bindValue(":id", $doc->getIdDocumento(), PDO::PARAM_INT);
             return $stmt->execute();
         } catch (PDOException $e) {
             error_log("Erro ao apagar documento: " . $e->getMessage());
@@ -217,16 +215,17 @@ class DocumentoDAO
     {
         $dto = new DocumentoDTO();
 
-        if (isset($linha['id'])) $dto->setIdDocumento($linha['id']);
+        if (isset($linha['idDocumento'])) $dto->setIdDocumento($linha['idDocumento']);
+        if (isset($linha['idAluno'])) $dto->setIdAluno($linha['idAluno']);
+        if (isset($linha['idProfessor'])) $dto->setIdProfessor($linha['idProfessor']);
         if (isset($linha['tipoDocumento'])) $dto->setTipoDocumento($linha['tipoDocumento']);
+        if (isset($linha['estadoDocumento'])) $dto->setEstadoDocumento($linha['estadoDocumento']);
         if (isset($linha['dataEmissaoDocumento'])) $dto->setDataEmissaoDocumento($linha['dataEmissaoDocumento']);
-        if (isset($linha['caminhoArquivoDocumento'])) $dto->setCaminhoArquivoDocumento($linha['caminhoArquivoDocumento']);
-        if (isset($linha['idAluno'])) $dto->setAluno_IdAluno($linha['idAluno']);
-        if (isset($linha['idCurso'])) $dto->setIdCurso($linha['idCurso']);
-        if (isset($linha['idNota'])) $dto->setIdNota($linha['idNota']);
-        if (isset($linha['idDisciplina'])) $dto->setIdDisciplina($linha['idDisciplina']);
-        if (isset($linha['idTurma'])) $dto->setIdTurma($linha['idTurma']);
-        if (isset($linha['idProfessor'])) $dto->setProfessor_IdProfessor($linha['idProfessor']);
+        if (isset($linha['cursoDocumento'])) $dto->setCursoDocumento($linha['cursoDocumento']);
+        if (isset($linha['turmaDocumento'])) $dto->setTurmaDocumento($linha['turmaDocumento']);
+        if (isset($linha['classeDocumento'])) $dto->setClasseDocumento($linha['classeDocumento']);
+        if (isset($linha['periodoDocumento'])) $dto->setPeriodoDocumento($linha['periodoDocumento']);
+        if (isset($linha['disciplinaDocumento'])) $dto->setDisciplinaDocumento($linha['disciplinaDocumento']);
 
         return $dto;
     }

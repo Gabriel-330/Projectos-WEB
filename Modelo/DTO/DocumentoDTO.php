@@ -92,11 +92,11 @@ public function setCaminhoArquivoDocumento($caminhoArquivoDocumento) {
 }
 
 // Id Do Aluno:
-public function getAluno_IdAluno() {
+public function getIdAluno() {
     return $this->aluno_idAluno;
 }
 
-public function setAluno_IdAluno($aluno_idAluno) {
+public function setIdAluno($aluno_idAluno) {
     $this->aluno_idAluno = $aluno_idAluno;
 }
 
@@ -137,11 +137,11 @@ public function setIdTurma($idTurma) {
 }
 
 // Id Do Professor:
-public function getProfessor_IdProfessor() {
+public function getIdProfessor() {
     return $this->professor_idProfessor;
 }
 
-public function setProfessor_IdProfessor($professor_idProfessor) {
+public function setIdProfessor($professor_idProfessor) {
     $this->professor_idProfessor = $professor_idProfessor;
 }
 

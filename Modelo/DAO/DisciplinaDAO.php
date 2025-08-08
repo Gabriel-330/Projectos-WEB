@@ -35,7 +35,7 @@ class DisciplinaDAO
     public function actualizar(DisciplinaDTO $disciplina)
     {
         try {
-            $sql = "UPDATE disciplina SET nomeDisciplina = :nome,classeDisciplina = :disciplina, idCurso = :idCurso, idProfessor =: idProfessor WHERE idDisciplina = :id";
+            $sql = "UPDATE disciplina SET nomeDisciplina = :nome,classeDisciplina = :disciplina, idCurso = :idCurso, idProfessor = :idProfessor WHERE idDisciplina = :id";
             $stmt = $this->conexao->prepare($sql);
 
             $stmt->bindValue(":nome", $disciplina->getNomeDisciplina());
@@ -46,7 +46,7 @@ class DisciplinaDAO
 
             return $stmt->execute();
         } catch (PDOException $e) {
-            echo "Erro ao atualizar disciplina: " . $e->getMessage();
+            die ("Erro ao atualizar disciplina: " . $e->getMessage());
             return false;
         }
     }
@@ -234,7 +234,11 @@ class DisciplinaDAO
     public function buscarPorId($id)
     {
         try {
-            $sql = "SELECT * FROM disciplina WHERE idDisciplina = :id";
+            $sql = "SELECT d.*, c.nomeCurso, p.nomeProfessor
+                FROM disciplina d
+                INNER JOIN curso c ON d.idCurso = c.idCurso
+                INNER JOIN professor p ON d.idProfessor = p.idProfessor
+                WHERE idDisciplina = :id";
             $stmt = $this->conexao->prepare($sql);
             $stmt->bindValue(':id', $id);
             $stmt->execute();

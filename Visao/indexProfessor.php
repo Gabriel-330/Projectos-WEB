@@ -28,7 +28,7 @@ $usuarioId = $_SESSION['idUtilizador'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - Professor</title>
+    <title>Home</title>
 
     <!-- Icones do site-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -43,7 +43,7 @@ $usuarioId = $_SESSION['idUtilizador'];
     <link href="assets/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet" type="text/css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet" type="text/css" />
     <link href="assets/css/style.css" rel="stylesheet" type="text/css" />
-     <link href="css/style-home.css" rel="stylesheet" type="text/css" />
+    <link href="css/style-home.css" rel="stylesheet" type="text/css" />
     <script src="assets/js/alertsMessage.js"></script>
     <script src="assets/js/sweetalert.js"></script>
 </head>
@@ -230,7 +230,7 @@ $usuarioId = $_SESSION['idUtilizador'];
             </nav>
         </div>
 
-     <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
 
         <nav class="menu-user">
             <div class="menu-content">
@@ -276,7 +276,7 @@ $usuarioId = $_SESSION['idUtilizador'];
             {
                 if ($max <= 0) return 0;
                 $percent = ($valor / $max) * 100;
-                return $percent > 100 ? 100 : round($percent, 2);  // Garante que nunca passa de 100%
+                return $percent > 100 ? 100 : round($percent, 2);
             }
             ?>
             <section class="cards">

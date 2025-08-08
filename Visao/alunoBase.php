@@ -31,7 +31,7 @@ $usuarioId = $_SESSION['idUtilizador'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Painel Aluno</title>
 
     <!-- Icones do site-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -196,21 +196,17 @@ $usuarioId = $_SESSION['idUtilizador'];
                                                             echo $data->format('d') . ' ' . traduzMes($data->format('m')) . ' ' . $data->format('Y');
                                                             ?>
                                                         </small>
-
                                                     </div>
                                                 </div>
                                             </li>
                                         <?php endforeach; ?>
                                     </ul>
-
                                 </div>
                                 <a class="all-notification d-block text-center p-2 border-top" href="notificacoes.php">
                                     Ver todas as notificações <i class="ti-arrow-right"></i>
                                 </a>
                             </div>
                         </li>
-
-
 
                         <li class="nav-item dropdown header-profile">
                             <a class="nav-link" href="javascript:void(0)" role="button" data-bs-toggle="dropdown">
@@ -253,7 +249,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                     <li><a href="turmaBase.php" title="Cadastro de Turmas"><i class="fa-solid fa-users"></i><span>Turmas</span></a></li>
                     <li><a href="disciplinaBase.php" title="Cadastro de Disciplinas"><i class="fa-solid fa-book-open"></i><span>Disciplinas</span></a></li>
                     <li><a href="matriculaBase.php" title="Matrícula"><i class="fa-solid fa-file-signature"></i><span>Matrículas</span></a></li>
-                    <li><a href="documentoBase.php" title="Aceitar Documentos"><i class="fa-regular fa-folder-open"></i><span class="text-white">Documentos</span></a></li>
+                    <li><a href="documentoBase.php" title="Aceitar Documentos"><i class="fa-regular fa-folder-open"></i><span>Documentos</span></a></li>
                 </ul>
 
             </div>
@@ -319,7 +315,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h4 class="card-title">Lista de Alunos</h4>
-                            <a href="#" class="btn btn-success btn-rounded " data-bs-toggle="modal" data-bs-target="#modalAlunoCadastrar">+ Adicionar aluno</a>
+                            <a href="#" id="btnVerificarTurma" class="btn btn-success btn-rounded " data-bs-toggle="modal" data-bs-target="#modalAlunoCadastrar">+ Adicionar Aluno</a>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -328,17 +324,17 @@ $usuarioId = $_SESSION['idUtilizador'];
                                         <tr>
                                             <th style="width:50px;"><strong>#</strong></th>
                                             <th><strong>NOME DO ALUNO</strong></th>
+                                            <th><strong>Nº DO BI</strong></th>
                                             <th><strong>MORADA</strong></th>
                                             <th><strong>DATA NASCIMENTO</strong></th>
                                             <th><strong>GÊNERO</strong></th>
                                             <th><strong>CURSO</strong></th>
                                             <th><strong>TURMA</strong></th>
                                             <th><strong>ClASSE</strong></th>
+                                            <th><strong>PERÍODO</strong></th>
                                             <th><strong>RESPONSÁVEL</strong></th>
                                             <th><strong>CONTACTO RESPONSÁVEL</strong></th>
                                             <th><strong>ANO DE MATRÍCULA</strong></th>
-                                            <th><strong>RESPONSÁVEL PELO CADASTRO</strong></th>
-                                            <th><strong>Nº DO BI</strong></th>
                                             <th><strong>AÇÕES</strong></th>
                                         </tr>
                                     </thead>
@@ -348,24 +344,25 @@ $usuarioId = $_SESSION['idUtilizador'];
                                             <?php
                                             $idAluno = $aluno->getIdAluno();
                                             $matriculas = $matriculaDAO->listarPorAluno($idAluno);
-                                            foreach($matriculas as $matricula){
-                                                                                     
+                                            foreach ($matriculas as $matricula) {
+
                                             ?>
-                                            <tr>
-                                                <td><strong><?= $cont++; ?></strong></td>
-                                                <td><?= htmlspecialchars($aluno->getNomeAluno()); ?></td>
-                                                <td><?= htmlspecialchars($aluno->getMoradaAluno()); ?></td>
-                                                <td><?= htmlspecialchars($aluno->getDataNascimentoAluno()); ?></td>
-                                                <td><?= htmlspecialchars($aluno->getGeneroAluno()); ?></td>
-                                                <td><?= htmlspecialchars($aluno->getNomeCurso()); ?></td>
-                                                <td><?= htmlspecialchars($aluno->getNomeTurma()); ?></td>
-                                                <td><?= htmlspecialchars($matricula->getClasseMatricula()) ?>ª</td>
-                                                <td><?= htmlspecialchars($aluno->getResponsavelAluno()); ?></td>
-                                                <td><?= htmlspecialchars($aluno->getContactoResponsavelAluno()); ?></td>
-                                                <td><?= htmlspecialchars($aluno->getAnoIngressoAluno()); ?></td>
-                                                <td><?= htmlspecialchars($aluno->getNomeUtilizador()); ?></td>
-                                                <td><?= htmlspecialchars($aluno->getnIdentificacao()); ?></td>
-   <?php }?>
+                                                <tr>
+                                                    <td><strong><?= $cont++; ?></strong></td>
+                                                    <td><?= htmlspecialchars($aluno->getNomeAluno()); ?></td>
+                                                    <td><?= htmlspecialchars($aluno->getnIdentificacao()); ?></td>
+                                                    <td><?= htmlspecialchars($aluno->getMoradaAluno()); ?></td>
+                                                    <td><?= htmlspecialchars($aluno->getDataNascimentoAluno()); ?></td>
+                                                    <td><?= htmlspecialchars($aluno->getGeneroAluno()); ?></td>
+                                                    <td><?= htmlspecialchars($aluno->getNomeCurso()); ?></td>
+                                                    <td><?= htmlspecialchars($aluno->getNomeTurma()); ?></td>
+                                                    <td><?= htmlspecialchars($matricula->getClasseMatricula()) ?>ª</td>
+                                                    <td><?= htmlspecialchars($matricula->getPeriodoMatricula()) ?></td>
+                                                    <td><?= htmlspecialchars($aluno->getResponsavelAluno()); ?></td>
+                                                    <td><?= htmlspecialchars($aluno->getContactoResponsavelAluno()); ?></td>
+                                                    <td><?= htmlspecialchars($aluno->getAnoIngressoAluno()); ?></td>
+
+                                                <?php } ?>
 
                                                 <td>
                                                     <div class="dropdown">
@@ -385,8 +382,8 @@ $usuarioId = $_SESSION['idUtilizador'];
                                                         </div>
                                                     </div>
                                                 </td>
-                                            </tr>
-                                        <?php endforeach; ?>
+                                                </tr>
+                                            <?php endforeach; ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -532,7 +529,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="mb-1"><strong>Foto do Aluno <b style="font-size: 14px;color: red;">*</b></strong></label>
-                                        <input type="file" class="form-control input-rounded" name="fotoAluno" accept="image/*" required>
+                                        <input type="file" class="form-control input-rounded" name="fotoAluno" accept="image/*">
                                     </div>
                                 </div>
                             </div>
@@ -567,6 +564,8 @@ $usuarioId = $_SESSION['idUtilizador'];
                 </div>
             </div>
         </div>
+
+
         <div class="modal fade" id="modalAlunoEditar">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
@@ -576,7 +575,25 @@ $usuarioId = $_SESSION['idUtilizador'];
                     </div>
                     <div class="modal-body">
                         <form action="../Controle/crudAluno.php" method="POST" enctype="multipart/form-data">
-                            <input type="hidden" class="form-control input-rounded" name="dataMatricula" id="dataMatriculaEditar" required>
+                            <?php if (!empty($matriculas)): ?>
+                                <?php foreach ($matriculas as $matricula): ?>
+                                    <input type="hidden" class="form-control input-rounded"
+                                        name="estadoMatricula"
+                                        value="<?= $matricula->getEstadoMatricula() ?>" required>
+
+                                    <input type="hidden" class="form-control input-rounded"
+                                        name="dataMatricula"
+                                        value="<?= $matricula->getDataMatricula() ?>" required>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <input type="hidden" class="form-control input-rounded"
+                                    name="estadoMatricula" value="" required>
+
+                                <input type="hidden" class="form-control input-rounded"
+                                    name="dataMatricula" value="" required>
+                            <?php endif; ?>
+
+                            <input type="hidden" class="form-control input-rounded" name="idAluno" id="idAlunoEditar" required>
 
                             <div class="form-group">
                                 <label class="mb-1"><strong>Nome do Aluno <b style="font-size: 14px;color: red;">*</b></strong></label>
@@ -640,7 +657,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="mb-1"><strong>Curso <b style="font-size: 14px;color: red;">*</b></strong></label>
-                                        <select class="form-control input-rounded" name="tipoCursoEditar" id="idCursoEditar" required>
+                                        <select class="form-control input-rounded" name="tipoCurso" id="idCursoEditar" required>
                                             <option value="">Selecione o curso</option>
                                             <?php foreach ($cursos as $curso): ?>
                                                 <option value="<?= htmlspecialchars($curso->getIdCurso()) ?>">
@@ -677,9 +694,26 @@ $usuarioId = $_SESSION['idUtilizador'];
 
 
 
-                                <?php foreach ($matriculas as $matricula): ?>
-                                    <?php $classeSelecionada = $matricula->getClasseMatricula(); ?>
-
+                                <?php if (!empty($matriculas)): ?>
+                                    <?php foreach ($matriculas as $matricula): ?>
+                                        <?php $classeSelecionada = $matricula->getClasseMatricula(); ?>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="mb-1">
+                                                    <strong>Classe<b style="font-size: 14px;color: red;">*</b></strong>
+                                                </label>
+                                                <select class="form-control input-rounded" name="classeMatricula" required>
+                                                    <option value="">Selecione a classe</option>
+                                                    <option value="10" <?= $classeSelecionada == '10' ? 'selected' : '' ?>>10ª</option>
+                                                    <option value="11" <?= $classeSelecionada == '11' ? 'selected' : '' ?>>11ª</option>
+                                                    <option value="12" <?= $classeSelecionada == '12' ? 'selected' : '' ?>>12ª</option>
+                                                    <option value="13" <?= $classeSelecionada == '13' ? 'selected' : '' ?>>13ª</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <!-- Exibe vazio se não houver matrícula -->
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label class="mb-1">
@@ -687,33 +721,82 @@ $usuarioId = $_SESSION['idUtilizador'];
                                             </label>
                                             <select class="form-control input-rounded" name="classeMatricula" required>
                                                 <option value="">Selecione a classe</option>
-                                                <option value="10" <?= $classeSelecionada == '10' ? 'selected' : '' ?>>10ª</option>
-                                                <option value="11" <?= $classeSelecionada == '11' ? 'selected' : '' ?>>11ª</option>
-                                                <option value="12" <?= $classeSelecionada == '12' ? 'selected' : '' ?>>12ª</option>
-                                                <option value="13" <?= $classeSelecionada == '13' ? 'selected' : '' ?>>13ª</option>
+                                                <option value="10">10ª</option>
+                                                <option value="11">11ª</option>
+                                                <option value="12">12ª</option>
+                                                <option value="13">13ª</option>
                                             </select>
                                         </div>
                                     </div>
-                                <?php endforeach; ?>
+                                <?php endif; ?>
+
                             </div>
 
                             <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="mb-1"><strong>Período<b style="font-size: 14px;color: red;">*</b></strong></label>
-                                        <select class="form-control input-rounded" name="periodoMatricula" id="periodoMatriculaEditar" required>
-                                            <option value="">Selecione o período</option>
-                                            <option value="Manhã">Manhã</option>
-                                            <option value="Tarde">Tarde</option>
-                                        </select>
+                                <?php if (!empty($matriculas)): ?>
+                                    <?php foreach ($matriculas as $matricula): ?>
+                                        <?php $periodoSelecionado = $matricula->getPeriodoMatricula(); ?>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="mb-1">
+                                                    <strong>Período<b style="font-size: 14px;color: red;">*</b></strong>
+                                                </label>
+                                                <select class="form-control input-rounded" name="periodoMatricula" required>
+                                                    <option value="">Selecione o período</option>
+                                                    <option value="Manhã" <?= $periodoSelecionado == 'Manhã' ? 'selected' : '' ?>>Manhã</option>
+                                                    <option value="Tarde" <?= $periodoSelecionado == 'Tarde' ? 'selected' : '' ?>>Tarde</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <!-- Exibe vazio se não houver matrícula -->
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="mb-1">
+                                                <strong>Período<b style="font-size: 14px;color: red;">*</b></strong>
+                                            </label>
+                                            <select class="form-control input-rounded" name="periodoMatricula" required>
+                                                <option value="">Selecione o período</option>
+                                                <option value="Manhã">Manhã</option>
+                                                <option value="Tarde">Tarde</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
+                                <?php endif; ?>
+
 
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="mb-1"><strong>Foto do Aluno <b style="font-size: 14px;color: red;">*</b></strong></label>
-                                        <input type="file" class="form-control input-rounded" name="fotoAluno" id="fotoAlunoEditar" accept="image/*" required>
+                                        <label class="mb-1">
+                                            <strong>Foto do Aluno <b style="font-size: 14px; color: red;">*</b></strong>
+                                        </label>
+
+                                        <div class="d-flex align-items-center gap-3">
+                                            <!-- Imagem pequena e arredondada -->
+                                            <img id="fotoAlunoPreview"
+                                                src=""
+                                                alt="Foto do aluno"
+                                                width="40"
+                                                height="40"
+                                                style="object-fit: cover; border-radius: 50%; border: 1px solid #ccc;">
+
+                                            <div class="flex-grow-1">
+                                                <!-- Input file para nova imagem -->
+                                                <input type="file"
+                                                    class="form-control input-rounded"
+                                                    name="fotoAlunoNova"
+                                                    id="fotoAlunoNovaEditar"
+                                                    accept="image/*">
+
+                                                <!-- Hidden com caminho da imagem antiga -->
+                                                <input type="hidden"
+                                                    name="fotoAlunoAntiga"
+                                                    id="fotoAlunoAntigaEditar">
+                                            </div>
+                                        </div>
                                     </div>
+
                                 </div>
                             </div>
                             <div class="row">
@@ -798,7 +881,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                     $('#moradaAlunoEditar').val(aluno.moradaAluno);
                     $('#dataNascimentoAlunoEditar').val(aluno.dataNascimentoAluno);
                     $('#generoAlunoEditar').val(aluno.generoAluno);
-                    $('#fotoAlunoPreview').attr('src', aluno.fotoAluno); // Para preview
+                    $('#fotoAlunoPreview').attr('src', '../' + aluno.fotoAluno);
                     $('#responsavelAlunoEditar').val(aluno.responsavelAluno);
                     $('#contactoResponsavelAlunoEditar').val(aluno.contactoResponsavelAluno);
                     $('#anoIngressoAlunoEditar').val(aluno.anoIngressoAluno);
@@ -808,6 +891,8 @@ $usuarioId = $_SESSION['idUtilizador'];
                     $('#nomeCursoEditar').val(aluno.nomeCurso);
                     $('#nomeUtilizadorEditar').val(aluno.nomeUtilizador);
                     $('#nomeTurmaEditar').val(aluno.nomeTurma);
+                    $('#fotoAlunoAntigaEditar').val(aluno.fotoAluno); // Guarda o caminho atual da foto
+
 
                 } catch (e) {
                     console.error('Erro ao interpretar o JSON retornado:', e);
@@ -836,6 +921,37 @@ $usuarioId = $_SESSION['idUtilizador'];
             }).fail(function(xhr) {
                 console.log('Erro na requisição AJAX:', xhr.responseText);
             });
+        });
+    </script>
+
+    <script>
+        document.getElementById('btnVerificarTurma').addEventListener('click', function() {
+            fetch('../Controle/verificarTurma.php', {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        const modal = new bootstrap.Modal(document.getElementById('modalAlunoCadastrar'));
+                        modal.show();
+                    } else if (data.status === 'erro') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro',
+                            text: data.message
+                        });
+                    } else if (data.status === 'redirect') {
+                        window.location.href = data.redirect;
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro na verificação:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: 'Erro ao verificar incidentes.'
+                    });
+                });
         });
     </script>
 
