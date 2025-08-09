@@ -5,22 +5,23 @@ require_once("../Modelo/DTO/NotificacoesDTO.php");
 require_once("../Modelo/DAO/AlunoDAO.php");
 
 // Verifica se o utilizador está autenticado
-if (!isset($_SESSION['idUtilizador']) || !isset($_SESSION['acesso'])) {
-    header("Location: index.php"); // Redireciona para login se não estiver autenticado
-    exit();
-}
-
-$acesso = $_SESSION['acesso'];
-$id = $_SESSION['idUtilizador'];
-
-// Verifica se o 'acesso' corresponde ao padrão de aluno (ex: 009266492HA041)
-if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
-    // Se não for aluno, redireciona com mensagem
-    $_SESSION['success'] = "Acesso negado! Apenas alunos podem aceder.";
-    $_SESSION['icon'] = "error";
+if (
+    empty($_SESSION['idUtilizador']) ||
+    empty($_SESSION['acesso'])
+) {
+    session_destroy();
     header("Location: index.php");
     exit();
 }
+
+// Verifica o tipo de usuário (exemplo: bloquear não administradores)
+if (isset($_SESSION['perfilUtilizador']) && $_SESSION['perfilUtilizador'] !== 'Aluno') {
+    header("Location: index.php");
+    exit();
+}
+
+$id = $_SESSION['idUtilizador'];
+
 
 $alunoDAO = new AlunoDAO();
 $idAluno = $alunoDAO->retornarDadosPorUtilizador($id);
@@ -60,6 +61,12 @@ $idAluno = $alunoDAO->retornarDadosPorUtilizador($id);
             color: white;
             /* cor do ícone ao clicar */
             border-radius: 5px;
+        }
+
+        #overlay {
+            transition: opacity 0.3s ease;
+            opacity: 0;
+            display: none;
         }
     </style>
 
@@ -231,7 +238,7 @@ $idAluno = $alunoDAO->retornarDadosPorUtilizador($id);
                 </div>
             </nav>
         </div>
-          <!-- Overlay -->
+        <!-- Overlay -->
         <div id="overlay" style="display:none; position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.5); z-index: 998;" onclick="toggleMenu()"></div>
 
         <nav class="menu-user">
@@ -246,7 +253,7 @@ $idAluno = $alunoDAO->retornarDadosPorUtilizador($id);
             </div>
         </nav>
         <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-      
+
     </div>
 
     <div class="content-body">
@@ -265,14 +272,19 @@ $idAluno = $alunoDAO->retornarDadosPorUtilizador($id);
             $dao = new NotaDAO();
             $palavra = $_GET['palavra'] ?? '';
 
-            // Verificar se algum filtro foi aplicado
             if ($palavra) {
-                // Se filtros estiverem preenchidos, realizar pesquisa
+                // Pesquisa pelo termo
                 $notas = $dao->pesquisar($palavra);
             } else {
-                // Caso contrário, exibir todos os notas
-                $notas = $dao->listarPorAluno($idAluno->getIdAluno());
+                // Verifica se $idAluno é um objeto válido
+                if ($idAluno && method_exists($idAluno, 'getIdAluno')) {
+                    $notas = $dao->listarPorAluno($idAluno->getIdAluno());
+                } else {
+                    $notas = []; // Ou uma string, dependendo do que seu código espera
+                    echo "<p class='text-danger text-center fs-26'>Matrícula apagada</p>";
+                }
             }
+
             ?>
 
             <form action="notaAlunoBase.php" method="GET">
@@ -369,39 +381,72 @@ $idAluno = $alunoDAO->retornarDadosPorUtilizador($id);
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <?php $cont = 1;
-                                                        foreach ($notasTrimestre as $nota):
-                                                            $valor = floatval($nota->getValorNota());
+                                                        <?php
+                                                        if (!empty($notasTrimestre)) :
+                                                            $cont = 1;
+                                                            foreach ($notasTrimestre as $nota):
+                                                                $valor = floatval($nota->getValorNota());
 
-                                                            // Badge da nota
-                                                            if ($valor >= 10) {
-                                                                $classeNota = 'badge bg-primary';
-                                                                $tooltip = 'Nota positiva';
-                                                                $icone = '<i class="bi bi-check-circle-fill me-1"></i>';
-                                                            } else {
-                                                                $classeNota = 'badge bg-danger';
-                                                                $tooltip = 'Nota negativa';
-                                                                $icone = '<i class="bi bi-x-circle-fill me-1"></i>';
-                                                            }
+                                                                // Badge da nota
+                                                                if ($valor >= 10) {
+                                                                    $classeNota = 'badge bg-primary';
+                                                                    $tooltip = 'Nota positiva';
+                                                                    $icone = '<i class="bi bi-check-circle-fill me-1"></i>';
+                                                                } else {
+                                                                    $classeNota = 'badge bg-danger';
+                                                                    $tooltip = 'Nota negativa';
+                                                                    $icone = '<i class="bi bi-x-circle-fill me-1"></i>';
+                                                                }
                                                         ?>
+                                                                <tr>
+                                                                    <td><strong><?= $cont++; ?></strong></td>
+                                                                    <td><?= htmlspecialchars($nota->getNomeAluno()); ?></td>
+                                                                    <td><?= htmlspecialchars($nota->getNomeCurso()); ?></td>
+                                                                    <td><?= htmlspecialchars($nota->getNomeDisciplina()); ?></td>
+                                                                    <td>
+                                                                        <span class="<?= $classeNota ?>" data-bs-toggle="tooltip" title="<?= $tooltip ?>">
+                                                                            <?= $icone ?><?= htmlspecialchars($nota->getValorNota()); ?>
+                                                                        </span>
+                                                                    </td>
+                                                                    <td><?= htmlspecialchars($nota->getDataValorNota()); ?></td>
+                                                                    <td><?= htmlspecialchars($nota->getTipoAvaliacaoNota()); ?></td>
+                                                                    <td><?= htmlspecialchars($nota->getTipoNota()); ?></td>
+                                                                    <td><?= htmlspecialchars($nota->getTrimestreNota()); ?></td>
+                                                                    <td>
+                                                                        <div class="dropdown">
+                                                                            <button type="button" class="btn btn-primary light sharp" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                                <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1">
+                                                                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                                                        <rect x="0" y="0" width="24" height="24"></rect>
+                                                                                        <circle fill="#000000" cx="5" cy="12" r="2"></circle>
+                                                                                        <circle fill="#000000" cx="12" cy="12" r="2"></circle>
+                                                                                        <circle fill="#000000" cx="19" cy="12" r="2"></circle>
+                                                                                    </g>
+                                                                                </svg>
+                                                                            </button>
+                                                                            <div class="dropdown-menu">
+                                                                                <a class="dropdown-item btn-apagar-nota" data-bs-toggle="modal" data-bs-target="#modalNotaApagar" data-id="<?= $nota->getIdNota() ?>">
+                                                                                    <i class="fa fa-trash me-2 text-danger"></i> Apagar
+                                                                                </a>
+                                                                                <a class="dropdown-item btn-editar-nota" data-bs-toggle="modal" data-bs-target="#modalNotaEditar" data-id="<?= $nota->getIdNota() ?>">
+                                                                                    <i class="fa fa-edit me-2 text-primary"></i> Editar
+                                                                                </a>
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            <?php
+                                                            endforeach;
+                                                        else: ?>
                                                             <tr>
-                                                                <td><strong><?= $cont++; ?></strong></td>
-                                                                <td><?= htmlspecialchars($nota->getNomeAluno()); ?></td>
-                                                                <td><?= htmlspecialchars($nota->getNomeCurso()); ?></td>
-                                                                <td><?= htmlspecialchars($nota->getNomeDisciplina()); ?></td>
-                                                                <td>
-                                                                    <span class="<?= $classeNota ?>" data-bs-toggle="tooltip" title="<?= $tooltip ?>">
-                                                                        <?= $icone ?><?= htmlspecialchars($nota->getValorNota()); ?>
-                                                                    </span>
+                                                                <td colspan="10" class="text-center text-muted">
+                                                                    <i class="bi bi-info-circle"></i> Nenhuma nota lançada.
                                                                 </td>
-                                                                <td><?= htmlspecialchars($nota->getDataValorNota()); ?></td>
-                                                                <td><?= htmlspecialchars($nota->getTipoAvaliacaoNota()); ?></td>
-                                                                <td><?= htmlspecialchars($nota->getTipoNota()); ?></td>
-                                                                <td><?= htmlspecialchars($nota->getTrimestreNota()); ?></td>
                                                             </tr>
-                                                        <?php endforeach; ?>
+                                                        <?php endif; ?>
                                                     </tbody>
                                                 </table>
+
                                             </div>
                                         </div>
                                     <?php $active = false;
@@ -441,15 +486,6 @@ $idAluno = $alunoDAO->retornarDadosPorUtilizador($id);
             });
         }
     </script>
-
-       <style>
-        .menu-user,
-        #overlay {
-            transition: opacity 0.3s ease;
-            opacity: 0;
-            display: none;
-        }
-    </style>
 
     <script>
         function toggleMenu() {

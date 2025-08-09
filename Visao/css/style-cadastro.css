@@ -1,13 +1,14 @@
 * {
     font-family: 'Lato', sans-serif;
-    box-sizing: border-box !important;
+    box-sizing: border-box;
 }
 
 body {
     margin: 0;
-    padding: 0;
-    min-height: 100vh!important;
-    display: flex!important;
+    padding: 0 20px;
+    /* Evita que o conteúdo encoste nas bordas em telas pequenas */
+    min-height: 100vh;
+    display: flex;
     align-items: center;
     justify-content: center;
     background-color: #f7f7f7;
@@ -21,7 +22,9 @@ body {
     justify-content: center;
     width: 100%;
     max-width: 800px;
-    height: 700px !important;
+    min-width: 320px;
+    /* largura mínima para evitar layout quebrado */
+    height: 700px;
     border-radius: 12px;
     box-shadow: 0 0 10px 1px rgba(42, 93, 159, 0.3);
     overflow: hidden;
@@ -30,9 +33,10 @@ body {
 
 /* Lado esquerdo com imagem e texto */
 .login-form-left {
-    background-image: linear-gradient(rgba(0, 0,0, 0.8), rgba(0, 0, 0, 0.8)), url("../imagens/facebook_1748299085681_7332897848269821055.jpg");
+    background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url("../imagens/estrela2.jpg");
     background-repeat: no-repeat;
     background-size: cover;
+    background-position: center;
     height: 100%;
     width: 55%;
     display: flex;
@@ -42,23 +46,27 @@ body {
     padding: 20px;
     text-align: center;
     color: #fff;
+    border-radius: 12px 0 0 12px;
 }
 
 .login-form-left p {
     font-size: 14px;
     margin-top: 10px;
+    max-width: 90%;
 }
 
 /* Social */
 .social-icons {
     margin-top: 20px;
 }
+
 .social-icons a {
     margin: 0 10px;
     color: #fff;
     font-size: 24px;
     transition: color 0.3s;
 }
+
 .social-icons a:hover {
     color: #007bff;
 }
@@ -71,16 +79,28 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-   
+    border-radius: 0 12px 12px 0;
+    height: 100%;
 }
+
+.form-check-input {
+    height: 1.1rem;
+    width: 1.1rem;
+    margin: 0;
+}
+
+.form-check-label {
+    margin: 0;
+    line-height: 1.4rem;
+}
+
 .login-form-right form {
     display: flex;
     flex-direction: column;
-    gap: 1px;
+    gap: 10px;
     width: 100%;
     max-width: 320px;
 }
-
 
 /* Outros */
 .login-form-right .check-group {
@@ -90,32 +110,86 @@ body {
     color: #666;
 }
 
-
-
 /* Responsivo */
+
+@media screen and (min-width: 1025px) {
+    .login-form {
+        max-width: 800px;
+        /* ou outro valor fixo maior */
+        min-width: 600px;
+        height: 900px;
+        /* altura fixa maior */
+        /* outros estilos específicos para telas grandes */
+    }
+
+    .login-form-left {
+        height: 100%;
+        /* ou 100% da altura do container */
+    }
+
+    .login-form-right {
+        height: 100%;
+    }
+}
+
+
+@media screen and (min-width: 700px) {
+    .login-form {
+        max-width: 800px;
+        /* ou outro valor fixo maior */
+        min-width: 600px;
+        height: 900px;
+        /* altura fixa maior */
+        /* outros estilos específicos para telas grandes */
+    }
+
+    .login-form-left {
+        height: 100%;
+        /* ou 100% da altura do container */
+    }
+
+    .login-form-right {
+        height: 100%;
+    }
+}
+
+
+/* Tablets pequenos e celulares grandes (<= 768px) */
 @media screen and (max-width: 768px) {
     .login-form {
         flex-direction: column;
-        width: 95%;
+        max-width: 95%;
+        min-width: 280px;
+        height: auto;
     }
 
     .login-form-left,
     .login-form-right {
         width: 100%;
         border-radius: 0;
+        min-height: auto;
     }
 
     .login-form-left {
         padding: 30px 10px;
         border-radius: 12px 12px 0 0;
+        height: 35vh;
     }
 
     .login-form-right {
         padding: 30px 10px;
+        border-radius: 0 0 12px 12px;
     }
 }
 
+/* Celulares pequenos (<= 480px) */
 @media screen and (max-width: 480px) {
+    .login-form {
+        min-width: 260px;
+        max-width: 100%;
+        margin: 0 10px;
+    }
+
     .login-form-right form {
         max-width: 100%;
     }
@@ -126,5 +200,76 @@ body {
 
     .social-icons a {
         font-size: 20px;
+        margin: 0 8px;
+    }
+}
+
+/* Celulares muito pequenos (<= 360px) */
+@media screen and (max-width: 360px) {
+    .login-form-left p {
+        font-size: 12px;
+    }
+
+    .social-icons a {
+        font-size: 18px;
+    }
+
+}
+
+@media screen and (max-width: 768px) and (orientation: landscape) {
+    .login-form {
+        flex-direction: row;
+        /* pode mudar para row para aproveitar largura maior */
+        height: auto;
+        max-width: 95%;
+        min-width: 320px;
+    }
+
+    .login-form-left,
+    .login-form-right {
+        width: 50%;
+        /* dividir metade para cada lado */
+        min-height: auto;
+        border-radius: 0;
+        padding: 20px;
+    }
+
+    .login-form-left {
+        height: auto;
+        border-radius: 12px 0 0 12px;
+    }
+
+    .login-form-right {
+        border-radius: 0 12px 12px 0;
+    }
+}
+
+@media screen and (max-width: 1000px) and (orientation: landscape) {
+    .login-form {
+        flex-direction: row;
+        /* pode mudar para row para aproveitar largura maior */
+        height: 220vh;
+        max-width: 95%;
+        min-width: 320px;
+
+    }
+
+    .login-form-left,
+    .login-form-right {
+        width: 50%;
+        /* dividir metade para cada lado */
+        min-height: auto;
+        border-radius: 0;
+        padding: 20px;
+    }
+
+    .login-form-left {
+        height: 100%;
+        border-radius: 12px 0 0 12px;
+    }
+
+    .login-form-right {
+        border-radius: 0 12px 12px 0;
+        margin-top: -2vh;
     }
 }

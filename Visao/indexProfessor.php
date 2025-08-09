@@ -2,18 +2,19 @@
 session_start();
 require_once("../Modelo/DAO/NotificacoesDAO.php");
 require_once("../Modelo/DTO/NotificacoesDTO.php");
+
 // Verifica se o utilizador está autenticado
-if (!isset($_SESSION['idUtilizador']) || !isset($_SESSION['acesso'])) {
-    header("Location: index.php"); // Redireciona para login se não estiver autenticado
+if (
+    empty($_SESSION['idUtilizador']) ||
+    empty($_SESSION['acesso'])
+) {
+    session_destroy();
+    header("Location: index.php");
     exit();
 }
 
-$acesso = strtoupper($_SESSION['acesso']);
-
-// Verifica se o acesso é email de admin válido (ex: termina com @admin.estrela.com)
-if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {    // Se não for admin, redireciona para página de acesso negado ou login
-    $_SESSION['success'] = "Acesso negado! Apenas professores podem aceder.";
-    $_SESSION['icon'] = "error";
+// Verifica o tipo de usuário (exemplo: bloquear não administradores)
+if (isset($_SESSION['perfilUtilizador']) && $_SESSION['perfilUtilizador'] !== 'Professor') {
     header("Location: index.php");
     exit();
 }
@@ -55,6 +56,12 @@ $usuarioId = $_SESSION['idUtilizador'];
         color: white;
         /* cor do ícone ao clicar */
         border-radius: 5px;
+    }
+
+    #overlay {
+        transition: opacity 0.3s ease;
+        opacity: 0;
+        display: none;
     }
 </style>
 
@@ -440,14 +447,7 @@ $usuarioId = $_SESSION['idUtilizador'];
             });
         });
     </script>
-     <style>
-        .menu-user,
-        #overlay {
-            transition: opacity 0.3s ease;
-            opacity: 0;
-            display: none;
-        }
-    </style>
+
 
     <script>
         function toggleMenu() {

@@ -2,22 +2,22 @@
 session_start();
 require_once("../Modelo/DAO/NotificacoesDAO.php");
 require_once("../Modelo/DTO/NotificacoesDTO.php");
+
 // Verifica se o utilizador está autenticado
-if (!isset($_SESSION['idUtilizador']) || !isset($_SESSION['acesso'])) {
-    header("Location: index.php"); // Redireciona para login se não estiver autenticado
-    exit();
-}
-
-$acesso = strtoupper($_SESSION['acesso']);
-
-// Verifica se o acesso é email de admin válido (ex: termina com @admin.estrela.com)
-if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {    // Se não for admin, redireciona para página de acesso negado ou login
-    $_SESSION['success'] = "Acesso negado! Apenas administradores podem aceder.";
-    $_SESSION['icon'] = "error";
+if (
+    empty($_SESSION['idUtilizador']) ||
+    empty($_SESSION['acesso'])
+) {
+    session_destroy();
     header("Location: index.php");
     exit();
 }
 
+// Verifica o tipo de usuário (exemplo: bloquear não administradores)
+if (isset($_SESSION['perfilUtilizador']) && $_SESSION['perfilUtilizador'] !== 'Administrador') {
+    header("Location: index.php");
+    exit();
+}
 // Se chegou aqui, é admin autenticado e pode continuar
 $usuarioId = $_SESSION['idUtilizador'];
 ?>
@@ -55,6 +55,12 @@ $usuarioId = $_SESSION['idUtilizador'];
             color: white;
             /* cor do ícone ao clicar */
             border-radius: 5px;
+        }
+
+        #overlay {
+            transition: opacity 0.3s ease;
+            opacity: 0;
+            display: none;
         }
     </style>
 
@@ -322,50 +328,62 @@ $usuarioId = $_SESSION['idUtilizador'];
                                             <th><strong>GÊNERO</strong></th>
                                             <th><strong>MORADA</strong></th>
                                             <th><strong>DATA NASCIMENTO</strong></th>
-                                            <th><strong>DATA CONTRATACÃO</strong></th>
-                                            <th><strong>CONTRACTO</strong></th>
+                                            <th><strong>DATA CONTRATAÇÃO</strong></th>
+                                            <th><strong>CONTRATO</strong></th>
                                             <th><strong>Nº DO BI</strong></th>
-
-                                            <th>AÇÕES</th>
+                                            <th><strong>AÇÕES</strong></th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php $cont = 1;
-                                        foreach ($professores as $professor): ?>
-                                            <tr>
-                                                <td><strong><?= $cont++; ?></strong></td>
-                                                <td><?= htmlspecialchars($professor->getNomeProfessor()); ?></td>
-                                                <td><?= htmlspecialchars($professor->getEmailProfessor()); ?></td>
-                                                <td><?= htmlspecialchars($professor->getGeneroProfessor()); ?></td>
-                                                <td><?= htmlspecialchars($professor->getMoradaProfessor()); ?></td>
-                                                <td><?= htmlspecialchars($professor->getDataDeNascimentoProfessor()); ?></td>
-                                                <td><?= htmlspecialchars($professor->getDataContProfessor()); ?></td>
-                                                <td><?= htmlspecialchars($professor->getTipoContratoProfessor()); ?></td>
-                                                <td><?= htmlspecialchars($professor->getnIdentificacao()); ?></td>
-
-
-                                                <td>
-                                                    <div class="dropdown">
-                                                        <button type="button" class="btn btn-primary light sharp" data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1">
-                                                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                                                    <rect x="0" y="0" width="24" height="24"></rect>
-                                                                    <circle fill="#000000" cx="5" cy="12" r="2"></circle>
-                                                                    <circle fill="#000000" cx="12" cy="12" r="2"></circle>
-                                                                    <circle fill="#000000" cx="19" cy="12" r="2"></circle>
-                                                                </g>
-                                                            </svg>
-                                                        </button>
-                                                        <div class="dropdown-menu">
-                                                            <a class="dropdown-item btn-apagar-professor" data-bs-toggle="modal" data-bs-target="#modalProfessorApagar" data-id="<?= $professor->getIdProfessor() ?>">Apagar</a>
-                                                            <a class="dropdown-item btn-editar-professor" data-bs-toggle="modal" data-bs-target="#modalProfessorEditar" data-id="<?= $professor->getIdProfessor() ?>">Editar</a>
+                                        <?php
+                                        if (!empty($professores)) :
+                                            $cont = 1;
+                                            foreach ($professores as $professor): ?>
+                                                <tr>
+                                                    <td><strong><?= $cont++; ?></strong></td>
+                                                    <td><?= htmlspecialchars($professor->getNomeProfessor()); ?></td>
+                                                    <td><?= htmlspecialchars($professor->getEmailProfessor()); ?></td>
+                                                    <td><?= htmlspecialchars($professor->getGeneroProfessor()); ?></td>
+                                                    <td><?= htmlspecialchars($professor->getMoradaProfessor()); ?></td>
+                                                    <td><?= htmlspecialchars($professor->getDataDeNascimentoProfessor()); ?></td>
+                                                    <td><?= htmlspecialchars($professor->getDataContProfessor()); ?></td>
+                                                    <td><?= htmlspecialchars($professor->getTipoContratoProfessor()); ?></td>
+                                                    <td><?= htmlspecialchars($professor->getnIdentificacao()); ?></td>
+                                                    <td>
+                                                        <div class="dropdown">
+                                                            <button type="button" class="btn btn-primary light sharp" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1">
+                                                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                                        <rect x="0" y="0" width="24" height="24"></rect>
+                                                                        <circle fill="#000000" cx="5" cy="12" r="2"></circle>
+                                                                        <circle fill="#000000" cx="12" cy="12" r="2"></circle>
+                                                                        <circle fill="#000000" cx="19" cy="12" r="2"></circle>
+                                                                    </g>
+                                                                </svg>
+                                                            </button>
+                                                            <div class="dropdown-menu">
+                                                                <a class="dropdown-item btn-apagar-professor" data-bs-toggle="modal" data-bs-target="#modalProfessorApagar" data-id="<?= $professor->getIdProfessor() ?>">
+                                                                    <i class="fa fa-trash me-2 text-danger"></i> Apagar
+                                                                </a>
+                                                                <a class="dropdown-item btn-editar-professor" data-bs-toggle="modal" data-bs-target="#modalProfessorEditar" data-id="<?= $professor->getIdProfessor() ?>">
+                                                                    <i class="fa fa-edit me-2 text-primary"></i> Editar
+                                                                </a>
+                                                            </div>
                                                         </div>
-                                                    </div>
+                                                    </td>
+                                                </tr>
+                                            <?php
+                                            endforeach;
+                                        else: ?>
+                                            <tr>
+                                                <td colspan="10" class="text-center text-muted">
+                                                    <i class="bi bi-info-circle"></i> Nenhum professor cadastrado.
                                                 </td>
                                             </tr>
-                                        <?php endforeach; ?>
+                                        <?php endif; ?>
                                     </tbody>
                                 </table>
+
                             </div>
                         </div>
                     </div>
@@ -722,14 +740,6 @@ $usuarioId = $_SESSION['idUtilizador'];
         }
     </script>
 
-    <style>
-        .menu-user,
-        #overlay {
-            transition: opacity 0.3s ease;
-            opacity: 0;
-            display: none;
-        }
-    </style>
 
     <script>
         function toggleMenu() {

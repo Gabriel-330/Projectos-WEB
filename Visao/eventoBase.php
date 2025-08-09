@@ -2,23 +2,25 @@
 session_start();
 require_once("../Modelo/DAO/NotificacoesDAO.php");
 require_once("../Modelo/DTO/NotificacoesDTO.php");
+
 // Verifica se o utilizador está autenticado
-if (!isset($_SESSION['idUtilizador']) || !isset($_SESSION['acesso'])) {
-    header("Location: index.php"); // Redireciona para login se não estiver autenticado
-    exit();
-}
-
-$acesso = $_SESSION['acesso'];
-$id = $_SESSION['idUtilizador'];
-
-// Verifica se o 'acesso' corresponde ao padrão de aluno (ex: 009266492HA041)
-if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
-    // Se não for admin, redireciona para página de acesso negado ou login
-    $_SESSION['success'] = "Acesso negado! Apenas administradores podem aceder.";
-    $_SESSION['icon'] = "error";
+if (
+    empty($_SESSION['idUtilizador']) ||
+    empty($_SESSION['acesso'])
+) {
+    session_destroy();
     header("Location: index.php");
     exit();
 }
+
+// Verifica o tipo de usuário (exemplo: bloquear não administradores)
+if (isset($_SESSION['perfilUtilizador']) && $_SESSION['perfilUtilizador'] !== 'Administrador') {
+    header("Location: index.php");
+    exit();
+}
+
+$id = $_SESSION['idUtilizador'];
+
 
 // Se chegou aqui, é admin autenticado e pode continuar
 $usuarioId = $_SESSION['idUtilizador'];
@@ -57,7 +59,14 @@ $usuarioId = $_SESSION['idUtilizador'];
             /* cor do ícone ao clicar */
             border-radius: 5px;
         }
+
+        #overlay {
+            transition: opacity 0.3s ease;
+            opacity: 0;
+            display: none;
+        }
     </style>
+
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -232,7 +241,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                 </div>
             </nav>
         </div>
- <div id="overlay" style="display:none; position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.5); z-index: 998;" onclick="toggleMenu()"></div>
+        <div id="overlay" style="display:none; position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.5); z-index: 998;" onclick="toggleMenu()"></div>
 
         <nav class="menu-user">
             <div class="menu-content">
@@ -252,8 +261,8 @@ $usuarioId = $_SESSION['idUtilizador'];
                 </ul>
             </div>
         </nav>
-             <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-    
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
     </div>
 
     <div class="content-body">
@@ -353,59 +362,76 @@ $usuarioId = $_SESSION['idUtilizador'];
                                                 </div>
                                                 <div class="card-body">
 
-                                                    <?php foreach ($eventos as $evento): ?>
-                                                        <?php
-                                                        $data = new DateTime($evento->getDataEvento());
-                                                        $dia = $data->format('d');
-                                                        $mes = ucfirst(strftime('%b', $data->getTimestamp())); // Ex: Jan, Fev, Mar
-                                                        ?>
-                                                        <div class="d-flex pb-3 border-bottom mb-3 align-items-center event-item">
-                                                            <div class="date-badge me-3 text-center">
-                                                                <span class="day d-block font-w600"><?= $dia ?></span>
-                                                                <span class="month d-block"><?= $mes ?></span>
-                                                            </div>
-                                                            <div class="me-auto">
-                                                                <h5 class="text-black font-w600 mb-2">
-                                                                    <?= htmlspecialchars($evento->getTituloEvento()) ?>
-                                                                </h5>
+                                                    <?php if (!empty($eventos)): ?>
+                                                        <?php foreach ($eventos as $evento): ?>
+                                                            <?php
+                                                            $data = new DateTime($evento->getDataEvento());
+                                                            $dia = $data->format('d');
+                                                            $mes = ucfirst(strftime('%b', $data->getTimestamp())); // Ex: Jan, Fev, Mar
+                                                            ?>
+                                                            <div class="d-flex pb-3 border-bottom mb-3 align-items-center event-item">
+                                                                <div class="date-badge me-3 text-center">
+                                                                    <span class="day d-block font-w600"><?= $dia ?></span>
+                                                                    <span class="month d-block"><?= $mes ?></span>
+                                                                </div>
+                                                                <div class="me-auto">
+                                                                    <h5 class="text-black font-w600 mb-2">
+                                                                        <?= htmlspecialchars($evento->getTituloEvento()) ?>
+                                                                    </h5>
 
-                                                                <ul class="list-unstyled mb-0">
-                                                                    <li>
-                                                                        <i class="las la-calendar text-primary me-1"></i>
-                                                                        <strong>Data: </strong> <?= htmlspecialchars(date("d/m/Y", strtotime($evento->getDataEvento()))) ?>
-                                                                    </li>
-                                                                    <li>
-                                                                        <i class="las la-clock text-primary me-1"></i>
-                                                                        <strong>Início: </strong> <?= htmlspecialchars($evento->getHoraFimEvento()) ?>
-                                                                        <span class="ms-2"><strong>Fim:</strong> <?= htmlspecialchars($evento->getHoraInicioEvento()) ?></span>
-                                                                    </li>
-                                                                    <li>
-                                                                        <i class="las la-map-marker text-primary me-1"></i>
-                                                                        <strong>Local: </strong> <?= htmlspecialchars($evento->getLocalEvento()) ?>
-                                                                    </li>
-                                                                    <li>
-                                                                        <i class="las la-user-tie text-primary me-1"></i>
-                                                                        <strong>Responsável: </strong> <?= htmlspecialchars($evento->getResponsavelEvento()) ?>
-                                                                    </li>
-                                                                    <li>
-                                                                        <i class="las la-tag text-primary me-1"></i>
-                                                                        <strong>Tipo: </strong> <?= htmlspecialchars($evento->getTipoEvento()) ?>
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
+                                                                    <ul class="list-unstyled mb-0">
+                                                                        <li>
+                                                                            <i class="las la-calendar text-primary me-1"></i>
+                                                                            <strong>Data: </strong> <?= htmlspecialchars(date("d/m/Y", strtotime($evento->getDataEvento()))) ?>
+                                                                        </li>
+                                                                        <li>
+                                                                            <i class="las la-clock text-primary me-1"></i>
+                                                                            <strong>Início: </strong> <?= htmlspecialchars($evento->getHoraInicioEvento()) ?>
+                                                                            <span class="ms-2"><strong>Fim:</strong> <?= htmlspecialchars($evento->getHoraFimEvento()) ?></span>
+                                                                        </li>
+                                                                        <li>
+                                                                            <i class="las la-map-marker text-primary me-1"></i>
+                                                                            <strong>Local: </strong> <?= htmlspecialchars($evento->getLocalEvento()) ?>
+                                                                        </li>
+                                                                        <li>
+                                                                            <i class="las la-user-tie text-primary me-1"></i>
+                                                                            <strong>Responsável: </strong> <?= htmlspecialchars($evento->getResponsavelEvento()) ?>
+                                                                        </li>
+                                                                        <li>
+                                                                            <i class="las la-tag text-primary me-1"></i>
+                                                                            <strong>Tipo: </strong> <?= htmlspecialchars($evento->getTipoEvento()) ?>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
 
-                                                            <div class="dropdown">
-                                                                <button type="button" class="btn btn-primary light btn-xs" data-bs-toggle="dropdown">
-                                                                    <i class="fa fa-ellipsis-h"></i>
-                                                                </button>
-                                                                <div class="dropdown-menu dropdown-menu-right">
-
-                                                                    <a class="dropdown-item btn-apagar-evento" data-bs-toggle="modal" data-bs-target="#modalEventoApagar" data-id="<?= $evento->getIdEvento() ?>">Apagar</a>
-                                                                    <a class="dropdown-item btn-editar-evento" data-bs-toggle="modal" data-bs-target="#modalEventoEditar" data-id="<?= $evento->getIdEvento() ?>">Editar</a>
+                                                                <div class="dropdown">
+                                                                    <button type="button" class="btn btn-primary light btn-xs" data-bs-toggle="dropdown">
+                                                                        <i class="fa fa-ellipsis-h"></i>
+                                                                    </button>
+                                                                    <div class="dropdown-menu dropdown-menu-right">
+                                                                        <a class="dropdown-item btn-editar-evento"
+                                                                            data-bs-toggle="modal"
+                                                                            data-bs-target="#modalEventoEditar"
+                                                                            data-id="<?= $evento->getIdEvento() ?>">
+                                                                            <i class="fa fa-edit text-primary me-2"></i> Editar
+                                                                        </a>
+                                                                        <a class="dropdown-item btn-apagar-evento"
+                                                                            data-bs-toggle="modal"
+                                                                            data-bs-target="#modalEventoApagar"
+                                                                            data-id="<?= $evento->getIdEvento() ?>">
+                                                                            <i class="fa fa-trash-alt text-danger me-2"></i> Apagar
+                                                                        </a>
+                                                                    </div>
                                                                 </div>
                                                             </div>
+                                                        <?php endforeach; ?>
+                                                    <?php else: ?>
+                                                        <div class="text-center text-muted py-5">
+                                                            <i class="fa fa-calendar-times fa-2x mb-2"></i>
+                                                            <p>Nenhum evento cadastrado.</p>
                                                         </div>
-                                                    <?php endforeach; ?>
+                                                    <?php endif; ?>
+
                                                 </div>
                                             </div>
                                         </div>
@@ -754,14 +780,7 @@ $usuarioId = $_SESSION['idUtilizador'];
             $('body').removeClass('modal-open');
         });
     </script>
-    <style>
-        .menu-user,
-        #overlay {
-            transition: opacity 0.3s ease;
-            opacity: 0;
-            display: none;
-        }
-    </style>
+
 
     <script>
         function toggleMenu() {

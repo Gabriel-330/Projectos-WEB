@@ -2,24 +2,26 @@
 session_start();
 require_once("../Modelo/DAO/NotificacoesDAO.php");
 require_once("../Modelo/DTO/NotificacoesDTO.php");
+
 // Verifica se o utilizador está autenticado
-if (!isset($_SESSION['idUtilizador']) || !isset($_SESSION['acesso'])) {
-    header("Location: index.php"); // Redireciona para login se não estiver autenticado
+if (
+    empty($_SESSION['idUtilizador']) ||
+    empty($_SESSION['acesso'])
+) {
+    session_destroy();
+    header("Location: index.php");
+    exit();
+}
+
+// Verifica o tipo de usuário (exemplo: bloquear não administradores)
+if (isset($_SESSION['perfilUtilizador']) && $_SESSION['perfilUtilizador'] !== 'Administrador') {
+    header("Location: index.php");
     exit();
 }
 
 $acesso = strtolower($_SESSION['acesso']);
 $acesso = $_SESSION['acesso'];
 $id = $_SESSION['idUtilizador'];
-
-// Verifica se o 'acesso' corresponde ao padrão de aluno (ex: 009266492HA041)
-if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
-    // Se não for admin, redireciona para página de acesso negado ou login
-    $_SESSION['success'] = "Acesso negado! Apenas administradores podem aceder.";
-    $_SESSION['icon'] = "error";
-    header("Location: index.php");
-    exit();
-}
 
 // Se chegou aqui, é admin autenticado e pode continuar
 $usuarioId = $_SESSION['idUtilizador'];
@@ -57,6 +59,12 @@ $usuarioId = $_SESSION['idUtilizador'];
             color: white;
             /* cor do ícone ao clicar */
             border-radius: 5px;
+        }
+
+        #overlay {
+            transition: opacity 0.3s ease;
+            opacity: 0;
+            display: none;
         }
     </style>
 
@@ -233,7 +241,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                 </div>
             </nav>
         </div>
- <div id="overlay" style="display:none; position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.5); z-index: 998;" onclick="toggleMenu()"></div>
+        <div id="overlay" style="display:none; position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.5); z-index: 998;" onclick="toggleMenu()"></div>
 
         <nav class="menu-user">
             <div class="menu-content">
@@ -252,8 +260,8 @@ $usuarioId = $_SESSION['idUtilizador'];
                 </ul>
             </div>
         </nav>
-             <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-     
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
     </div>
 
 
@@ -315,38 +323,47 @@ $usuarioId = $_SESSION['idUtilizador'];
                                             <th><strong>NOME DA DISCIPLINA</strong></th>
                                             <th><strong>PROFESSOR DA DISCIPLINA</strong></th>
                                             <th><strong>CURSO</strong></th>
-                                            <th>AÇÕES</th>
+                                            <th><strong>AÇÕES</strong></th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php $cont = 1;
-                                        foreach ($disciplinas as $disciplina): ?>
-                                            <tr>
-                                                <td><strong><?= $cont++; ?></strong></td>
-                                                <td><?= htmlspecialchars($disciplina->getNomeDisciplina()); ?></td>
-                                                <td><?= htmlspecialchars($disciplina->getNomeProfessor()); ?></td>
-                                                <td><?= htmlspecialchars($disciplina->getNomeCurso()); ?></td>
-
-                                                <td>
-                                                    <div class="dropdown">
-                                                        <button type="button" class="btn btn-primary light sharp" data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1">
-                                                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                                                    <rect x="0" y="0" width="24" height="24"></rect>
-                                                                    <circle fill="#000000" cx="5" cy="12" r="2"></circle>
-                                                                    <circle fill="#000000" cx="12" cy="12" r="2"></circle>
-                                                                    <circle fill="#000000" cx="19" cy="12" r="2"></circle>
-                                                                </g>
-                                                            </svg>
-                                                        </button>
-                                                        <div class="dropdown-menu">
-                                                            <a class="dropdown-item btn-apagar-disciplina" data-bs-toggle="modal" data-bs-target="#modalDisciplinaApagar" data-id="<?= $disciplina->getIdDisciplina(); ?>">Apagar</a>
-                                                            <a class="dropdown-item btn-editar-disciplina" data-bs-toggle="modal" data-bs-target="#modalDisciplinaEditar" data-id="<?= $disciplina->getIdDisciplina(); ?>">Editar</a>
+                                        <?php if (!empty($disciplinas)): ?>
+                                            <?php $cont = 1; ?>
+                                            <?php foreach ($disciplinas as $disciplina): ?>
+                                                <tr>
+                                                    <td><strong><?= $cont++; ?></strong></td>
+                                                    <td><?= htmlspecialchars($disciplina->getNomeDisciplina()); ?></td>
+                                                    <td><?= htmlspecialchars($disciplina->getNomeProfessor()); ?></td>
+                                                    <td><?= htmlspecialchars($disciplina->getNomeCurso()); ?></td>
+                                                    <td>
+                                                        <div class="dropdown">
+                                                            <button type="button" class="btn btn-primary light sharp" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1">
+                                                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                                        <rect x="0" y="0" width="24" height="24"></rect>
+                                                                        <circle fill="#000000" cx="5" cy="12" r="2"></circle>
+                                                                        <circle fill="#000000" cx="12" cy="12" r="2"></circle>
+                                                                        <circle fill="#000000" cx="19" cy="12" r="2"></circle>
+                                                                    </g>
+                                                                </svg>
+                                                            </button>
+                                                            <div class="dropdown-menu">
+                                                                <a class="dropdown-item btn-apagar-disciplina" data-bs-toggle="modal" data-bs-target="#modalDisciplinaApagar" data-id="<?= $disciplina->getIdDisciplina(); ?>">
+                                                                    <i class="fa fa-trash me-2 text-danger"></i> Apagar
+                                                                </a>
+                                                                <a class="dropdown-item btn-editar-disciplina" data-bs-toggle="modal" data-bs-target="#modalDisciplinaEditar" data-id="<?= $disciplina->getIdDisciplina(); ?>">
+                                                                    <i class="fa fa-edit me-2 text-primary"></i> Editar
+                                                                </a>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                </td>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <tr>
+                                                <td colspan="5" class="text-center text-muted">Nenhuma disciplina cadastrada</td>
                                             </tr>
-                                        <?php endforeach; ?>
+                                        <?php endif; ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -650,15 +667,6 @@ $usuarioId = $_SESSION['idUtilizador'];
             $('body').removeClass('modal-open');
         });
     </script>
-
-      <style>
-        .menu-user,
-        #overlay {
-            transition: opacity 0.3s ease;
-            opacity: 0;
-            display: none;
-        }
-    </style>
 
     <script>
         function toggleMenu() {

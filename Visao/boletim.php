@@ -10,6 +10,15 @@ require_once '../Modelo/DAO/MatriculaDAO.php';
 require_once '../Modelo/DTO/MatriculaDTO.php';
 require_once '../Modelo/DAO/AlunoDAO.php';
 require_once '../Modelo/DTO/AlunoDTO.php';
+require_once '../Modelo/DAO/DocumentoDAO.php';
+
+$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+
+
+if (isset($_SESSION['perfilUtilizador']) && $_SESSION['perfilUtilizador'] !== 'Professor') {
+    header("Location: index.php");
+    exit();
+}
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -18,9 +27,11 @@ $notaDAO = new NotaDAO();
 $disciplinaDAO = new DisciplinaDAO();
 $matriculasDAO = new MatriculaDAO();
 $alunoDAO = new AlunoDAO();
+$documentoDAO = new DocumentoDAO();
+$doc = $documentoDAO->buscarPorId($id);
 
-$aluno = $alunoDAO->retornarDadosPorUtilizador($_SESSION['idUtilizador']); // Exemplo: ID do aluno
-$notas = $notaDAO->listarPorAluno($aluno->getIdAluno()); // Retorna array com estrutura correta
+
+$notas = $notaDAO->listarPorAluno($doc->getIdAluno()); // Retorna array com estrutura correta
 
 
 
@@ -32,25 +43,25 @@ $mapaNotas = [];
 $nomeAluno = $responsavelAluno = $nomeCurso = $dataNascimentoAluno = "";
 $nomeTurma = $classeMatricula = $periodoMatricula = "";
 
-$nomeAluno = $aluno->getNomeAluno();
-$responsavelAluno = $aluno->getResponsavelAluno();
-$nomeCurso = $aluno->getNomeCurso();
-$dataNascimentoAluno = $aluno->getDataNascimentoAluno();
 
-
-// Buscar matrícula uma única vez fora do loop
-$matriculas = $matriculasDAO->listarPorAluno($aluno->getIdAluno());
-$matricula = !empty($matriculas) ? $matriculas[0] : null;
-
-if ($matricula) {
-    $nomeTurma = $matricula->getNomeTurma();
-    $classeMatricula = $matricula->getClasseMatricula();
-    $periodoMatricula = $matricula->getPeriodoMatricula();
-}
 
 // Processar notas
 foreach ($notas as $nota) {
+    $nomeAluno = $nota->getNomeAluno();
+    $responsavelAluno = $nota->getResponsavelAluno();
+    $nomeCurso = $nota->getNomeCurso();
+    $dataNascimentoAluno = $nota->getDataNascimentoAluno();
 
+
+    // Buscar matrícula uma única vez fora do loop
+    $matriculas = $matriculasDAO->listarPorAluno($nota->getIdAluno());
+    $matricula = !empty($matriculas) ? $matriculas[0] : null;
+
+    if ($matricula) {
+        $nomeTurma = $matricula->getNomeTurma();
+        $classeMatricula = $matricula->getClasseMatricula();
+        $periodoMatricula = $matricula->getPeriodoMatricula();
+    }
 
     $disciplina = $nota->getNomeDisciplina();
     $trimestre = $nota->getTrimestreNota(); // 1, 2 ou 3
@@ -115,7 +126,6 @@ if (is_numeric($mfdFloor) && is_numeric($mecFloor) && is_numeric($ne)) {
     $trimestres["final"]["MFA"] = round($mfa, 2);
     $trimestres["final"]["MFA"] = floor($mfa);
     $trimestres["final"]["MFA"]  = ceil($mfa);
-
 }
 unset($trimestres);
 
@@ -346,4 +356,4 @@ $dompdf = new Dompdf($options);
 $dompdf->loadHtml($html);
 $dompdf->setPaper('A4', 'landscape'); // Horizontal
 $dompdf->render();
-$dompdf->stream("boletim.pdf", ["Attachment" => false]);
+$dompdf->stream("boletim".$nomeAluno.".pdf", ["Attachment" => false]);

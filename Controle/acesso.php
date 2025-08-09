@@ -7,7 +7,7 @@ require_once("../Modelo/DTO/acessoDTO.php");
 
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["aceder"])) {
     // Sanitizar o input para evitar injeções simples
-    $n_acesso = trim(filter_input(INPUT_POST, 'numero_acesso', FILTER_SANITIZE_STRING));
+    $n_acesso = trim(filter_input(INPUT_POST, 'numero_acesso', FILTER_SANITIZE_SPECIAL_CHARS));
 
     if (!empty($n_acesso)) {
         // Criar DTO e definir o número de acesso
@@ -19,21 +19,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["aceder"])) {
         $utilizador = $acessoDAO->autenticar_acesso($acessoDTO->getAcesso());
 
         if ($utilizador) {
+            // Guardar dados de Acesso ANTES do redirecionamento
+            $_SESSION['Acesso'] = $acessoDTO->getAcesso();
+
             // Armazenar info de sessão antes do redirecionamento
             $_SESSION['success'] = "Acesso permitido!";
             $_SESSION['icon'] = "success";
-            // Poderias guardar o ID ou nome do utilizador também, ex: $_SESSION['utilizador'] = $utilizador;
+
             header("Location: ../Visao/cadastro.php");
             exit();
         } else {
             $_SESSION['success'] = "Acesso negado!";
             $_SESSION['icon'] = "error";
+
             header("Location: ../Visao/index.php");
             exit();
         }
     } else {
         $_SESSION['success'] = "Por favor, introduza o número de acesso.";
         $_SESSION['icon'] = "warning";
+
         header("Location: ../Visao/index.php");
         exit();
     }

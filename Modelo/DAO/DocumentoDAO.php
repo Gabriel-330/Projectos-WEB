@@ -52,12 +52,17 @@ class DocumentoDAO
         }
     }
 
-    public function mostrarDocumentoPorCPCT()
+    public function mostrarDocumentoPorCPCT($id)
     {
         try {
             $sql = "SELECT cursoDocumento, turmaDocumento, classeDocumento, periodoDocumento, disciplinaDocumento 
-                    FROM documento";
-            $stmt = $this->conexao->query($sql);
+                FROM documento 
+                WHERE idDocumento = :id";
+
+            $stmt = $this->conexao->prepare($sql);
+            $stmt->bindValue(":id", $id, PDO::PARAM_INT);
+            $stmt->execute(); // <- ESSENCIAL
+
             $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             $resultado = [];
@@ -70,6 +75,7 @@ class DocumentoDAO
                 $dto->setDisciplinaDocumento($linha['disciplinaDocumento']);
                 $resultado[] = $dto;
             }
+
             return $resultado;
         } catch (PDOException $e) {
             die("Erro ao mostrar os documentos: " . $e->getMessage());
@@ -207,6 +213,37 @@ class DocumentoDAO
             return $stmt->execute();
         } catch (PDOException $e) {
             error_log("Erro ao apagar documento: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function AceitarDocumento($id)
+    {
+        try {
+            $stmt = $this->conexao->prepare("UPDATE Documento SET estadoDocumento = 'Aceite' WHERE idDocumento = ?");
+            return $stmt->execute([$id]);
+        } catch (PDOException $e) {
+            echo "Erro ao aceitar Documento: " . $e->getMessage();
+            return false;
+        }
+    }
+    public function ValidarDocumento($id)
+    {
+        try {
+            $stmt = $this->conexao->prepare("UPDATE Documento SET estadoDocumento = 'Validado' WHERE idDocumento = ?");
+            return $stmt->execute([$id]);
+        } catch (PDOException $e) {
+            echo "Erro ao aceitar Documento: " . $e->getMessage();
+            return false;
+        }
+    }
+    public function RecusarDocumento($id)
+    {
+        try {
+            $stmt = $this->conexao->prepare("UPDATE Documento SET estadoDocumento = 'Recusado' WHERE idDocumento = ?");
+            return $stmt->execute([$id]);
+        } catch (PDOException $e) {
+            echo "Erro ao aceitar Documento: " . $e->getMessage();
             return false;
         }
     }

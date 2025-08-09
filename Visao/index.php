@@ -5,6 +5,7 @@
 <head>
     <title>Login</title>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="author" content="Estrela Dourada">
     <link rel="stylesheet" href="assets/scss/main.scss">
     <link rel="stylesheet" href="css/style-login.css">
@@ -13,6 +14,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="js/alertsMessage.js"></script>
     <script src="js/sweetalert.js"></script>
+
+    <style>
+        .d-flex a:hover {
+            color: #007bff;
+        }
+    </style>
 </head>
 
 <body>
@@ -74,14 +81,14 @@
                     <input type="password" class="form-control rounded-1" id="senha" name="senha" placeholder="Digite sua senha" style="height: 50px;" required>
                     <label for="senha" style="font-size: 13px;">Senha</label>
                 </div>
-
                 <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
-                    <div class="form-check d-flex">
-                        <input type="checkbox" class="form-check-input " id="lembrar" name="lembrar">
-                        <label class="form-check-label" for="lembrar">Lembrar de mim</label>
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="checkbox" class="form-check-input m-0" id="lembrar" name="lembrar">
+                        <label class="form-check-label m-0" for="lembrar">Lembrar de mim</label>
                     </div>
-                    <a href="#" target="_blank">Esqueceu a senha?</a>
+                    <a href="#" target="_blank" class="ms-3">Esqueceu a senha?</a>
                 </div>
+
 
                 <div class="d-grid gap-2">
                     <button type="submit" class="btn btn-primary rounded-1" name="entrar">Iniciar Sessão</button>

@@ -2,23 +2,24 @@
 session_start();
 require_once("../Modelo/DAO/NotificacoesDAO.php");
 require_once("../Modelo/DTO/NotificacoesDTO.php");
+
 // Verifica se o utilizador está autenticado
-if (!isset($_SESSION['idUtilizador']) || !isset($_SESSION['acesso'])) {
-    header("Location: index.php"); // Redireciona para login se não estiver autenticado
-    exit();
-}
-
-$acesso = $_SESSION['acesso'];
-
-// Verifica se o 'acesso' corresponde ao padrão de aluno (ex: 009266492HA041)
-if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
-    // Se não for aluno, redireciona com mensagem
-    $_SESSION['success'] = "Acesso negado! Apenas alunos podem aceder.";
-    $_SESSION['icon'] = "error";
+if (
+    empty($_SESSION['idUtilizador']) ||
+    empty($_SESSION['acesso'])
+) {
+    session_destroy();
     header("Location: index.php");
     exit();
 }
-// Se chegou aqui, é um aluno autenticado e pode continuar
+
+// Verifica o tipo de usuário (exemplo: bloquear não administradores)
+if (isset($_SESSION['perfilUtilizador']) && $_SESSION['perfilUtilizador'] !== 'Aluno') {
+    header("Location: index.php");
+    exit();
+}
+$acesso = $_SESSION['acesso'];
+
 ?>
 
 <!DOCTYPE html>
@@ -53,6 +54,12 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
             color: white;
             /* cor do ícone ao clicar */
             border-radius: 5px;
+        }
+
+        #overlay {
+            transition: opacity 0.3s ease;
+            opacity: 0;
+            display: none;
         }
     </style>
 
@@ -224,7 +231,7 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                 </div>
             </nav>
         </div>
-     <div id="overlay" style="display:none; position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.5); z-index: 998;" onclick="toggleMenu()"></div>
+        <div id="overlay" style="display:none; position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.5); z-index: 998;" onclick="toggleMenu()"></div>
 
         <nav class="menu-user">
             <div class="menu-content">
@@ -237,11 +244,11 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                 </ul>
             </div>
         </nav>
-             <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-      
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
     </div>
 
-    <div class="content-body" >
+    <div class="content-body">
         <div class="container-fluid">
             <div class="page-titles">
                 <h4>Consultar Horário</h4>
@@ -303,23 +310,52 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                                             <th><strong>DIA</strong></th>
                                             <th><strong>INICIO</strong></th>
                                             <th><strong>FIM</strong></th>
-
+                                            <th><strong>AÇÕES</strong></th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php $cont = 1;
-                                        foreach ($horarios as $horario): ?>
+                                        <?php if (!empty($horarios)): ?>
+                                            <?php $cont = 1;
+                                            foreach ($horarios as $horario): ?>
+                                                <tr>
+                                                    <td><strong><?= $cont++; ?></strong></td>
+                                                    <td><?= htmlspecialchars($horario->getTurma()); ?></td>
+                                                    <td><?= htmlspecialchars($horario->getSalaTurma()); ?></td>
+                                                    <td><?= htmlspecialchars($horario->getNomeDisciplina()); ?></td>
+                                                    <td><?= htmlspecialchars($horario->getDiaSemana()); ?></td>
+                                                    <td><?= htmlspecialchars($horario->getHoraInicio()); ?></td>
+                                                    <td><?= htmlspecialchars($horario->getHoraFim()); ?></td>
+                                                    <td>
+                                                        <div class="dropdown">
+                                                            <button type="button" class="btn btn-primary light sharp" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1">
+                                                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                                        <rect x="0" y="0" width="24" height="24"></rect>
+                                                                        <circle fill="#000000" cx="5" cy="12" r="2"></circle>
+                                                                        <circle fill="#000000" cx="12" cy="12" r="2"></circle>
+                                                                        <circle fill="#000000" cx="19" cy="12" r="2"></circle>
+                                                                    </g>
+                                                                </svg>
+                                                            </button>
+                                                            <div class="dropdown-menu">
+                                                                <a class="dropdown-item btn-apagar-horario" data-bs-toggle="modal" data-bs-target="#modalHorarioApagar" data-id="<?= $horario->getIdHorario() ?>">
+                                                                    <i class="fa fa-trash me-2 text-danger"></i> Apagar
+                                                                </a>
+                                                                <a class="dropdown-item btn-editar-horario" data-bs-toggle="modal" data-bs-target="#modalHorarioEditar" data-id="<?= $horario->getIdHorario() ?>">
+                                                                    <i class="fa fa-edit me-2 text-primary"></i> Editar
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
                                             <tr>
-                                                <td><strong><?= $cont++; ?></strong></td>
-                                                <td><?= htmlspecialchars($horario->getTurma()); ?></td>
-                                                <td><?= htmlspecialchars($horario->getSalaTurma()); ?></td>
-                                                <td><?= htmlspecialchars($horario->getNomeDisciplina()); ?></td>
-                                                <td><?= htmlspecialchars($horario->getDiaSemana()); ?></td>
-                                                <td><?= htmlspecialchars($horario->getHoraInicio()); ?></td>
-                                                <td><?= htmlspecialchars($horario->getHoraFim()); ?></td>
-
+                                                <td colspan="8" class="text-center text-muted">
+                                                    <i class="fa fa-info-circle me-2"></i> Nenhum horário cadastrado.
+                                                </td>
                                             </tr>
-                                        <?php endforeach; ?>
+                                        <?php endif; ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -357,14 +393,6 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
         }
     </script>
 
-       <style>
-        .menu-user,
-        #overlay {
-            transition: opacity 0.3s ease;
-            opacity: 0;
-            display: none;
-        }
-    </style>
 
     <script>
         function toggleMenu() {

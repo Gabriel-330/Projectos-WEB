@@ -2,22 +2,24 @@
 session_start();
 require_once("../Modelo/DAO/NotificacoesDAO.php");
 require_once("../Modelo/DTO/NotificacoesDTO.php");
-// Verifica se o utilizador está autenticado
-if (!isset($_SESSION['idUtilizador']) || !isset($_SESSION['acesso'])) {
-    header("Location: index.php"); // Redireciona para login se não estiver autenticado
-    exit();
-}
-$acesso = $_SESSION['acesso'];
-$id = $_SESSION['idUtilizador'];
 
-// Verifica se o 'acesso' corresponde ao padrão de aluno (ex: 009266492HA041)
-if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
-    // Se não for admin, redireciona para página de acesso negado ou login
-    $_SESSION['success'] = "Acesso negado! Apenas administradores podem aceder.";
-    $_SESSION['icon'] = "error";
+// Verifica se o utilizador está autenticado
+if (
+    empty($_SESSION['idUtilizador']) ||
+    empty($_SESSION['acesso'])
+) {
+    session_destroy();
     header("Location: index.php");
     exit();
 }
+
+// Verifica o tipo de usuário (exemplo: bloquear não administradores)
+if (isset($_SESSION['perfilUtilizador']) && $_SESSION['perfilUtilizador'] !== 'Administrador') {
+    header("Location: index.php");
+    exit();
+}
+
+$id = $_SESSION['idUtilizador'];
 
 // Se chegou aqui, é admin autenticado e pode continuar
 $usuarioId = $_SESSION['idUtilizador'];
@@ -55,6 +57,12 @@ $usuarioId = $_SESSION['idUtilizador'];
             color: white;
             /* cor do ícone ao clicar */
             border-radius: 5px;
+        }
+
+        #overlay {
+            transition: opacity 0.3s ease;
+            opacity: 0;
+            display: none;
         }
     </style>
 
@@ -311,50 +319,54 @@ $usuarioId = $_SESSION['idUtilizador'];
                                             <th style="width:50px;"><strong>#</strong></th>
                                             <th><strong>NOME DA TURMA</strong></th>
                                             <th><strong>CURSO</strong></th>
-                                            <th><strong>DIRECTOR DE TURMA</strong></th>
+                                            <th><strong>DIRETOR DE TURMA</strong></th>
                                             <th><strong>SALA</strong></th>
-                                            <th>AÇÕES</th>
+                                            <th><strong>AÇÕES</strong></th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php $cont = 1;
-                                        foreach ($turmas as $turma): ?>
-                                            <tr>
-                                                <td><?= $cont++; ?></strong></td>
-                                                <td><?= htmlspecialchars($turma->getNomeTurma()); ?></td>
-                                                <td><?= htmlspecialchars($turma->getNomeCurso()); ?></td>
-                                                <td><?= htmlspecialchars($turma->getNomeProfessor()); ?></td>
-                                                <td><?= htmlspecialchars($turma->getSalaTurma()); ?></td>
-
-
-                                                <td>
-                                                    <div class="dropdown">
-                                                        <button type="button" class="btn btn-primary light sharp" data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1">
-                                                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                                                    <rect x="0" y="0" width="24" height="24"></rect>
-                                                                    <circle fill="#000000" cx="5" cy="12" r="2"></circle>
-                                                                    <circle fill="#000000" cx="12" cy="12" r="2"></circle>
-                                                                    <circle fill="#000000" cx="19" cy="12" r="2"></circle>
-                                                                </g>
-                                                            </svg>
-                                                        </button>
-                                                        <div class="dropdown-menu">
-                                                            <a class="dropdown-item btn-apagar-turma"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#modalTurmaApagar"
-                                                                data-id="<?= $turma->getIdTurma() ?>">Apagar</a>
-
-                                                            <a class="dropdown-item btn-editar-turma"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#modalTurmaEditar"
-                                                                data-id="<?= $turma->getIdTurma() ?>">Editar</a>
+                                        <?php
+                                        if (!empty($turmas)) :
+                                            $cont = 1;
+                                            foreach ($turmas as $turma): ?>
+                                                <tr>
+                                                    <td><?= $cont++; ?></td>
+                                                    <td><?= htmlspecialchars($turma->getNomeTurma()); ?></td>
+                                                    <td><?= htmlspecialchars($turma->getNomeCurso()); ?></td>
+                                                    <td><?= htmlspecialchars($turma->getNomeProfessor()); ?></td>
+                                                    <td><?= htmlspecialchars($turma->getSalaTurma()); ?></td>
+                                                    <td>
+                                                        <div class="dropdown">
+                                                            <button type="button" class="btn btn-primary light sharp" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1">
+                                                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                                        <rect x="0" y="0" width="24" height="24"></rect>
+                                                                        <circle fill="#000000" cx="5" cy="12" r="2"></circle>
+                                                                        <circle fill="#000000" cx="12" cy="12" r="2"></circle>
+                                                                        <circle fill="#000000" cx="19" cy="12" r="2"></circle>
+                                                                    </g>
+                                                                </svg>
+                                                            </button>
+                                                            <div class="dropdown-menu">
+                                                                <a class="dropdown-item btn-apagar-turma" data-bs-toggle="modal" data-bs-target="#modalTurmaApagar" data-id="<?= $turma->getIdTurma() ?>">
+                                                                    <i class="fa fa-trash me-2 text-danger"></i> Apagar
+                                                                </a>
+                                                                <a class="dropdown-item btn-editar-turma" data-bs-toggle="modal" data-bs-target="#modalTurmaEditar" data-id="<?= $turma->getIdTurma() ?>">
+                                                                    <i class="fa fa-edit me-2 text-primary"></i> Editar
+                                                                </a>
+                                                            </div>
                                                         </div>
-
-                                                    </div>
+                                                    </td>
+                                                </tr>
+                                            <?php
+                                            endforeach;
+                                        else: ?>
+                                            <tr>
+                                                <td colspan="6" class="text-center text-muted">
+                                                    <i class="bi bi-info-circle"></i> Nenhuma turma encontrada.
                                                 </td>
                                             </tr>
-                                        <?php endforeach; ?>
+                                        <?php endif; ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -642,17 +654,6 @@ $usuarioId = $_SESSION['idUtilizador'];
             $('body').removeClass('modal-open');
         });
     </script>
-
-
-
-    <style>
-        .menu-user,
-        #overlay {
-            transition: opacity 0.3s ease;
-            opacity: 0;
-            display: none;
-        }
-    </style>
 
     <script>
         function toggleMenu() {

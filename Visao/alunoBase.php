@@ -2,28 +2,27 @@
 session_start();
 require_once("../Modelo/DAO/NotificacoesDAO.php");
 require_once("../Modelo/DTO/NotificacoesDTO.php");
-// Verifica se o utilizador está autenticado
-if (!isset($_SESSION['idUtilizador']) || !isset($_SESSION['acesso'])) {
-    header("Location: index.php"); // Redireciona para login se não estiver autenticado
-    exit();
-}
-//sdsdfsd
-$acesso = strtoupper($_SESSION['acesso']);
 
-// Verifica se o acesso é email de admin válido (ex: termina com @admin.estrela.com)
-if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
-    // Se não for admin, redireciona para página de acesso negado ou login
-    $_SESSION['success'] = "Acesso negado! Apenas administradores podem aceder.";
-    $_SESSION['icon'] = "error";
+// Verifica se o utilizador está autenticado
+if (
+    empty($_SESSION['idUtilizador']) ||
+    empty($_SESSION['acesso'])
+) {
+    session_destroy();
     header("Location: index.php");
     exit();
 }
 
-// Se chegou aqui, é admin autenticado e pode continuar
+// Verifica o tipo de usuário (exemplo: bloquear não administradores)
+if (isset($_SESSION['perfilUtilizador']) && $_SESSION['perfilUtilizador'] !== 'Administrador') {
+    header("Location: index.php");
+    exit();
+}
+
+// ID do utilizador logado
 $usuarioId = $_SESSION['idUtilizador'];
-
-
 ?>
+
 
 <!DOCTYPE html>
 <html lang="pt">
@@ -62,6 +61,12 @@ $usuarioId = $_SESSION['idUtilizador'];
             color: white;
             /* cor do ícone ao clicar */
             border-radius: 5px;
+        }
+
+        #overlay {
+            transition: opacity 0.3s ease;
+            opacity: 0;
+            display: none;
         }
     </style>
 
@@ -235,7 +240,7 @@ $usuarioId = $_SESSION['idUtilizador'];
             </nav>
         </div>
 
- <div id="overlay" style="display:none; position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.5); z-index: 998;" onclick="toggleMenu()"></div>
+        <div id="overlay" style="display:none; position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.5); z-index: 998;" onclick="toggleMenu()"></div>
 
         <nav class="menu-user">
             <div class="menu-content">
@@ -334,7 +339,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                                             <th><strong>GÊNERO</strong></th>
                                             <th><strong>CURSO</strong></th>
                                             <th><strong>TURMA</strong></th>
-                                            <th><strong>ClASSE</strong></th>
+                                            <th><strong>CLASSE</strong></th>
                                             <th><strong>PERÍODO</strong></th>
                                             <th><strong>RESPONSÁVEL</strong></th>
                                             <th><strong>CONTACTO RESPONSÁVEL</strong></th>
@@ -343,63 +348,60 @@ $usuarioId = $_SESSION['idUtilizador'];
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php
-                                        $cont = 1;
-                                        foreach ($alunos as $aluno):
-                                            $idAluno = $aluno->getIdAluno();
-                                            $matriculas = $matriculaDAO->listarPorAluno($idAluno);
-
-                                            // Pega a primeira matrícula, se existir
-                                            $matricula = !empty($matriculas) ? $matriculas[0] : null;
-                                        ?>
-                                            <tr>
-                                                <td><strong><?= $cont++; ?></strong></td>
-                                                <td><?= htmlspecialchars($aluno->getNomeAluno()); ?></td>
-                                                <td><?= htmlspecialchars($aluno->getnIdentificacao()); ?></td>
-                                                <td><?= htmlspecialchars($aluno->getMoradaAluno()); ?></td>
-                                                <td><?= htmlspecialchars($aluno->getDataNascimentoAluno()); ?></td>
-                                                <td><?= htmlspecialchars($aluno->getGeneroAluno()); ?></td>
-                                                <td><?= htmlspecialchars($aluno->getNomeCurso()); ?></td>
-                                                <td><?= htmlspecialchars($aluno->getNomeTurma()); ?></td>
-
-                                                <td>
-                                                    <?= $matricula
-                                                        ? htmlspecialchars($matricula->getClasseMatricula()) . 'ª'
-                                                        : '-' ?>
-                                                </td>
-                                                <td>
-                                                    <?= $matricula
-                                                        ? htmlspecialchars($matricula->getPeriodoMatricula())
-                                                        : '-' ?>
-                                                </td>
-
-                                                <td><?= htmlspecialchars($aluno->getResponsavelAluno()); ?></td>
-                                                <td><?= htmlspecialchars($aluno->getContactoResponsavelAluno()); ?></td>
-                                                <td><?= htmlspecialchars($aluno->getAnoIngressoAluno()); ?></td>
-
-                                                <td>
-                                                    <div class="dropdown">
-                                                        <button type="button" class="btn btn-primary light sharp" data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1">
-                                                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                                                    <rect x="0" y="0" width="24" height="24"></rect>
-                                                                    <circle fill="#000000" cx="5" cy="12" r="2"></circle>
-                                                                    <circle fill="#000000" cx="12" cy="12" r="2"></circle>
-                                                                    <circle fill="#000000" cx="19" cy="12" r="2"></circle>
-                                                                </g>
-                                                            </svg>
-                                                        </button>
-                                                        <div class="dropdown-menu">
-                                                            <a class="dropdown-item btn-apagar-aluno" data-bs-toggle="modal" data-bs-target="#modalAlunoApagar" data-id="<?= $aluno->getIdAluno() ?>">Apagar</a>
-                                                            <a class="dropdown-item btn-editar-aluno" data-bs-toggle="modal" data-bs-target="#modalAlunoEditar" data-id="<?= $aluno->getIdAluno() ?>">Editar</a>
+                                        <?php if (!empty($alunos)): ?>
+                                            <?php
+                                            $cont = 1;
+                                            foreach ($alunos as $aluno):
+                                                $idAluno = $aluno->getIdAluno();
+                                                $matriculas = $matriculaDAO->listarPorAluno($idAluno);
+                                                $matricula = !empty($matriculas) ? $matriculas[0] : null;
+                                            ?>
+                                                <tr>
+                                                    <td><strong><?= $cont++; ?></strong></td>
+                                                    <td><?= htmlspecialchars($aluno->getNomeAluno()); ?></td>
+                                                    <td><?= htmlspecialchars($aluno->getnIdentificacao()); ?></td>
+                                                    <td><?= htmlspecialchars($aluno->getMoradaAluno()); ?></td>
+                                                    <td><?= htmlspecialchars($aluno->getDataNascimentoAluno()); ?></td>
+                                                    <td><?= htmlspecialchars($aluno->getGeneroAluno()); ?></td>
+                                                    <td><?= htmlspecialchars($aluno->getNomeCurso()); ?></td>
+                                                    <td><?= htmlspecialchars($aluno->getNomeTurma()); ?></td>
+                                                    <td><?= $matricula ? htmlspecialchars($matricula->getClasseMatricula()) . 'ª' : '-' ?></td>
+                                                    <td><?= $matricula ? htmlspecialchars($matricula->getPeriodoMatricula()) : '-' ?></td>
+                                                    <td><?= htmlspecialchars($aluno->getResponsavelAluno()); ?></td>
+                                                    <td><?= htmlspecialchars($aluno->getContactoResponsavelAluno()); ?></td>
+                                                    <td><?= htmlspecialchars($aluno->getAnoIngressoAluno()); ?></td>
+                                                    <td>
+                                                        <div class="dropdown">
+                                                            <button type="button" class="btn btn-primary light sharp" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1">
+                                                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                                        <rect x="0" y="0" width="24" height="24"></rect>
+                                                                        <circle fill="#000000" cx="5" cy="12" r="2"></circle>
+                                                                        <circle fill="#000000" cx="12" cy="12" r="2"></circle>
+                                                                        <circle fill="#000000" cx="19" cy="12" r="2"></circle>
+                                                                    </g>
+                                                                </svg>
+                                                            </button>
+                                                            <div class="dropdown-menu">
+                                                                <a class="dropdown-item btn-apagar-aluno" data-bs-toggle="modal" data-bs-target="#modalAlunoApagar" data-id="<?= $aluno->getIdAluno() ?>">
+                                                                    <i class="fa fa-trash me-2 text-danger"></i> Apagar
+                                                                </a>
+                                                                <a class="dropdown-item btn-editar-aluno" data-bs-toggle="modal" data-bs-target="#modalAlunoEditar" data-id="<?= $aluno->getIdAluno() ?>">
+                                                                    <i class="fa fa-edit me-2 text-primary"></i> Editar
+                                                                </a>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                </td>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <tr>
+                                                <td colspan="14" class="text-center text-muted">Nenhum aluno cadastrado</td>
                                             </tr>
-                                        <?php endforeach; ?>
+                                        <?php endif; ?>
                                     </tbody>
-
                                 </table>
+
                             </div>
                         </div>
                     </div>
@@ -1040,14 +1042,7 @@ $usuarioId = $_SESSION['idUtilizador'];
             $('body').removeClass('modal-open');
         });
     </script>
-    <style>
-        .menu-user,
-        #overlay {
-            transition: opacity 0.3s ease;
-            opacity: 0;
-            display: none;
-        }
-    </style>
+
 
     <script>
         function toggleMenu() {

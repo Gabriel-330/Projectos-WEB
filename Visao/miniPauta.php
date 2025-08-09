@@ -11,25 +11,36 @@ require_once '../Modelo/DAO/MatriculaDAO.php';
 require_once '../Modelo/DTO/MatriculaDTO.php';
 require_once '../Modelo/DAO/DocumentoDAO.php';
 
+$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+
+
+if (isset($_SESSION['perfilUtilizador']) && $_SESSION['perfilUtilizador'] !== 'Professor') {
+    header("Location: index.php");
+    exit();
+}
+
+
+
 use Dompdf\Dompdf;
 use Dompdf\Options;
 
 $alunoDAO = new AlunoDAO();
 $notaDAO = new NotaDAO();
 $matriculasDAO = new MatriculaDAO();
-$doc = $DAO->mostrarDocumentoPorCPCT();
+$documentoDAO = new DocumentoDAO();
+$doc = $documentoDAO->mostrarDocumentoPorCPCT($id);
 
 
 $anoAtual = date("Y");
 $anoAnterior = $anoAtual - 1;
 $anoLectico = "$anoAnterior/$anoAtual";
 
-foreach($doc as $documento){
-$classe = $documento->getClasseDocumento();
-$periodo =$documento->getPeriodoDocumento() ;
-$curso = $documento->getCursoDocumento();
-$turma = $documento->getTurmaDocumento();
-$disciplinaFiltrada = $documento->getDisciplinaDocumento();
+foreach ($doc as $documento) {
+    $classe = $documento->getClasseDocumento();
+    $periodo = $documento->getPeriodoDocumento();
+    $curso = $documento->getCursoDocumento();
+    $turma = $documento->getTurmaDocumento();
+    $disciplinaFiltrada = $documento->getDisciplinaDocumento();
 }
 
 // Obter lista de todos os alunos por classe, periodo, curso e turma
@@ -315,4 +326,4 @@ $dompdf = new Dompdf($options);
 $dompdf->loadHtml($html);
 $dompdf->setPaper('A4', 'landscape'); // Horizontal
 $dompdf->render();
-$dompdf->stream("miniPauta.pdf", ["Attachment" => false]);
+$dompdf->stream("miniPauta".$classe.".pdf", ["Attachment" => false]);

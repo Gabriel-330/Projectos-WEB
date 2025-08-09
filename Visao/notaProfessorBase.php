@@ -3,24 +3,25 @@ session_start();
 require_once("../Modelo/DAO/NotificacoesDAO.php");
 require_once("../Modelo/DTO/NotificacoesDTO.php");
 require_once("../Modelo/DAO/ProfessorDAO.php");
+
 // Verifica se o utilizador está autenticado
-if (!isset($_SESSION['idUtilizador']) || !isset($_SESSION['acesso'])) {
-    header("Location: index.php"); // Redireciona para login se não estiver autenticado
-    exit();
-}
-
-$acesso = strtoupper($_SESSION['acesso']);
-$professorDAO = new ProfessorDAO();
-$professor = $professorDAO->buscarPorUtilizador($_SESSION['idUtilizador']);
-
-// Verifica se o acesso é email de admin válido (ex: termina com @admin.estrela.com)
-if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {    // Se não for admin, redireciona para página de acesso negado ou login
-    // Se não for admin, redireciona para página de acesso negado ou login
-    $_SESSION['success'] = "Acesso negado! Apenas professores podem aceder.";
-    $_SESSION['icon'] = "error";
+if (
+    empty($_SESSION['idUtilizador']) ||
+    empty($_SESSION['acesso'])
+) {
+    session_destroy();
     header("Location: index.php");
     exit();
 }
+
+// Verifica o tipo de usuário (exemplo: bloquear não administradores)
+if (isset($_SESSION['perfilUtilizador']) && $_SESSION['perfilUtilizador'] !== 'Professor') {
+    header("Location: index.php");
+    exit();
+}
+
+$professorDAO = new ProfessorDAO();
+$professor = $professorDAO->buscarPorUtilizador($_SESSION['idUtilizador']);
 
 // Se chegou aqui, é admin autenticado e pode continuar
 $usuarioId = $_SESSION['idUtilizador'];
@@ -74,6 +75,12 @@ $usuarioId = $_SESSION['idUtilizador'];
             color: white;
             /* cor do ícone ao clicar */
             border-radius: 5px;
+        }
+
+        #overlay {
+            transition: opacity 0.3s ease;
+            opacity: 0;
+            display: none;
         }
     </style>
 
@@ -250,7 +257,7 @@ $usuarioId = $_SESSION['idUtilizador'];
                 </div>
             </nav>
         </div>
-          <!-- Overlay -->
+        <!-- Overlay -->
         <div id="overlay" style="display:none; position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.5); z-index: 998;" onclick="toggleMenu()"></div>
 
         <nav class="menu-user">
@@ -265,7 +272,7 @@ $usuarioId = $_SESSION['idUtilizador'];
             </div>
         </nav>
         <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-      
+
     </div>
 
     <div class="content-body">
@@ -387,51 +394,68 @@ $usuarioId = $_SESSION['idUtilizador'];
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <?php $cont = 1;
-                                                    foreach ($notasTrimestre as $nota):
-                                                        $valor = floatval($nota->getValorNota());
+                                                    <?php
+                                                    if (!empty($notasTrimestre)) :
+                                                        $cont = 1;
+                                                        foreach ($notasTrimestre as $nota):
+                                                            $valor = floatval($nota->getValorNota());
 
-                                                        if ($valor >= 10) {
-                                                            $classeNota = 'badge bg-primary';
-                                                            $tooltip = 'Nota positiva';
-                                                            $icone = '<i class="bi bi-check-circle-fill me-1"></i>';
-                                                        } else {
-                                                            $classeNota = 'badge bg-danger';
-                                                            $tooltip = 'Nota negativa';
-                                                            $icone = '<i class="bi bi-x-circle-fill me-1"></i>';
-                                                        }
+                                                            if ($valor >= 10) {
+                                                                $classeNota = 'badge bg-primary';
+                                                                $tooltip = 'Nota positiva';
+                                                                $icone = '<i class="bi bi-check-circle-fill me-1"></i>';
+                                                            } else {
+                                                                $classeNota = 'badge bg-danger';
+                                                                $tooltip = 'Nota negativa';
+                                                                $icone = '<i class="bi bi-x-circle-fill me-1"></i>';
+                                                            }
                                                     ?>
-                                                        <tr>
-                                                            <td><strong><?= $cont++; ?></strong></td>
-                                                            <td><?= htmlspecialchars($nota->getNomeAluno()); ?></td>
-                                                            <td><?= htmlspecialchars($nota->getNomeCurso()); ?></td>
-                                                            <td><?= htmlspecialchars($nota->getNomeDisciplina()); ?></td>
-                                                            <td>
-                                                                <span class="<?= $classeNota ?>" data-bs-toggle="tooltip" title="<?= $tooltip ?>">
-                                                                    <?= $icone ?><?= htmlspecialchars($nota->getValorNota()); ?>
-                                                                </span>
-                                                            </td>
-                                                            <td><?= htmlspecialchars($nota->getDataValorNota()); ?></td>
-                                                            <td><?= htmlspecialchars($nota->getTipoAvaliacaoNota()); ?></td>
-                                                            <td><?= htmlspecialchars($nota->getTipoNota()); ?></td>
-                                                            <td><?= htmlspecialchars($nota->getTrimestreNota()); ?></td>
-                                                            <td>
-                                                                <div class="dropdown">
-                                                                    <button type="button" class="btn btn-primary light sharp" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                        <svg width="20px" height="20px" viewBox="0 0 24 24">
-                                                                            <circle fill="#000" cx="5" cy="12" r="2"></circle>
-                                                                            <circle fill="#000" cx="12" cy="12" r="2"></circle>
-                                                                            <circle fill="#000" cx="19" cy="12" r="2"></circle>
-                                                                        </svg>
-                                                                    </button>
-                                                                    <div class="dropdown-menu">
-                                                                        <a class="dropdown-item btn-apagar-nota" data-bs-toggle="modal" data-bs-target="#modalNotaApagar" href="#" data-id="<?= $nota->getIdNota() ?>">Apagar</a>
-                                                                        <a class="dropdown-item btn-editar-nota" data-bs-toggle="modal" data-bs-target="#modalNotaEditar" href="#" data-id="<?= $nota->getIdNota() ?>">Editar</a>
+                                                            <tr>
+                                                                <td><strong><?= $cont++; ?></strong></td>
+                                                                <td><?= htmlspecialchars($nota->getNomeAluno()); ?></td>
+                                                                <td><?= htmlspecialchars($nota->getNomeCurso()); ?></td>
+                                                                <td><?= htmlspecialchars($nota->getNomeDisciplina()); ?></td>
+                                                                <td>
+                                                                    <span class="<?= $classeNota ?>" data-bs-toggle="tooltip" title="<?= $tooltip ?>">
+                                                                        <?= $icone ?><?= htmlspecialchars($nota->getValorNota()); ?>
+                                                                    </span>
+                                                                </td>
+                                                                <td><?= htmlspecialchars($nota->getDataValorNota()); ?></td>
+                                                                <td><?= htmlspecialchars($nota->getTipoAvaliacaoNota()); ?></td>
+                                                                <td><?= htmlspecialchars($nota->getTipoNota()); ?></td>
+                                                                <td><?= htmlspecialchars($nota->getTrimestreNota()); ?></td>
+                                                                <td>
+                                                                    <div class="dropdown">
+                                                                        <button type="button" class="btn btn-primary light sharp" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                            <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1">
+                                                                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                                                    <rect x="0" y="0" width="24" height="24"></rect>
+                                                                                    <circle fill="#000000" cx="5" cy="12" r="2"></circle>
+                                                                                    <circle fill="#000000" cx="12" cy="12" r="2"></circle>
+                                                                                    <circle fill="#000000" cx="19" cy="12" r="2"></circle>
+                                                                                </g>
+                                                                            </svg>
+                                                                        </button>
+                                                                        <div class="dropdown-menu">
+                                                                            <a class="dropdown-item btn-apagar-nota" data-bs-toggle="modal" data-bs-target="#modalNotaApagar" data-id="<?= $nota->getIdNota() ?>">
+                                                                                <i class="fa fa-trash me-2 text-danger"></i> Apagar
+                                                                            </a>
+                                                                            <a class="dropdown-item btn-editar-nota" data-bs-toggle="modal" data-bs-target="#modalNotaEditar" data-id="<?= $nota->getIdNota() ?>">
+                                                                                <i class="fa fa-edit me-2 text-primary"></i> Editar
+                                                                            </a>
+                                                                        </div>
                                                                     </div>
-                                                                </div>
+                                                                </td>
+                                                            </tr>
+                                                        <?php
+                                                        endforeach;
+                                                    else: ?>
+                                                        <tr>
+                                                            <td colspan="10" class="text-center text-muted">
+                                                                <i class="bi bi-info-circle"></i> Nenhuma nota cadastrada.
                                                             </td>
                                                         </tr>
-                                                    <?php endforeach; ?>
+                                                    <?php endif; ?>
                                                 </tbody>
                                             </table>
                                         </div>
@@ -962,14 +986,7 @@ $usuarioId = $_SESSION['idUtilizador'];
             return new bootstrap.Tooltip(el)
         });
     </script>
-       <style>
-        .menu-user,
-        #overlay {
-            transition: opacity 0.3s ease;
-            opacity: 0;
-            display: none;
-        }
-    </style>
+
 
     <script>
         function toggleMenu() {

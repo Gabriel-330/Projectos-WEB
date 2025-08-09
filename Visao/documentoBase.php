@@ -2,24 +2,22 @@
 session_start();
 require_once("../Modelo/DAO/NotificacoesDAO.php");
 require_once("../Modelo/DTO/NotificacoesDTO.php");
+
 // Verifica se o utilizador está autenticado
-if (!isset($_SESSION['idUtilizador']) || !isset($_SESSION['acesso'])) {
-    header("Location: index.php"); // Redireciona para login se não estiver autenticado
-    exit();
-}
-
-$acesso = $_SESSION['acesso'];
-
-// Verifica se o 'acesso' corresponde ao padrão de aluno (ex: 009266492HA041)
-if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
-    // Se não for aluno, redireciona com mensagem
-    $_SESSION['success'] = "Acesso negado! Apenas alunos podem aceder.";
-    $_SESSION['icon'] = "error";
+if (
+    empty($_SESSION['idUtilizador']) ||
+    empty($_SESSION['acesso'])
+) {
+    session_destroy();
     header("Location: index.php");
     exit();
 }
 
-// Se chegou aqui, é um aluno autenticado e pode continuar
+// Verifica o tipo de usuário (exemplo: bloquear não administradores)
+if (isset($_SESSION['perfilUtilizador']) && $_SESSION['perfilUtilizador'] !== 'Administrador') {
+    header("Location: index.php");
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -55,6 +53,12 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
             color: white;
             /* cor do ícone ao clicar */
             border-radius: 5px;
+        }
+
+        #overlay {
+            transition: opacity 0.3s ease;
+            opacity: 0;
+            display: none;
         }
     </style>
 
@@ -245,8 +249,8 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                 </ul>
             </div>
         </nav>
-             <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-    
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
     </div>
 
 
@@ -368,7 +372,7 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                                                 <tr>
                                                     <td>
                                                         <div class="d-flex align-items-center">
-                                                            <i class="fa fa-file-pdf text-danger mr-3 fa-2x"></i>
+                                                            <i class="fa fa-file-pdf text-danger me-3 fa-2x"></i>
                                                             <div>
                                                                 <strong><?= htmlspecialchars($documento->getTipoDocumento()) ?></strong>
                                                             </div>
@@ -390,31 +394,49 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
 
                                                     <td>
                                                         <div class="dropdown">
-                                                            <button class="btn btn-primary light btn-rounded btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                Ações
+                                                            <button type="button" class="btn btn-primary light sharp" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1">
+                                                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                                        <rect x="0" y="0" width="24" height="24"></rect>
+                                                                        <circle fill="#000000" cx="5" cy="12" r="2"></circle>
+                                                                        <circle fill="#000000" cx="12" cy="12" r="2"></circle>
+                                                                        <circle fill="#000000" cx="19" cy="12" r="2"></circle>
+                                                                    </g>
+                                                                </svg>
                                                             </button>
-                                                            <ul class="dropdown-menu">
-                                                                <li>
-                                                                    <a class="dropdown-item" href="visualizarDocumento.php?id=<?= $documento->getIdDocumento() ?>">
-                                                                        <i class="fa fa-eye me-2"></i>Visualizar
+                                                            <div class="dropdown-menu">
+                                                                <?php
+                                                                $estado = $documento->getEstadoDocumento();
+
+                                                                if ($estado === "Em validação") {
+                                                                ?>
+                                                                    <a class="dropdown-item btn-apagar-documento" data-bs-toggle="modal" data-bs-target="#modalDocumentoApagar" data-id="<?= $documento->getIdDocumento() ?>">
+                                                                        <i class="fa fa-trash me-2 text-danger"></i> Apagar
                                                                     </a>
-                                                                </li>
-                                                                <li>
-                                                                    <a class="dropdown-item" href="downloadDocumento.php?id=<?= $documento->getIdDocumento() ?>">
-                                                                        <i class="fa fa-download me-2"></i>Baixar
+                                                               
+                                                                <?php
+                                                                } elseif ($estado === "Validado") {
+                                                                ?>
+                                                                    <a class="dropdown-item btn-aceitar-documento" data-bs-toggle="modal" data-bs-target="#modalDocumentoAceitar" data-id="<?= $documento->getIdDocumento() ?>">
+                                                                        <i class="fa fa-check me-2 text-success"></i> Aceitar
                                                                     </a>
-                                                                </li>
-                                                                <li>
-                                                                    <a class="dropdown-item" href="editarDocumento.php?id=<?= $documento->getIdDocumento() ?>">
-                                                                        <i class="fa fa-edit me-2"></i>Editar
+                                                               
+                                                                    <a class="dropdown-item btn-recusar-documento" data-bs-toggle="modal" data-bs-target="#modalDocumentoRecusar" data-id="<?= $documento->getIdDocumento() ?>">
+                                                                        <i class="fa fa-times me-2 text-warning"></i> Recusar
                                                                     </a>
-                                                                </li>
-                                                                <li>
-                                                                    <a class="dropdown-item text-danger" href="excluirDocumento.php?id=<?= $documento->getIdDocumento() ?>" onclick="return confirm('Tem certeza que deseja excluir este documento?')">
-                                                                        <i class="fa fa-trash me-2"></i>Excluir
+                                                                    <a class="dropdown-item btn-apagar-documento" data-bs-toggle="modal" data-bs-target="#modalDocumentoApagar" data-id="<?= $documento->getIdDocumento() ?>">
+                                                                        <i class="fa fa-trash me-2 text-danger"></i> Apagar
                                                                     </a>
-                                                                </li>
-                                                            </ul>
+                                                                <?php
+                                                                } elseif ($estado === "Aceite" || $estado === "Recusado") {
+                                                                ?>
+                                                                    <a class="dropdown-item btn-apagar-documento" data-bs-toggle="modal" data-bs-target="#modalDocumentoApagar" data-id="<?= $documento->getIdDocumento() ?>">
+                                                                        <i class="fa fa-trash me-2 text-danger"></i> Apagar
+                                                                    </a>
+                                                                <?php
+                                                                }
+                                                                ?>
+                                                            </div>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -425,8 +447,8 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                                             </tr>
                                         <?php endif; ?>
                                     </tbody>
-
                                 </table>
+
                             </div>
 
                             <nav class="mt-4">
@@ -443,41 +465,69 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
                 </div>
             </div>
         </div>
-        <div class="modal fade" id="modalDocumentoSolicitar">
-            <div class="modal-dialog modal-lg">
+  
+        <div class="modal fade" id="modalDocumentoApagar">
+            <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Solicitar Documento</h5>
+                        <h5 class="modal-title">Confirmar Exclusão</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-
-                        <form action="../Controle/crudDocumento.php" method="POST">
-                            <input type="hidden" name="estadoDocumento" value="Em validação">
-
-                            <div class="col-md-12">
-                                <label><strong>Tipo de Documento</strong></label>
-                                <select id="classeSelect" class="form-control input-rounded" name="tipoDocumento">
-                                    <option value="">Selecione o tipo de Documento</option>
-                                    <option value="Boletim">Boletim</option>
-                                    <option value="Certificado">Certificado</option>
-                                    <option value="Declaração">Declaração</option>
-                                </select>
-                            </div>
-
-                            <div class="text-center mt-4">
-                                <button type="submit" class="btn btn-primary btn-rounded w-50" name="solicitarDocumento">Solicitar</button>
-                                <a href="#" class="btn btn-light btn-rounded ml-2" data-bs-dismiss="modal">Cancelar</a>
-
-                            </div>
+                        <p>Tem certeza que deseja apagar esta solicitação de Documento? Esta ação não pode ser desfeita.</p>
+                        <form id="formDocumentoApagar" method="POST" action="../Controle/crudDocumento.php">
+                            <input type="hidden" name="idDocumento" id="idDocumentoApagar" required>
+                        </form>
                     </div>
-
-                    </form>
+                    <div class="modal-footer">
+                        <a href="#" class="btn btn-light btn-rounded ml-2" data-bs-dismiss="modal">Cancelar</a>
+                        <button type="submit" form="formDocumentoApagar" class="btn btn-danger" name="apagarDocumento">Confirmar Exclusão</button>
+                    </div>
                 </div>
-
             </div>
         </div>
-    </div>
+
+        <div class="modal fade" id="modalDocumentoRecusar">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Recusar solicitação de documento</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Tem certeza que deseja recusar esta solicitação de Documento? Esta ação não pode ser desfeita.</p>
+                        <form id="formDocumentoRecusar" method="POST" action="../Controle/recusarDocumento.php">
+                            <input type="hidden" name="idDocumento" id="idDocumentoRecusar" required>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="#" class="btn btn-light btn-rounded ml-2" data-bs-dismiss="modal">Cancelar</a>
+                        <button type="submit" form="formDocumentoRecusar" class="btn btn-danger" name="recusarDocumento">Confirmar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalDocumentoAceitar">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Aceitar solicitação de documento</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Tem certeza que deseja aceitar esta solicitação de Documento? Esta ação não pode ser desfeita.</p>
+                        <form id="formDocumentoAceitar" method="POST" action="../Controle/aceitarDocumento.php">
+                            <input type="hidden" name="idDocumento" id="idDocumentoAceitar" required>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="#" class="btn btn-light btn-rounded ml-2" data-bs-dismiss="modal">Cancelar</a>
+                        <button type="submit" form="formDocumentoAceitar" class="btn btn-primary" name="aceitarDocumento">Confirmar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </div>
     <div class="footer">
@@ -485,6 +535,107 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
             <p>Copyright © Sistema de Gestão Web de Gestão de Alunos by <a href="#" target="_blank">SGWA</a> 2025</p>
         </div>
     </div>
+
+    <script src="assets/js/jquery-3.6.0.min.js"></script>
+    <!--<script>
+        $(document).on('click', '.btn-editar-documento', function() {
+            const id = $(this).data('id');
+
+            $.get('../Controle/retornarDocumento.php', {
+                id: id
+            }, function(data) {
+                try {
+                    const doc = data;
+
+                    $('#idDocumentoEditar').val(doc.idDocumento);
+                    $('#tipoDocumentoEditar').val(doc.tipoDocumento);
+                    $('#estadoDocumentoEditar').val(doc.estadoDocumento);
+                    $('#dataEmissaoDocumentoEditar').val(doc.dataEmissaoDocumento);
+                    $('#caminhoArquivoDocumentoEditar').val(doc.caminhoArquivoDocumento);
+                    $('#idAlunoEditar').val(doc.idAluno);
+                    $('#idCursoEditar').val(doc.idCurso);
+                    $('#idNotaEditar').val(doc.idNota);
+                    $('#idDisciplinaEditar').val(doc.idDisciplina);
+                    $('#idTurmaEditar').val(doc.idTurma);
+                    $('#idProfessorEditar').val(doc.idProfessor);
+                    $('#cursoDocumentoEditar').val(doc.cursoDocumento);
+                    $('#turmaDocumentoEditar').val(doc.turmaDocumento);
+                    $('#classeDocumentoEditar').val(doc.classeDocumento);
+                    $('#periodoDocumentoEditar').val(doc.periodoDocumento);
+                    $('#disciplinaDocumentoEditar').val(doc.disciplinaDocumento);
+
+                } catch (e) {
+                    console.error('Erro ao processar JSON:', data);
+                }
+            }).fail(function(xhr) {
+                console.error('Erro na requisição AJAX:', xhr.responseText);
+            });
+        });
+    </script>-->
+
+    <script>
+        $(document).on('click', '.btn-recusar-documento', function() {
+            const id = $(this).data('id');
+
+            $.get('../Controle/retornarDocumento.php', {
+                id: id
+            }, function(data) {
+                try {
+                    const doc = data;
+
+                    $('#idDocumentoRecusar').val(doc.idDocumento);
+
+                } catch (e) {
+                    console.error('Erro ao processar JSON:', data);
+                }
+            }).fail(function(xhr) {
+                console.error('Erro na requisição AJAX:', xhr.responseText);
+            });
+        });
+    </script>
+
+    <script>
+        $(document).on('click', '.btn-aceitar-documento', function() {
+            const id = $(this).data('id');
+
+            $.get('../Controle/retornarDocumento.php', {
+                id: id
+            }, function(data) {
+                try {
+                    const doc = data;
+
+                    $('#idDocumentoAceitar').val(doc.idDocumento);
+
+                } catch (e) {
+                    console.error('Erro ao processar JSON:', data);
+                }
+            }).fail(function(xhr) {
+                console.error('Erro na requisição AJAX:', xhr.responseText);
+            });
+        });
+    </script>
+
+    <script>
+        $(document).on('click', '.btn-apagar-documento', function() {
+            const id = $(this).data('id');
+
+            $.get('../Controle/retornarDocumento.php', {
+                id: id
+            }, function(data) {
+                try {
+                    const doc = data;
+
+                    $('#idDocumentoApagar').val(doc.idDocumento);
+
+                } catch (e) {
+                    console.error('Erro ao processar JSON:', data);
+                }
+            }).fail(function(xhr) {
+                console.error('Erro na requisição AJAX:', xhr.responseText);
+            });
+        });
+    </script>
+
     <script src="assets/vendor/global/global.min.js" type="text/javascript"></script>
     <script src="assets/vendor/bootstrap-select/dist/js/bootstrap-select.min.js" type="text/javascript"></script>
     <script src="assets/vendor/chart-js/chart.bundle.min.js" type="text/javascript"></script>
@@ -506,14 +657,7 @@ if (!preg_match('/^[0-9]{9}[A-Z]{2}[0-9]{3}$/', $acesso)) {
             });
         }
     </script>
-     <style>
-        .menu-user,
-        #overlay {
-            transition: opacity 0.3s ease;
-            opacity: 0;
-            display: none;
-        }
-    </style>
+
 
     <script>
         function toggleMenu() {
